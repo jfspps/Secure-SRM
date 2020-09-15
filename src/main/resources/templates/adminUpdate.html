@@ -16,11 +16,11 @@
             <p><b>Your username:</b> <span sec:authentication="name"></span></p>
             <p><b>Your permissions:</b> <span sec:authentication="authorities"></span></p>
 
-            <!--/*@thymesVar id="currentUser" type="com.secure_srm.data.model.security.User"*/-->
+            <!--/*@thymesVar id="currentUser" type="com.secure_srm.model.security.User"*/-->
             <form th:object="${currentUser}" th:action="@{/updateAdmin/{userID}(userID=${currentUser.id})}" method="post"
                   sec:authorize="hasAuthority('admin.update')">
 
-                <!--/*@thymesVar id="currentAdminUser" type="com.secure_srm.data.model.security.AdminUser"*/-->
+                <!--/*@thymesVar id="currentAdminUser" type="com.secure_srm.model.security.AdminUser"*/-->
                 <div th:object="${currentAdminUser}">
                     <label>Admin's full name: </label>
                     <input size="50" type="text" th:field="*{adminUserName}"/>
