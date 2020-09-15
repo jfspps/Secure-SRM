@@ -47,7 +47,20 @@ public class TeacherUserControllerTest extends UserControllerTest {
         mockMvc.perform(post("/createTeacher").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "Pater Sellers")
                 .param("username", "petersellers")
-                .param("password", "petersellers123"))
+                .param("password", "petersellers123")
+                .param("department", "Comedy"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/adminPage"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postCreateTeacher_NoDept(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/createTeacher").with(httpBasic(username, pwd)).with(csrf())
+                .param("teacherUserName", "Pater Sellers")
+                .param("username", "petersellers")
+                .param("password", "petersellers123")
+                .param("department", ""))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/adminPage"));
     }
@@ -89,7 +102,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     void postUpdateTeacher(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "blablablabla")
-                .param("username", "someoneNotOnFile"))
+                .param("username", "someoneNotOnFile")
+                .param("department", "Science"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("teacherUpdate"))
                 .andExpect(model().attributeExists("TeacherUserSaved"))
@@ -102,7 +116,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     void postUpdateTeacher_UsernameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "blablablabla")
-                .param("username", ""))
+                .param("username", "")
+                .param("department", "Mathematics"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("teacherUpdate"))
                 .andExpect(model().attributeExists("user"))
@@ -116,7 +131,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     void postUpdateTeacher_TeacherUserNameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "")
-                .param("username", "asduafajlkasjdjlk"))
+                .param("username", "asduafajlkasjdjlk")
+                .param("department", "Mathematics"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("teacherUpdate"))
                 .andExpect(model().attributeExists("user"))
@@ -130,7 +146,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     void postUpdateTeacher_UserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/4").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "fdsfdsfds")
-                .param("username", "alexsmith"))
+                .param("username", "alexsmith")
+                .param("department", "English"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("teacherUpdate"))
                 .andExpect(model().attributeExists("user"))
@@ -144,7 +161,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     void postUpdateTeacher_TeacherUserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/4").with(httpBasic(username, pwd)).with(csrf())
                 .param("teacherUserName", "Keith Jones")
-                .param("username", "marymanning"))
+                .param("username", "marymanning")
+                .param("department", "English"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("teacherUpdate"))
                 .andExpect(model().attributeExists("user"))

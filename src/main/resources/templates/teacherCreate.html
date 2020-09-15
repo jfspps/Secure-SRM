@@ -29,6 +29,15 @@
                         </ul>
                     </span>
                 </div>
+                <div th:object="${newTeacher}">
+                    <label>Teacher's department: </label>
+                    <input size="50" type="text" th:field="*{department}"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('department')}">
+                        <ul>
+                            <li class="alert-warning" th:each="err : ${#fields.errors('department')}" th:text="${err}">department error</li>
+                        </ul>
+                    </span>
+                </div>
                 <div>
                     <label>Weblogin username: </label>
                     <input size="50" type="text" th:field="*{username}"/>

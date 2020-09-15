@@ -440,7 +440,7 @@ public class UserController {
             allGood = false;
         }
 
-        //either the adminUser name field is empty or is already on file
+        //either the teacherUser name field is empty or is already on file
         if (teacherBindingResult.hasErrors()) {
             model.addAttribute("teacherUserNameError", INVALID_TEACHER_NAME);
             allGood = false;
@@ -450,6 +450,11 @@ public class UserController {
         } else {
             model.addAttribute("teacherUserExists", "TeacherUser with given name already exists");
             allGood = false;
+        }
+
+        //set department name to a default in all cases, if none entered
+        if(currentTeacherUser.getDepartment() == null || currentTeacherUser.getDepartment().isEmpty()){
+            currentTeacherUser.setDepartment("(no department name submitted)");
         }
 
         //models needed to set ID of POST path

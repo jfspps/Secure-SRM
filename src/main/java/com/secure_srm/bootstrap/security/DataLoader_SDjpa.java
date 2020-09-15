@@ -161,8 +161,10 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         Role teacherRole = roleService.findByRoleName("TEACHER");
 
         // Instantiating the admin users (this must be done after Users)
-        TeacherUser keithJones = teacherUserService.save(TeacherUser.builder().teacherUserName("Keith Jones").build());
-        TeacherUser maryManning = teacherUserService.save(TeacherUser.builder().teacherUserName("Mary Manning").build());
+        TeacherUser keithJones = teacherUserService.save(TeacherUser.builder().teacherUserName("Keith Jones")
+                .department("Mathematics").build());
+        TeacherUser maryManning = teacherUserService.save(TeacherUser.builder().teacherUserName("Mary Manning")
+                .department("English").build());
 
         //passwords are not displayed on the schema...?
         User keithJonesUser = userService.save(User.builder().username("keithjones")

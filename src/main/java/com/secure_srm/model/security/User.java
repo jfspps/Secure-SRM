@@ -2,6 +2,7 @@ package com.secure_srm.model.security;
 
 import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.TestRecord;
+import com.secure_srm.model.people.ContactDetail;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.Set;
@@ -114,4 +116,15 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     //testRecord mappings, one user to many testRecords
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<TestRecord> testRecords;
+
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    //transferred to Student, Teacher and Guardian??? wait and see
+    @OneToOne
+    private ContactDetail contactDetail;
 }
