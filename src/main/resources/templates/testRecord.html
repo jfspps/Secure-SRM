@@ -20,7 +20,7 @@
             <h3>TestRecords on file</h3>
             <p sec:authorize="hasAuthority('teacher.update')">Click the ID to update or delete a record:</p>
 
-            <!--/*@thymesVar id="testRecord" type="com.springsecurity.weblogin.model.TestRecord"*/-->
+            <!--/*@thymesVar id="testRecord" type="com.secure_srm.data.model.TestRecord"*/-->
             <div th:each="testRecord: ${testRecords}">
                 <a sec:authorize="hasAuthority('teacher.update')" th:href="@{/testRecord/{id}(id=${testRecord.id})}" th:text="${testRecord.id}">1</a>
                 <label th:text="${testRecord.recordName}">Record Name</label>

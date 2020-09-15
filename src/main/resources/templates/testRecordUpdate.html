@@ -15,7 +15,7 @@
             <h1>Update/delete a testRecord</h1>
             <p><b>Your username:</b> <span sec:authentication="name"></span></p>
 
-            <!--/*@thymesVar id="testRecord" type="com.springsecurity.weblogin.model.TestRecord"*/-->
+            <!--/*@thymesVar id="testRecord" type="com.secure_srm.data.model.TestRecord"*/-->
             <form th:object="${testRecord}"
                   th:action="@{/{guardianID}/updateTestRecord/{testRecordID}(
                   guardianID=${guardian.getId()}, testRecordID=${testRecord.id})}"
@@ -26,7 +26,7 @@
                     <p th:text="${'TestRecord ID: ' + testRecord.id}"></p>
                 </div>
 
-                <!--/*@thymesVar id="guardian" type="com.springsecurity.weblogin.model.security.User"*/-->
+                <!--/*@thymesVar id="guardian" type="com.secure_srm.data.model.security.User"*/-->
                 <div th:object="${guardian}">
                     <p th:text="${'Guardian ID: ' + guardian.getId()}"></p>
                 </div>
@@ -52,7 +52,7 @@
                 </div>
             </form>
             <hr>
-            <!--/*@thymesVar id="testRecord" type="com.springsecurity.weblogin.model.TestRecord"*/-->
+            <!--/*@thymesVar id="testRecord" type="com.secure_srm.data.model.TestRecord"*/-->
             <form th:object="${testRecord}"
                   th:action="@{/deleteTestRecord/{testRecordID}(testRecordID=${testRecord.id})}" method="post"
                   sec:authorize="hasAuthority('teacher.delete')">
