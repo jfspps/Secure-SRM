@@ -31,6 +31,10 @@
                         <p class="alert-warning" th:text="${teacherUserExists}">Error</p>
                     </span>
                 </div>
+                <div th:object="${currentTeacherUser}">
+                    <label>Teacher's department: </label>
+                    <input size="50" type="text" th:field="*{department}"/>
+                </div>
                 <div>
                     <label>Weblogin username: </label>
                     <input size="50" type="text" th:field="*{username}"/>
