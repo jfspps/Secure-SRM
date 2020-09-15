@@ -18,7 +18,7 @@
                 <b>Your username:</b> <span sec:authentication="name"></span>
             </p>
 
-            <!--/*@thymesVar id="newTestRecord" type="com.secure_srm.data.model.TestRecord"*/-->
+            <!--/*@thymesVar id="newTestRecord" type="com.secure_srm.model.TestRecord"*/-->
             <form th:object="${newTestRecord}" th:action="@{/createTestRecord}" method="post"
                   sec:authorize="hasAuthority('teacher.update')">
 
@@ -36,7 +36,7 @@
                 <div>
                     <label>Guardian username</label>
                 </div>
-                <!--/*@thymesVar id="guardianUser" type="com.secure_srm.data.model.security.User"*/-->
+                <!--/*@thymesVar id="guardianUser" type="com.secure_srm.model.security.User"*/-->
                 <div th:object="${guardianUser}">
                     <input type="text" size="50" placeholder="Guardian username" th:field="*{username}"/>
                     <span class="help-block" th:if="${#fields.hasErrors('username')}">

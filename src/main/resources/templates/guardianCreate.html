@@ -15,11 +15,11 @@
             <h1>Add new guardian</h1>
             <p><b>Your username:</b> <span sec:authentication="name"></span></p>
 
-            <!--/*@thymesVar id="newUser" type="com.secure_srm.data.model.security.User"*/-->
+            <!--/*@thymesVar id="newUser" type="com.secure_srm.model.security.User"*/-->
             <form th:object="${newUser}" th:action="@{/createGuardian}" method="post"
                   sec:authorize="hasAuthority('admin.create')">
 
-                <!--/*@thymesVar id="newGuardian" type="com.secure_srm.data.model.security.GuardianUser"*/-->
+                <!--/*@thymesVar id="newGuardian" type="com.secure_srm.model.security.GuardianUser"*/-->
                 <div th:object="${newGuardian}">
                     <label>Guardian's full name: </label>
                     <input size="50" type="text" th:field="*{guardianUserName}"/>

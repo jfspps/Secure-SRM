@@ -24,7 +24,7 @@
                     <th>Admin ID</th>
                     <th>Admin username</th>
                 </tr>
-                <!--/*@thymesVar id="adminUser" type="com.secure_srm.data.model.security.User"*/-->
+                <!--/*@thymesVar id="adminUser" type="com.secure_srm.model.security.User"*/-->
                 <tr th:each="adminUser: ${AdminUsersFound}">
                     <td><a sec:authorize="hasAuthority('teacher.update')"
                            th:href="@{/updateAdmin/{userId}(userId=${adminUser.id})}" th:text="${adminUser.id}"></a></td>
@@ -47,7 +47,7 @@
                     <th>Teacher ID</th>
                     <th>Teacher username</th>
                 </tr>
-                <!--/*@thymesVar id="teacherUser" type="com.secure_srm.data.model.security.User"*/-->
+                <!--/*@thymesVar id="teacherUser" type="com.secure_srm.model.security.User"*/-->
                 <tr th:each="teacherUser: ${TeacherUsersFound}">
                     <td><a sec:authorize="hasAuthority('teacher.update')"
                            th:href="@{/updateTeacher/{userId}(userId=${teacherUser.id})}" th:text="${teacherUser.id}"></a></td>
@@ -70,7 +70,7 @@
                     <th>Guardian ID</th>
                     <th>Guardian username</th>
                 </tr>
-                <!--/*@thymesVar id="guardianUser" type="com.secure_srm.data.model.security.User"*/-->
+                <!--/*@thymesVar id="guardianUser" type="com.secure_srm.model.security.User"*/-->
                 <tr th:each="guardianUser: ${GuardianUsersFound}">
                     <td><a sec:authorize="hasAuthority('teacher.update')"
                            th:href="@{/updateGuardian/{userId}(userId=${guardianUser.id})}" th:text="${guardianUser.id}"></a></td>
