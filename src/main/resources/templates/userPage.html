@@ -24,7 +24,7 @@
             </form>
 
             <table class="table table-sm">
-                <!--/*@thymesVar id="found" type="com.springsecurity.weblogin.model.security.User"*/-->
+                <!--/*@thymesVar id="found" type="com.secure_srm.data.model.security.User"*/-->
                 <tr th:each="found: ${usersFound}">
                     <td th:text="${found.username}"></td>
                 </tr>

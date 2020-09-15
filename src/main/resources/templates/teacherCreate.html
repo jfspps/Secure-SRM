@@ -15,11 +15,11 @@
             <h1>Add new teacher</h1>
             <p><b>Your username:</b> <span sec:authentication="name"></span></p>
 
-            <!--/*@thymesVar id="newUser" type="com.springsecurity.weblogin.model.security.User"*/-->
+            <!--/*@thymesVar id="newUser" type="com.secure_srm.data.model.security.User"*/-->
             <form th:object="${newUser}" th:action="@{/createTeacher}" method="post"
                   sec:authorize="hasAuthority('admin.create')">
 
-                <!--/*@thymesVar id="newTeacher" type="com.springsecurity.weblogin.model.security.TeacherUser"*/-->
+                <!--/*@thymesVar id="newTeacher" type="com.secure_srm.data.model.security.TeacherUser"*/-->
                 <div th:object="${newTeacher}">
                     <label>Teacher's full name: </label>
                     <input size="50" type="text" th:field="*{teacherUserName}"/>
