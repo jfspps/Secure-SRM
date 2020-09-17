@@ -39,13 +39,23 @@ public class GuardianUserSDjpaService implements GuardianUserService {
     }
 
     @Override
-    public GuardianUser findByGuardianUserName(String username) {
-        return guardianUserRepository.findByGuardianUserName(username).orElse(null);
+    public GuardianUser findByFirstNameAndLastName(String firstName, String lastName) {
+        return guardianUserRepository.findByFirstNameAndLastName(firstName, lastName).orElse(null);
     }
 
     @Override
-    public Set<GuardianUser> findAllByGuardianUserName(String userName) {
-        return guardianUserRepository.findAllByGuardianUserName(userName);
+    public Set<GuardianUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
+        return guardianUserRepository.findByFirstNameLikeAndLastNameLike(firstName, lastName);
+    }
+
+    @Override
+    public Set<GuardianUser> findAllByLastNameLike(String lastName) {
+        return guardianUserRepository.findAllByLastNameLike(lastName);
+    }
+
+    @Override
+    public Set<GuardianUser> findAllByFirstNameAndLastName(String firstName, String lastName) {
+        return guardianUserRepository.findAllByFirstNameAndLastName(firstName, lastName);
     }
 
     @Override

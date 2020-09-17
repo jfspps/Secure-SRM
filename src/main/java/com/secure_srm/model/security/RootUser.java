@@ -3,10 +3,8 @@ package com.secure_srm.model.security;
 import com.secure_srm.model.BaseEntity;
 import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Builder
@@ -16,7 +14,13 @@ import java.util.Set;
 @Setter
 @Entity
 public class RootUser extends BaseEntity {
-    private String rootUserName;
+
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
+    @Size(min = 1, max = 255)
+    private String firstName;
+
+    @Size(min = 1, max = 255)
+    private String lastName;
 
     @OneToMany(mappedBy = "rootUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;

@@ -117,13 +117,6 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<TestRecord> testRecords;
 
-    //Hibernate uses snake case by default so the name argument is somewhat redundant here
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
     //transferred to Student, Teacher and Guardian??? wait and see
     @OneToOne
     private ContactDetail contactDetail;

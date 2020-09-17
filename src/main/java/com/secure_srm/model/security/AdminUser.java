@@ -6,10 +6,7 @@ package com.secure_srm.model.security;
 import com.secure_srm.model.BaseEntity;
 import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -21,8 +18,12 @@ import java.util.Set;
 @Entity
 public class AdminUser extends BaseEntity {
 
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
     @Size(min = 1, max = 255)
-    private String adminUserName;
+    private String firstName;
+
+    @Size(min = 1, max = 255)
+    private String lastName;
 
     @OneToMany(mappedBy = "adminUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;

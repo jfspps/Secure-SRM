@@ -39,13 +39,23 @@ public class TeacherUserSDjpaService implements TeacherUserService {
     }
 
     @Override
-    public TeacherUser findByTeacherUserName(String username) {
-        return teacherUserRepository.findByTeacherUserName(username).orElse(null);
+    public TeacherUser findByFirstNameAndLastName(String firstName, String lastName) {
+        return teacherUserRepository.findByFirstNameAndLastName(firstName, lastName).orElse(null);
     }
 
     @Override
-    public Set<TeacherUser> findAllByTeacherUserName(String userName) {
-        return teacherUserRepository.findAllByTeacherUserName(userName);
+    public Set<TeacherUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
+        return teacherUserRepository.findByFirstNameLikeAndLastNameLike(firstName, lastName);
+    }
+
+    @Override
+    public Set<TeacherUser> findAllByLastNameLike(String lastName) {
+        return teacherUserRepository.findAllByLastNameLike(lastName);
+    }
+
+    @Override
+    public Set<TeacherUser> findAllByFirstNameAndLastName(String firstName, String lastName) {
+        return teacherUserRepository.findAllByFirstNameAndLastName(firstName, lastName);
     }
 
     @Override

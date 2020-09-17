@@ -32,8 +32,23 @@ public class RootUserSDjpaService implements RootUserService {
     }
 
     @Override
-    public RootUser findByRootUserName(String username) {
-        return rootUserRepository.findByRootUserName(username).orElse(null);
+    public RootUser findByFirstNameAndLastName(String firstName, String lastName) {
+        return rootUserRepository.findByFirstNameAndLastName(firstName, lastName).orElse(null);
+    }
+
+    @Override
+    public Set<RootUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
+        return rootUserRepository.findByFirstNameLikeAndLastNameLike(firstName, lastName);
+    }
+
+    @Override
+    public Set<RootUser> findAllByLastNameLike(String lastName) {
+        return rootUserRepository.findAllByLastNameLike(lastName);
+    }
+
+    @Override
+    public Set<RootUser> findAllByFirstNameAndLastName(String firstName, String lastName) {
+        return rootUserRepository.findAllByFirstNameAndLastName(firstName, lastName);
     }
 
     @Override

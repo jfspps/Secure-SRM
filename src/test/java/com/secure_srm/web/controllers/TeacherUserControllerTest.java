@@ -45,7 +45,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postCreateTeacher(String username, String pwd) throws Exception {
         mockMvc.perform(post("/createTeacher").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "Pater Sellers")
+                .param("firstName", "Peter")
+                .param("lastName", "Sellers")
                 .param("username", "petersellers")
                 .param("password", "petersellers123")
                 .param("department", "Comedy"))
@@ -57,7 +58,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postCreateTeacher_NoDept(String username, String pwd) throws Exception {
         mockMvc.perform(post("/createTeacher").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "Pater Sellers")
+                .param("firstName", "Peter")
+                .param("lastName", "Sellers")
                 .param("username", "petersellers")
                 .param("password", "petersellers123")
                 .param("department", ""))
@@ -101,7 +103,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateTeacher(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "blablablabla")
+                .param("firstName", "Peter")
+                .param("lastName", "Sellers")
                 .param("username", "someoneNotOnFile")
                 .param("department", "Science"))
                 .andExpect(status().is2xxSuccessful())
@@ -115,7 +118,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateTeacher_UsernameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "blablablabla")
+                .param("firstName", "Peter")
+                .param("lastName", "Sellers")
                 .param("username", "")
                 .param("department", "Mathematics"))
                 .andExpect(status().is2xxSuccessful())
@@ -130,7 +134,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateTeacher_TeacherUserNameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/3").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "")
+                .param("firstName", "")
+                .param("lastName", "")
                 .param("username", "asduafajlkasjdjlk")
                 .param("department", "Mathematics"))
                 .andExpect(status().is2xxSuccessful())
@@ -145,7 +150,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateTeacher_UserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/4").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "fdsfdsfds")
+                .param("firstName", "Peter")
+                .param("lastName", "Sellers")
                 .param("username", "alexsmith")
                 .param("department", "English"))
                 .andExpect(status().is2xxSuccessful())
@@ -160,7 +166,8 @@ public class TeacherUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateTeacher_TeacherUserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateTeacher/4").with(httpBasic(username, pwd)).with(csrf())
-                .param("teacherUserName", "Keith Jones")
+                .param("firstName", "Keith")
+                .param("lastName", "Jones")
                 .param("username", "marymanning")
                 .param("department", "English"))
                 .andExpect(status().is2xxSuccessful())

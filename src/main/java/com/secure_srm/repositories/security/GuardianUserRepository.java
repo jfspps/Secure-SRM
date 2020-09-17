@@ -7,7 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface GuardianUserRepository extends JpaRepository<GuardianUser, Long>  {
-    Optional<GuardianUser> findByGuardianUserName(String username);
 
-    Set<GuardianUser> findAllByGuardianUserName(String userName);
+    Optional<GuardianUser> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Set<GuardianUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    Set<GuardianUser> findAllByLastNameLike(String lastName);
+
+    Set<GuardianUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

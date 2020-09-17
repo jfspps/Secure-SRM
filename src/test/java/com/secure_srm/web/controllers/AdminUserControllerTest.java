@@ -47,7 +47,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postCreateAdmin(String username, String pwd) throws Exception {
         mockMvc.perform(post("/createAdmin").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "Grace Peters")
+                .param("firstName", "Grace")
+                .param("lastName", "Peters")
                 .param("username", "gracepeters")
                 .param("password", "gracepeters123"))
                 .andExpect(status().is3xxRedirection())
@@ -58,7 +59,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postCreateAdmin_BlankFields(String username, String pwd) throws Exception {
         mockMvc.perform(post("/createAdmin").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "")
+                .param("firstName", "")
+                .param("lastName", "")
                 .param("username", "")
                 .param("password", ""))
                 .andExpect(status().is2xxSuccessful())
@@ -102,7 +104,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateAdmin(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateAdmin/1").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "blablablabla")
+                .param("firstName", "blablablabla")
+                .param("lastName", "dododododo")
                 .param("username", "someoneNotOnFile"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
@@ -115,7 +118,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateAdmin_UsernameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateAdmin/1").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "blablablabla")
+                .param("firstName", "blablablabla")
+                .param("lastName", "dododododo")
                 .param("username", ""))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
@@ -129,7 +133,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateAdmin_AdminUserNameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateAdmin/1").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "")
+                .param("firstName", "")
+                .param("lastName", "")
                 .param("username", "asduafajlkasjdjlk"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
@@ -143,7 +148,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateAdmin_UserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateAdmin/1").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "fdsfdsfds")
+                .param("firstName", "dasjdlksaj")
+                .param("lastName", "dododfoienkjsf")
                 .param("username", "paulsmith"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
@@ -157,7 +163,8 @@ public class AdminUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateAdmin_AdminUserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateAdmin/1").with(httpBasic(username, pwd)).with(csrf())
-                .param("adminUserName", "Amy Smith")
+                .param("firstName", "Amy")
+                .param("lastName", "Smith")
                 .param("username", "johnsmith"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))

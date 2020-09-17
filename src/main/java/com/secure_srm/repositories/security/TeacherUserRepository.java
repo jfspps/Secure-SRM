@@ -7,7 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface TeacherUserRepository extends JpaRepository<TeacherUser, Long> {
-    Optional<TeacherUser> findByTeacherUserName(String username);
 
-    Set<TeacherUser> findAllByTeacherUserName(String userName);
+    Optional<TeacherUser> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Set<TeacherUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    Set<TeacherUser> findAllByLastNameLike(String lastName);
+
+    Set<TeacherUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

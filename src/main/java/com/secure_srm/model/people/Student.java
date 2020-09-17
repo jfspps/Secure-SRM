@@ -18,6 +18,11 @@ import java.util.Set;
 @Entity
 public class Student extends BaseEntity {
 
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
+    private String firstName;
+
+    private String lastName;
+
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
     @JsonIgnore

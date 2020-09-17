@@ -22,8 +22,12 @@ import java.util.Set;
 @Entity
 public class TeacherUser extends BaseEntity {
 
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
     @Size(min = 1, max = 255)
-    private String teacherUserName;
+    private String firstName;
+
+    @Size(min = 1, max = 255)
+    private String lastName;
 
     @OneToMany(mappedBy = "teacherUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;
