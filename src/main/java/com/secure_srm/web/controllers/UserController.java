@@ -38,7 +38,6 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     private final String INVALID_USERNAME = "User's username length must be >= 8 characters";
-    private final String INVALID_PASSWORD = "Password length must be >= 8 characters";
     private final String INVALID_ADMIN_NAME = "AdminUser's name length must be >= 8 characters";
     private final String INVALID_TEACHER_NAME = "TeacherUser's name length must be >= 8 characters";
     private final String INVALID_GUARDIAN_NAME = "GuardianUser's name length must be >= 8 characters";
