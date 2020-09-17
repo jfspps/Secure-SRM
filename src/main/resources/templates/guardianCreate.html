@@ -21,13 +21,24 @@
 
                 <!--/*@thymesVar id="newGuardian" type="com.secure_srm.model.security.GuardianUser"*/-->
                 <div th:object="${newGuardian}">
-                    <label>Guardian's full name: </label>
-                    <input size="50" type="text" th:field="*{guardianUserName}"/>
-                    <span class="help-block" th:if="${#fields.hasErrors('guardianUserName')}">
+                    <div>
+                        <label>Guardian's first name: </label>
+                        <input size="50" type="text" th:field="*{firstName}"/>
+                        <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
                         <ul>
-                            <li class="alert-warning" th:each="err : ${#fields.errors('guardianUserName')}" th:text="${err}">Error</li>
+                            <li class="alert-warning" th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                         </ul>
                     </span>
+                    </div>
+                    <div>
+                        <label>Guardian's first name: </label>
+                        <input size="50" type="text" th:field="*{lastName}"/>
+                        <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                        <ul>
+                            <li class="alert-warning" th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                        </ul>
+                    </span>
+                    </div>
                 </div>
                 <div>
                     <label>Weblogin username: </label>

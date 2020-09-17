@@ -17,23 +17,32 @@
             <p><b>Your permissions:</b> <span sec:authentication="authorities"></span></p>
 
             <!--/*@thymesVar id="currentUser" type="com.secure_srm.model.security.User"*/-->
-            <form th:object="${currentUser}" th:action="@{/updateTeacher/{userID}(userID=${currentUser.id})}" method="post"
+            <form th:object="${currentUser}" th:action="@{/updateTeacher/{userID}(userID=${currentUser.id})}"
+                  method="post"
                   sec:authorize="hasAuthority('admin.update')">
 
                 <!--/*@thymesVar id="currentTeacherUser" type="com.secure_srm.model.security.TeacherUser"*/-->
                 <div th:object="${currentTeacherUser}">
-                    <label>Teacher's full name: </label>
-                        <input size="50" type="text" th:field="*{teacherUserName}"/>
-                    <span class="help-block">
+                    <div>
+                        <div>
+                            <label>Teacher's first name: </label>
+                            <input size="50" type="text" th:field="*{firstName}"/>
+                        </div>
+                        <div>
+                            <label>Teacher's last name: </label>
+                            <input size="50" type="text" th:field="*{lastName}"/>
+                        </div>
+                        <span class="help-block">
                         <!--/*@thymesVar id="teacherUserNameError" type="java.lang.String"*/-->
                         <p class="alert-warning" th:text="${teacherUserNameError}">Error</p>
-                        <!--/*@thymesVar id="teacherUserExists" type="java.lang.String"*/-->
+                            <!--/*@thymesVar id="teacherUserExists" type="java.lang.String"*/-->
                         <p class="alert-warning" th:text="${teacherUserExists}">Error</p>
                     </span>
-                </div>
-                <div th:object="${currentTeacherUser}">
-                    <label>Teacher's department: </label>
-                    <input size="50" type="text" th:field="*{department}"/>
+                    </div>
+                    <div>
+                        <label>Teacher's department: </label>
+                        <input size="50" type="text" th:field="*{department}"/>
+                    </div>
                 </div>
                 <div>
                     <label>Weblogin username: </label>
@@ -65,7 +74,8 @@
                 </div>
                 <div>
                     <label>Account credentials have not expired: </label>
-                    <input type="checkbox" th:field="*{credentialsNonExpired}" th:value="${currentUser.credentialsNonExpired}"/>
+                    <input type="checkbox" th:field="*{credentialsNonExpired}"
+                           th:value="${currentUser.credentialsNonExpired}"/>
                 </div>
                 <br/>
                 <div>
@@ -88,14 +98,16 @@
             </form>
             <hr>
 
-            <form th:object="${currentUser}" th:action="@{/changePassword/{userID}(userID=${currentUser.id})}" method="post"
+            <form th:object="${currentUser}" th:action="@{/changePassword/{userID}(userID=${currentUser.id})}"
+                  method="post"
                   sec:authorize="hasAuthority('admin.update')">
                 <div>
                     <label>Enter a new password: </label>
-                        <input size="50" name="newPassword" type="password" th:field="*{password}"/>
-                        <span class="help-block" th:if="${#fields.hasErrors('password')}">
+                    <input size="50" name="newPassword" type="password" th:field="*{password}"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('password')}">
                             <ul>
-                                <li class="alert-warning" th:each="err : ${#fields.errors('password')}" th:text="${err}">Error</li>
+                                <li class="alert-warning" th:each="err : ${#fields.errors('password')}"
+                                    th:text="${err}">Error</li>
                             </ul>
                         </span>
                 </div>

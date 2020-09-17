@@ -118,8 +118,8 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         // Instantiating the admin users (this must be done after Users)
         // AdminUsers can store non-Security related fields (department, academic year etc.)
         // Note, UserName is not Username
-        AdminUser johnSmith = adminUserService.save(AdminUser.builder().adminUserName("John Smith").build());
-        AdminUser amySmith = adminUserService.save(AdminUser.builder().adminUserName("Amy Smith").build());
+        AdminUser johnSmith = adminUserService.save(AdminUser.builder().firstName("John").lastName("Smith").build());
+        AdminUser amySmith = adminUserService.save(AdminUser.builder().firstName("Amy").lastName("Smith").build());
 
         //passwords are not displayed on the schema...?
         User johnSmithUser = userService.save(User.builder().username("johnsmith")
@@ -139,8 +139,8 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         Role guardianRole = roleService.findByRoleName("GUARDIAN");
 
         // Instantiating the admin users (this must be done after Users)
-        GuardianUser paulSmith = guardianUserService.save(GuardianUser.builder().guardianUserName("Paul Smith").build());
-        GuardianUser alexSmith = guardianUserService.save(GuardianUser.builder().guardianUserName("Alex Smith").build());
+        GuardianUser paulSmith = guardianUserService.save(GuardianUser.builder().firstName("Paul").lastName("Smith").build());
+        GuardianUser alexSmith = guardianUserService.save(GuardianUser.builder().firstName("Alex").lastName("Smith").build());
 
         //passwords are not displayed on the schema...?
         User paulSmithUser = userService.save(User.builder().username("paulsmith")
@@ -161,9 +161,9 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         Role teacherRole = roleService.findByRoleName("TEACHER");
 
         // Instantiating the admin users (this must be done after Users)
-        TeacherUser keithJones = teacherUserService.save(TeacherUser.builder().teacherUserName("Keith Jones")
+        TeacherUser keithJones = teacherUserService.save(TeacherUser.builder().firstName("Keith").lastName("Jones")
                 .department("Mathematics").build());
-        TeacherUser maryManning = teacherUserService.save(TeacherUser.builder().teacherUserName("Mary Manning")
+        TeacherUser maryManning = teacherUserService.save(TeacherUser.builder().firstName("Mary").lastName("Manning")
                 .department("English").build());
 
         //passwords are not displayed on the schema...?

@@ -22,8 +22,12 @@ import java.util.Set;
 @Entity
 public class GuardianUser extends BaseEntity {
 
+    //Hibernate uses snake case by default so the name argument is somewhat redundant here
     @Size(min = 1, max = 255)
-    private String guardianUserName;
+    private String firstName;
+
+    @Size(min = 1, max = 255)
+    private String lastName;
 
     @OneToMany(mappedBy = "guardianUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;

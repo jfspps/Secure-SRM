@@ -4,7 +4,15 @@ import com.secure_srm.model.security.RootUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface RootUserRepository extends JpaRepository<RootUser, Long> {
-    Optional<RootUser> findByRootUserName(String username);
+
+    Optional<RootUser> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Set<RootUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    Set<RootUser> findAllByLastNameLike(String lastName);
+
+    Set<RootUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

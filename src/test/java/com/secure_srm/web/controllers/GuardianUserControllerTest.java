@@ -44,7 +44,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postCreateGuardian(String username, String pwd) throws Exception {
         mockMvc.perform(post("/createGuardian").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "TeamGreen and TeamRed")
+                .param("firstName", "Team Red")
+                .param("lastName", "Team Green")
                 .param("username", "bigteeee")
                 .param("password", "bigteeee123"))
                 .andExpect(status().is3xxRedirection())
@@ -88,7 +89,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateGuardian(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateGuardian/5").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "blablablabla")
+                .param("firstName", "blablablabla")
+                .param("lastName", "dododododo")
                 .param("username", "someoneNotOnFile"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("guardianUpdate"))
@@ -101,7 +103,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateGuardian_UsernameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateGuardian/5").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "blablablabla")
+                .param("firstName", "blablablabla")
+                .param("lastName", "dododododo")
                 .param("username", ""))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("guardianUpdate"))
@@ -115,7 +118,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateGuardian_GuardianUserNameBlank(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateGuardian/6").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "")
+                .param("firstName", "")
+                .param("lastName", "")
                 .param("username", "asduafajlkasjdjlk"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("guardianUpdate"))
@@ -129,7 +133,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateGuardian_UserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateGuardian/5").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "fdsfdsfds")
+                .param("firstName", "blablablabla")
+                .param("lastName", "dododododo")
                 .param("username", "alexsmith"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("guardianUpdate"))
@@ -143,7 +148,8 @@ public class GuardianUserControllerTest extends UserControllerTest {
     @ParameterizedTest
     void postUpdateGuardian_GuardianUserExists(String username, String pwd) throws Exception {
         mockMvc.perform(post("/updateGuardian/5").with(httpBasic(username, pwd)).with(csrf())
-                .param("guardianUserName", "Alex Smith")
+                .param("firstName", "Alex")
+                .param("lastName", "Smith")
                 .param("username", "paulsmith"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("guardianUpdate"))

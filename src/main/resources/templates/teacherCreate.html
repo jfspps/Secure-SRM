@@ -21,13 +21,24 @@
 
                 <!--/*@thymesVar id="newTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
                 <div th:object="${newTeacher}">
-                    <label>Teacher's full name: </label>
-                    <input size="50" type="text" th:field="*{teacherUserName}"/>
-                    <span class="help-block" th:if="${#fields.hasErrors('teacherUserName')}">
+                    <div>
+                        <label>Teacher's first name: </label>
+                        <input size="50" type="text" th:field="*{firstName}"/>
+                        <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
                         <ul>
-                            <li class="alert-warning" th:each="err : ${#fields.errors('teacherUserName')}" th:text="${err}">Error</li>
+                            <li class="alert-warning" th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                         </ul>
                     </span>
+                    </div>
+                    <div th:object="${newTeacher}">
+                        <label>Teacher's last name: </label>
+                        <input size="50" type="text" th:field="*{lastName}"/>
+                        <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                        <ul>
+                            <li class="alert-warning" th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                        </ul>
+                    </span>
+                    </div>
                 </div>
                 <div th:object="${newTeacher}">
                     <label>Teacher's department: </label>

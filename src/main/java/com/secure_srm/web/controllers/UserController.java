@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -163,7 +164,7 @@ public class UserController {
     public String postChangePassword(@PathVariable String userID, @Valid @ModelAttribute("currentUser") User passwordChangeUser,
                                      BindingResult bindingResult) {
         if (userService.findById(Long.valueOf(userID)) != null) {
-            if (passwordIsOK(bindingResult, true, passwordChangeUser.getPassword(), INVALID_PASSWORD)) {
+            if (passwordIsOK(bindingResult, true, passwordChangeUser.getPassword())) {
                 User saved = changeUserPassword(Long.valueOf(userID), passwordChangeUser);
                 return "redirect:/" + userTypeUpdatePage(saved) + "/" + saved.getId();
             } else {
@@ -186,7 +187,7 @@ public class UserController {
                 model.addAttribute("returnURL", userTypeUpdatePage(currentUser) + "/" + userID);
                 model.addAttribute("pageTitle", "previous page");
             } else {
-                if (userTypeDelete(currentUser, userID)) {
+                if (userTypeDeleteSuccess(currentUser, userID)) {
                     model.addAttribute("confirmDelete", "User with username \"" + currentUser.getUsername()
                             + "\" successfully deleted");
                     model.addAttribute("returnURL", "adminPage");
@@ -224,9 +225,9 @@ public class UserController {
                                BindingResult userBindingResult) {
         boolean checksOut = true;
 
-        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword(), INVALID_PASSWORD);
-        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername(), INVALID_USERNAME);
-        checksOut = newUserType_nameIsOK(adminBindingResult, checksOut, newAdminUser.getAdminUserName(), INVALID_ADMIN_NAME);
+        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword());
+        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername());
+        checksOut = firstName_lastName_isOK(adminBindingResult, checksOut, newAdminUser.getFirstName(), newAdminUser.getLastName());
 
         if (!checksOut) {
             return "adminCreate";
@@ -239,14 +240,12 @@ public class UserController {
         // New Users, with given Roles, are instantiated before AdminUsers. One AdminUser is associated with many Users.
         // All User usernames and hence Users are unique. Check that the new AdminUser is not registering with a User it is already
         // associated with
-        User userFound;
-        AdminUser adminUserFound;
-        if (userService.findByUsername(newUser.getUsername()) != null) {
+        User userFound = userAlreadyExists(newUser.getUsername());
+        AdminUser adminUserFound = adminUserAlreadyExists(newAdminUser.getFirstName(), newAdminUser.getLastName());
+        if (userFound != null) {
             //User is already on file
-            userFound = userService.findByUsername(newUser.getUsername());
-            if (adminUserService.findByAdminUserName(newAdminUser.getAdminUserName()) != null) {
+            if (adminUserFound != null) {
                 //AdminUser is also on file
-                adminUserFound = adminUserService.findByAdminUserName(newAdminUser.getAdminUserName());
                 if (adminUserFound.getUsers().stream().anyMatch(user ->
                         user.getUsername().equals(userFound.getUsername()))) {
                     //already registered/associated (only option is to change the AdminUserName
@@ -303,9 +302,10 @@ public class UserController {
         if (userBindingResult.hasErrors()) {
             model.addAttribute("usernameError", INVALID_USERNAME);
             allGood = false;
-        } else if (userService.findByUsername(currentUser.getUsername()) == null
+        } else if (userAlreadyExists(currentUser.getUsername()) == null
                 || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
-                userToBeUpdated.setUsername(currentUser.getUsername());
+            //User not on file or username was not changed
+            userToBeUpdated.setUsername(currentUser.getUsername());
         } else {
             model.addAttribute("usernameExists", "Username already taken");
             allGood = false;
@@ -315,31 +315,36 @@ public class UserController {
         if (adminBindingResult.hasErrors()) {
             model.addAttribute("adminUserNameError", INVALID_ADMIN_NAME);
             allGood = false;
-        } else if (adminUserService.findByAdminUserName(currentAdminUser.getAdminUserName()) == null
-                || userToBeUpdated.getAdminUser().getAdminUserName().equals(currentAdminUser.getAdminUserName())) {
-                userToBeUpdated.getAdminUser().setAdminUserName(currentAdminUser.getAdminUserName());
+        } else if (adminUserAlreadyExists(currentAdminUser.getFirstName(), currentAdminUser.getLastName()) == null
+                || (userToBeUpdated.getAdminUser().getFirstName().equals(currentAdminUser.getFirstName())) &&
+                (userToBeUpdated.getAdminUser().getLastName().equals(currentAdminUser.getLastName()))){
+
+            //AdminUser not found or AdminUser firstName and lastName not changed
+            userToBeUpdated.getAdminUser().setFirstName(currentAdminUser.getFirstName());
+            userToBeUpdated.getAdminUser().setLastName(currentAdminUser.getLastName());
         } else {
             model.addAttribute("adminUserExists", "AdminUser with given name already exists");
             allGood = false;
         }
 
-        //models needed to set ID of POST path
+        //send submitted form data back
         if (!allGood) {
             userToBeUpdated.setUsername(currentUser.getUsername());
-            userToBeUpdated.getAdminUser().setAdminUserName(currentAdminUser.getAdminUserName());
+            userToBeUpdated.getAdminUser().setFirstName(currentAdminUser.getFirstName());
+            userToBeUpdated.getAdminUser().setLastName(currentAdminUser.getLastName());
             model.addAttribute("user", getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentAdminUser", userToBeUpdated.getAdminUser());
             return "adminUpdate";
         }
 
-        //sync. account related settings
+        //sync. account related settings (lockout, enabled, etc.)
         syncAccountSettings(currentUser, userToBeUpdated);
 
         //save changes
         User saved = userService.save(userToBeUpdated);
-        log.debug("Username: " + saved.getUsername() + ", adminUser name: " + saved.getAdminUser().getAdminUserName() +
-                " saved");
+        log.debug("Username: " + saved.getUsername() + ", adminUser name: " + saved.getAdminUser().getFirstName() +
+                " " + saved.getAdminUser().getLastName() + " saved");
         model.addAttribute("AdminUserSaved", "Updates applied successfully");
         model.addAttribute("currentUser", saved);
         model.addAttribute("currentAdminUser", saved.getAdminUser());
@@ -367,21 +372,19 @@ public class UserController {
                                  BindingResult userBindingResult) {
         boolean checksOut = true;
 
-        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword(), INVALID_PASSWORD);
-        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername(), INVALID_USERNAME);
-        checksOut = newUserType_nameIsOK(teacherBindingResult, checksOut, newTeacherUser.getTeacherUserName(),
-                INVALID_TEACHER_NAME);
+        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword());
+        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername());
+        checksOut = firstName_lastName_isOK(teacherBindingResult, checksOut, newTeacherUser.getFirstName(),
+                newTeacherUser.getLastName());
 
         if (!checksOut) {
             return "teacherCreate";
         }
 
-        User userFound;
-        TeacherUser teacherUserFound;
-        if (userService.findByUsername(newUser.getUsername()) != null) {
-            userFound = userService.findByUsername(newUser.getUsername());
-            if (teacherUserService.findByTeacherUserName(newTeacherUser.getTeacherUserName()) != null) {
-                teacherUserFound = teacherUserService.findByTeacherUserName(newTeacherUser.getTeacherUserName());
+        User userFound = userAlreadyExists(newUser.getUsername());
+        TeacherUser teacherUserFound = teacherUserAlreadyExists(newTeacherUser.getFirstName(), newTeacherUser.getLastName());
+        if (userFound != null) {
+            if (teacherUserFound != null) {
                 if (teacherUserFound.getUsers().stream().anyMatch(user ->
                         user.getUsername().equals(userFound.getUsername()))) {
                     log.debug("TeacherUser is already registered with the given User");
@@ -418,7 +421,7 @@ public class UserController {
 
     @AdminUpdate
     @PostMapping("/updateTeacher/{teacherUserID}")
-    public String postUpdateTeacher(@PathVariable String teacherUserID,
+    public String postUpdateTeacherWithID(@PathVariable String teacherUserID,
                                     @Valid @ModelAttribute("currentUser") User currentUser, BindingResult userBindingResult,
                                     @Valid @ModelAttribute("currentTeacherUser") TeacherUser currentTeacherUser,
                                     BindingResult teacherBindingResult, Model model) {
@@ -432,7 +435,7 @@ public class UserController {
         if (userBindingResult.hasErrors()) {
             model.addAttribute("usernameError", INVALID_USERNAME);
             allGood = false;
-        } else if (userService.findByUsername(currentUser.getUsername()) == null
+        } else if (userAlreadyExists(currentUser.getUsername()) == null
                 || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
             userToBeUpdated.setUsername(currentUser.getUsername());
         } else {
@@ -444,9 +447,13 @@ public class UserController {
         if (teacherBindingResult.hasErrors()) {
             model.addAttribute("teacherUserNameError", INVALID_TEACHER_NAME);
             allGood = false;
-        } else if (teacherUserService.findByTeacherUserName(currentTeacherUser.getTeacherUserName()) == null
-                || userToBeUpdated.getTeacherUser().getTeacherUserName().equals(currentTeacherUser.getTeacherUserName())) {
-            userToBeUpdated.getTeacherUser().setTeacherUserName(currentTeacherUser.getTeacherUserName());
+        } else if (teacherUserAlreadyExists(currentTeacherUser.getFirstName(), currentTeacherUser.getLastName()) == null
+                || ((userToBeUpdated.getTeacherUser().getFirstName().equals(currentTeacherUser.getFirstName())) &&
+                (userToBeUpdated.getTeacherUser().getLastName().equals(currentTeacherUser.getLastName())))) {
+
+            //TeacherUser not found or TeacherUser firstName and lastName not changed
+            userToBeUpdated.getTeacherUser().setFirstName(currentTeacherUser.getFirstName());
+            userToBeUpdated.getTeacherUser().setLastName(currentTeacherUser.getLastName());
         } else {
             model.addAttribute("teacherUserExists", "TeacherUser with given name already exists");
             allGood = false;
@@ -457,10 +464,11 @@ public class UserController {
             currentTeacherUser.setDepartment("(no department name submitted)");
         }
 
-        //models needed to set ID of POST path
+        //send submitted form data back
         if (!allGood) {
             userToBeUpdated.setUsername(currentUser.getUsername());
-            userToBeUpdated.getTeacherUser().setTeacherUserName(currentTeacherUser.getTeacherUserName());
+            userToBeUpdated.getTeacherUser().setFirstName(currentTeacherUser.getFirstName());
+            userToBeUpdated.getTeacherUser().setLastName(currentTeacherUser.getLastName());
             model.addAttribute("user", getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentAdminUser", userToBeUpdated.getTeacherUser());
@@ -471,8 +479,8 @@ public class UserController {
 
         //save changes
         User saved = userService.save(userToBeUpdated);
-        log.debug("Username: " + saved.getUsername() + ", teacherUser name: " + saved.getTeacherUser().getTeacherUserName() +
-                " saved");
+        log.debug("Username: " + saved.getUsername() + ", teacherUser name: " + saved.getTeacherUser().getFirstName() +
+                " " + saved.getTeacherUser().getLastName() + " saved");
         model.addAttribute("TeacherUserSaved", "Updates applied successfully");
         model.addAttribute("currentUser", saved);
         model.addAttribute("currentTeacherUser", saved.getTeacherUser());
@@ -500,21 +508,19 @@ public class UserController {
                                   BindingResult userBindingResult) {
         boolean checksOut = true;
 
-        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword(), INVALID_PASSWORD);
-        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername(), INVALID_USERNAME);
-        checksOut = newUserType_nameIsOK(guardianBindingResult, checksOut, newGuardianUser.getGuardianUserName(),
-                INVALID_GUARDIAN_NAME);
+        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword());
+        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername());
+        checksOut = firstName_lastName_isOK(guardianBindingResult, checksOut, newGuardianUser.getFirstName(),
+                newGuardianUser.getLastName());
 
         if (!checksOut) {
             return "guardianCreate";
         }
 
-        User userFound;
-        GuardianUser guardianUserFound;
-        if (userService.findByUsername(newUser.getUsername()) != null) {
-            userFound = userService.findByUsername(newUser.getUsername());
-            if (guardianUserService.findByGuardianUserName(newGuardianUser.getGuardianUserName()) != null) {
-                guardianUserFound = guardianUserService.findByGuardianUserName(newGuardianUser.getGuardianUserName());
+        User userFound = userAlreadyExists(newUser.getUsername());
+        GuardianUser guardianUserFound = guardianUserAlreadyExists(newGuardianUser.getFirstName(), newGuardianUser.getLastName());
+        if (userFound != null) {
+            if (guardianUserFound != null) {
                 if (guardianUserFound.getUsers().stream().anyMatch(user ->
                         user.getUsername().equals(userFound.getUsername()))) {
                     log.debug("GuardianUser is already registered with the given User");
@@ -551,7 +557,7 @@ public class UserController {
 
     @AdminUpdate
     @PostMapping("/updateGuardian/{guardianUserID}")
-    public String postUpdateTeacher(@PathVariable String guardianUserID,
+    public String postUpdateGuardianWithID(@PathVariable String guardianUserID,
                                     @Valid @ModelAttribute("currentUser") User currentUser, BindingResult userBindingResult,
                                     @Valid @ModelAttribute("currentGuardianUser") GuardianUser currentGuardianUser,
                                     BindingResult guardianBindingResult, Model model) {
@@ -577,18 +583,23 @@ public class UserController {
         if (guardianBindingResult.hasErrors()) {
             model.addAttribute("guardianUserNameError", INVALID_GUARDIAN_NAME);
             allGood = false;
-        } else if (guardianUserService.findByGuardianUserName(currentGuardianUser.getGuardianUserName()) == null
-                || userToBeUpdated.getGuardianUser().getGuardianUserName().equals(currentGuardianUser.getGuardianUserName())) {
-            userToBeUpdated.getGuardianUser().setGuardianUserName(currentGuardianUser.getGuardianUserName());
+        } else if (guardianUserAlreadyExists(currentGuardianUser.getFirstName(), currentGuardianUser.getLastName()) == null
+                || (userToBeUpdated.getGuardianUser().getFirstName().equals(currentGuardianUser.getFirstName())) &&
+                (userToBeUpdated.getGuardianUser().getLastName().equals(currentGuardianUser.getLastName()))){
+
+            //GuardianUser not found or GuardianUser firstName and lastName not changed
+            userToBeUpdated.getGuardianUser().setFirstName(currentGuardianUser.getFirstName());
+            userToBeUpdated.getGuardianUser().setLastName(currentGuardianUser.getLastName());
         } else {
             model.addAttribute("guardianUserExists", "GuardianUser with given name already exists");
             allGood = false;
         }
 
-        //models needed to set ID of POST path
+        //send submitted form data back
         if (!allGood) {
             userToBeUpdated.setUsername(currentUser.getUsername());
-            userToBeUpdated.getGuardianUser().setGuardianUserName(currentGuardianUser.getGuardianUserName());
+            userToBeUpdated.getGuardianUser().setFirstName(currentGuardianUser.getFirstName());
+            userToBeUpdated.getGuardianUser().setLastName(currentGuardianUser.getLastName());
             model.addAttribute("user", getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentGuardianUser", userToBeUpdated.getGuardianUser());
@@ -599,8 +610,8 @@ public class UserController {
 
         //save changes
         User saved = userService.save(userToBeUpdated);
-        log.debug("Username: " + saved.getUsername() + ", guardianUser name: " + saved.getGuardianUser().getGuardianUserName() +
-                " saved");
+        log.debug("Username: " + saved.getUsername() + ", guardianUser name: " + saved.getGuardianUser().getFirstName() +
+                " " + saved.getGuardianUser().getLastName() + " saved");
         model.addAttribute("GuardianUserSaved", "Updates applied successfully");
         model.addAttribute("currentUser", saved);
         model.addAttribute("currentGuardianUser", saved.getGuardianUser());
@@ -627,7 +638,7 @@ public class UserController {
      * executes JPA User delete() dependent on the Usertype (AdminUser, TeacherUser or GuardianUser)
      */
     @AdminDelete
-    private boolean userTypeDelete(User user, String userID) {
+    private boolean userTypeDeleteSuccess(User user, String userID) {
         if (user.getAdminUser() != null) {
             deleteAdminUser(user.getId());
         } else if (user.getTeacherUser() != null) {
@@ -664,11 +675,13 @@ public class UserController {
      * Checks if a AdminUser/TeacherUser/GuardianUser name property is valid
      */
     @AdminCreate
-    private boolean newUserType_nameIsOK(BindingResult adminBindingResult, boolean checksOut, String adminUserName, String inputErrorMsg) {
-        if (adminUserName == null || adminUserName.length() < 8) {
-            log.debug(inputErrorMsg);
-            adminBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
+    private boolean firstName_lastName_isOK(BindingResult result, boolean checksOut, String firstName, String lastName) {
+        if (firstName == null || lastName == null) {
+            log.debug("Null firstName and lastName passed");
             checksOut = false;
+        } else if (result.hasErrors()) {
+                result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
+                checksOut = false;
         }
         return checksOut;
     }
@@ -677,22 +690,24 @@ public class UserController {
      * Checks if a User username property is valid
      */
     @AdminCreate
-    private boolean newUser_usernameIsOK(BindingResult userBindingResult, boolean checksOut, String username, String inputErrorMsg) {
-        if (username == null || username.length() < 8) {
-            //if the User username needs attention
-            log.debug(inputErrorMsg);
-            userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
+    private boolean newUser_usernameIsOK(BindingResult result, boolean checksOut, String username) {
+        if (username == null){
+            log.debug("Null username passed");
+            checksOut = false;
+        } else if (result.hasErrors()) {
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
             checksOut = false;
         }
         return checksOut;
     }
 
     @AdminUpdate
-    private boolean passwordIsOK(BindingResult userBindingResult, boolean checksOut, String password, String s) {
-        if (password == null || password.length() < 8) {
-            //if the password needs attention
-            log.debug(s);
-            userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
+    private boolean passwordIsOK(BindingResult result, boolean checksOut, String password) {
+        if (password == null){
+            log.debug("Null password passed");
+            checksOut = false;
+        } else if (result.hasErrors()) {
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
             checksOut = false;
         }
         return checksOut;
@@ -711,36 +726,90 @@ public class UserController {
     private void newTeacherUser(TeacherUser newTeacherUser, User newUser) {
         Role teacherRole = roleService.findByRoleName("TEACHER");
         TeacherUser savedTeacherUser = teacherUserService.save(
-                TeacherUser.builder().teacherUserName(newTeacherUser.getTeacherUserName()).build());
+                TeacherUser.builder().firstName(newTeacherUser.getFirstName()).lastName(newTeacherUser.getLastName()).build());
         User savedUser = userService.save(User.builder().teacherUser(savedTeacherUser)
                 .username(newUser.getUsername()).password(passwordEncoder.encode(newUser.getPassword()))
                 .role(teacherRole).build());
-        log.debug("New Teacher name: " + savedUser.getTeacherUser().getTeacherUserName() + " with username" +
-                savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
+        log.debug("New Teacher name: " + savedUser.getTeacherUser().getFirstName() + " " + savedUser.getTeacherUser().getLastName()
+                + ", with username " + savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
     }
 
     @AdminUpdate
     private void newAdminUser(AdminUser newAdminUser, User newUser) {
         Role adminRole = roleService.findByRoleName("ADMIN");
         AdminUser savedAdminUser = adminUserService.save(
-                AdminUser.builder().adminUserName(newAdminUser.getAdminUserName()).build());
+                AdminUser.builder().firstName(newAdminUser.getFirstName()).lastName(newAdminUser.getLastName()).build());
         User savedUser = userService.save(User.builder().adminUser(savedAdminUser)
                 .username(newUser.getUsername()).password(passwordEncoder.encode(newUser.getPassword()))
                 .role(adminRole).build());
-        log.debug("New Admin name: " + savedUser.getAdminUser().getAdminUserName() + " with username" +
-                savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
+        log.debug("New Admin name: " + savedUser.getAdminUser().getFirstName() + " " + savedUser.getAdminUser().getLastName()
+                + ", with username " + savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
     }
 
     @AdminUpdate
     private void newGuardianUser(GuardianUser newGuardianUser, User newUser) {
         Role guardianRole = roleService.findByRoleName("GUARDIAN");
         GuardianUser savedGuardianUser = guardianUserService.save(
-                GuardianUser.builder().guardianUserName(newGuardianUser.getGuardianUserName()).build());
+                GuardianUser.builder().firstName(newGuardianUser.getFirstName()).lastName(newGuardianUser.getLastName()).build());
         User savedUser = userService.save(User.builder().guardianUser(savedGuardianUser)
                 .username(newUser.getUsername()).password(passwordEncoder.encode(newUser.getPassword()))
                 .role(guardianRole).build());
-        log.debug("New Guardian name: " + savedUser.getGuardianUser().getGuardianUserName() + " with username" +
-                savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
+        log.debug("New Guardian name: " + savedUser.getGuardianUser().getFirstName() + " " + savedUser.getGuardianUser().getLastName()
+                + ", with username " + savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
+    }
+
+    @AdminUpdate
+    private User userAlreadyExists(String username){
+        if (username == null || username.isEmpty()){
+            log.debug("Null or empty username passed");
+            return null;
+        }
+        if (userService.findAllByUsername(username) == null){
+            log.debug("User, " + username + " not found");
+            return null;
+        } else {
+            log.debug("User, " + username + " found");
+            return userService.findByUsername(username);
+        }
+    }
+
+    @AdminUpdate
+    private AdminUser adminUserAlreadyExists(String firstName, String lastName){
+        if (firstName == null || lastName == null){
+            log.debug("AdminUser null firstName and/or lastName passed");
+            return null;
+        }
+        if (adminUserService.findByFirstNameAndLastName(firstName, lastName) == null){
+            log.debug("AdminUser not found");
+            return null;
+        } else
+            return adminUserService.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @AdminUpdate
+    private TeacherUser teacherUserAlreadyExists(String firstName, String lastName){
+        if (firstName == null || lastName == null){
+            log.debug("TeacherUser null firstName and/or lastName passed");
+            return null;
+        }
+        if (teacherUserService.findByFirstNameAndLastName(firstName, lastName) == null){
+            log.debug("TeacherUser not found");
+            return null;
+        } else
+            return teacherUserService.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @AdminUpdate
+    private GuardianUser guardianUserAlreadyExists(String firstName, String lastName){
+        if (firstName == null || lastName == null){
+            log.debug("GuardianUser null firstName and/or lastName passed");
+            return null;
+        }
+        if (guardianUserService.findByFirstNameAndLastName(firstName, lastName) == null){
+            log.debug("GuardianUser not found");
+            return null;
+        } else
+            return guardianUserService.findByFirstNameAndLastName(firstName, lastName);
     }
 
     @AdminDelete
@@ -754,7 +823,7 @@ public class UserController {
         adminUser.getUsers().removeIf(user -> user.getUsername().equals(toBeDeleted.getUsername()));
         adminUserService.save(adminUser);
 
-        String adminUserName = adminUser.getAdminUserName();
+        String adminUserName = adminUser.getFirstName() + " " + adminUser.getLastName();
         Long adminUserId = adminUser.getId();
         if (adminUser.getUsers().isEmpty()) {
             adminUserService.deleteById(adminUserId);
@@ -777,7 +846,7 @@ public class UserController {
         teacherUser.getUsers().removeIf(user -> user.getUsername().equals(toBeDeleted.getUsername()));
         teacherUserService.save(teacherUser);
 
-        String teacherUserName = teacherUser.getTeacherUserName();
+        String teacherUserName = teacherUser.getFirstName() + " " + teacherUser.getLastName();
         Long teacherUserId = teacherUser.getId();
         if (teacherUser.getUsers().isEmpty()) {
             teacherUserService.deleteById(teacherUserId);
@@ -800,7 +869,7 @@ public class UserController {
         guardianUser.getUsers().removeIf(user -> user.getUsername().equals(toBeDeleted.getUsername()));
         guardianUserService.save(guardianUser);
 
-        String guardianUserName = guardianUser.getGuardianUserName();
+        String guardianUserName = guardianUser.getFirstName() + " " + guardianUser.getLastName();
         Long guardianUserId = guardianUser.getId();
         if (guardianUser.getUsers().isEmpty()) {
             guardianUserService.deleteById(guardianUserId);

@@ -32,13 +32,23 @@ public class AdminUserSDjpaService implements AdminUserService {
     }
 
     @Override
-    public AdminUser findByAdminUserName(String username) {
-        return adminUserRepository.findByAdminUserName(username).orElse(null);
+    public AdminUser findByFirstNameAndLastName(String firstName, String lastName) {
+        return adminUserRepository.findByFirstNameAndLastName(firstName, lastName).orElse(null);
     }
 
     @Override
-    public Set<AdminUser> findAllByAdminUserName(String userName) {
-        return adminUserRepository.findAllByAdminUserName(userName);
+    public Set<AdminUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
+        return adminUserRepository.findByFirstNameLikeAndLastNameLike(firstName, lastName);
+    }
+
+    @Override
+    public Set<AdminUser> findAllByLastNameLike(String lastName) {
+        return adminUserRepository.findAllByLastNameLike(lastName);
+    }
+
+    @Override
+    public Set<AdminUser> findAllByFirstNameAndLastName(String firstName, String lastName) {
+        return adminUserRepository.findAllByFirstNameAndLastName(firstName, lastName);
     }
 
     @Override

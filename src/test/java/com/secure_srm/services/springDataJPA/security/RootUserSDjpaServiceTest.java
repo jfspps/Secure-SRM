@@ -34,7 +34,6 @@ class RootUserSDjpaServiceTest {
     //set User and RootUser credentials
     private final String username = "root";
     private final String password = "rootPassword";
-    private final String rootUserName = "Jim Bob";
 
     //set Authority and Role
     Authority authority = Authority.builder().permission("allGame").build();
@@ -43,6 +42,9 @@ class RootUserSDjpaServiceTest {
     //instantiate User and their associated RootUsers
     User user;
     RootUser rootUser;
+
+    private final String firstName = "Jim";
+    private final String lastName = "Bob";
 
     Set<User> rootUser_userSet = new HashSet<>();
     List<User> users = new ArrayList<>();
@@ -53,7 +55,7 @@ class RootUserSDjpaServiceTest {
         //instantiate and establish mapping between User and RootUser
         user = User.builder().username(username).password(password).role(role).build();
         rootUser_userSet.add(user);
-        rootUser = RootUser.builder().rootUserName(rootUserName).users(rootUser_userSet).build();
+        rootUser = RootUser.builder().firstName(firstName).lastName(lastName).users(rootUser_userSet).build();
         user.setRootUser(rootUser);
 
         //for SDjpa
@@ -82,16 +84,6 @@ class RootUserSDjpaServiceTest {
     }
 
     @Test
-    void findByRootUserName() {
-        when(rootUserRepositoryTEST.findByRootUserName(anyString())).thenReturn(Optional.of(rootUser));
-
-        assertNotNull(rootUserRepositoryTEST.findByRootUserName(rootUserName));
-        assertEquals(rootUserName, rootUserRepositoryTEST.findByRootUserName("someone").get().getRootUserName());
-
-        verify(rootUserRepositoryTEST, times(2)).findByRootUserName(anyString());
-    }
-
-    @Test
     void findAll(){
         when(rootUserRepositoryTEST.findAll()).thenReturn(rootUsers);
 
@@ -99,12 +91,4 @@ class RootUserSDjpaServiceTest {
 
         verify(rootUserRepositoryTEST, times(1)).findAll();
     }
-
-//    @Test
-//    void delete() {
-//    }
-//
-//    @Test
-//    void deleteById() {
-//    }
 }

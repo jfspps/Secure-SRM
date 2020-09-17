@@ -7,7 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
-    Optional<AdminUser> findByAdminUserName(String username);
 
-    Set<AdminUser> findAllByAdminUserName(String userName);
+    Optional<AdminUser> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Set<AdminUser> findByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    Set<AdminUser> findAllByLastNameLike(String lastName);
+
+    Set<AdminUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

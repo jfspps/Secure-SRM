@@ -22,8 +22,14 @@
 
                 <!--/*@thymesVar id="currentAdminUser" type="com.secure_srm.model.security.AdminUser"*/-->
                 <div th:object="${currentAdminUser}">
-                    <label>Admin's full name: </label>
-                    <input size="50" type="text" th:field="*{adminUserName}"/>
+                    <div>
+                        <label>Admin's first name: </label>
+                        <input size="50" type="text" th:field="*{firstName}"/>
+                    </div>
+                    <div>
+                        <label>Admin's last name: </label>
+                        <input size="50" type="text" th:field="*{lastName}"/>
+                    </div>
                     <span class="help-block">
                         <!--/*@thymesVar id="adminUserNameError" type="java.lang.String"*/-->
                         <p class="alert-warning" th:text="${adminUserNameError}">Error</p>
