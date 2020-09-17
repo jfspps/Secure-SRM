@@ -1,9 +1,9 @@
-package com.secure_srm.services.securityServices;
+package com.secure_srm.services;
 
 import java.util.Set;
 
 //BaseService and all child classes/interfaces are strictly not necessary when only impl JPA services but is provided here
-//if databases other than MySQL are required
+//if databases or datasources other than MySQL are required
 
 public interface BaseService<T, ID> {
 

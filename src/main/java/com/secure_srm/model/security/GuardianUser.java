@@ -6,6 +6,7 @@ package com.secure_srm.model.security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.people.Address;
+import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.Student;
 import lombok.*;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "Guardians")
 public class GuardianUser extends BaseEntity {
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
@@ -44,4 +46,7 @@ public class GuardianUser extends BaseEntity {
     //"guardians" refers to the Set<Guardian> fro Student
     @ManyToMany(mappedBy = "guardians")
     private Set<Student> students = new HashSet<>();
+
+    @OneToOne
+    private ContactDetail contactDetail;
 }

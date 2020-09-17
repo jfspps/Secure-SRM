@@ -6,6 +6,7 @@ package com.secure_srm.model.security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.people.ContactDetail;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "Teachers")
 public class TeacherUser extends BaseEntity {
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
@@ -41,4 +43,7 @@ public class TeacherUser extends BaseEntity {
     private Set<Subject> subjects = new HashSet<>();
 
     private String department;
+
+    @OneToOne
+    private ContactDetail contactDetail;
 }

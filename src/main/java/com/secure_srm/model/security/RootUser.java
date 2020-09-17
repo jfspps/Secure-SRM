@@ -1,6 +1,7 @@
 package com.secure_srm.model.security;
 
 import com.secure_srm.model.BaseEntity;
+import com.secure_srm.model.people.ContactDetail;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "SRM_root_users")
 public class RootUser extends BaseEntity {
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
@@ -24,4 +26,7 @@ public class RootUser extends BaseEntity {
 
     @OneToMany(mappedBy = "rootUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;
+
+    @OneToOne
+    private ContactDetail contactDetail;
 }

@@ -1,4 +1,4 @@
-# This table is specifically for access to the MySQL workbench database (this is not launched automatically)
+-- This table is specifically for access to the MySQL workbench database (this is not launched automatically)
 
 CREATE DATABASE web_login;
 
@@ -15,4 +15,4 @@ GRANT INSERT ON web_login.* to 'SRM_dev_user'@'%';
 GRANT DELETE ON web_login.* to 'SRM_dev_user'@'%';
 GRANT UPDATE ON web_login.* to 'SRM_dev_user'@'%';
 
-# Don't forget to check the port number with Docker containers!!
+-- Don't forget to check the port number with Docker containers!!

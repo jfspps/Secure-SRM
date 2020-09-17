@@ -6,7 +6,7 @@ import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
+import javax.validation.constraints.Email;
 
 @Setter
 @Getter
@@ -17,6 +17,7 @@ import javax.persistence.Table;
 @Table(name = "contact_detail")
 public class ContactDetail extends BaseEntity {
 
+    @Email
     @Column(name = "email")
     private String email;
 

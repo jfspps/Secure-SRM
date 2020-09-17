@@ -1,7 +1,7 @@
 package com.secure_srm.services.peopleServices;
 
 import com.secure_srm.model.people.Student;
-import com.secure_srm.services.securityServices.BaseService;
+import com.secure_srm.services.BaseService;
 
 import java.util.Set;
 

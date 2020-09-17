@@ -2,6 +2,7 @@ package com.secure_srm.services.securityServices;
 
 import com.secure_srm.model.security.LoginFailure;
 import com.secure_srm.model.security.User;
+import com.secure_srm.services.BaseService;
 
 import java.sql.Timestamp;
 import java.util.List;
