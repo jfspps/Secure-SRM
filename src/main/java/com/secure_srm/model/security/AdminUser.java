@@ -4,6 +4,7 @@ package com.secure_srm.model.security;
 //in which the credentials and account status are stored)
 
 import com.secure_srm.model.BaseEntity;
+import com.secure_srm.model.people.ContactDetail;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "Administrators")
 public class AdminUser extends BaseEntity {
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
@@ -27,4 +29,7 @@ public class AdminUser extends BaseEntity {
 
     @OneToMany(mappedBy = "adminUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     Set<User> users;
+
+    @OneToOne
+    private ContactDetail contactDetail;
 }

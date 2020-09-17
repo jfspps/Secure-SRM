@@ -1,6 +1,7 @@
 package com.secure_srm.services.securityServices;
 
 import com.secure_srm.model.security.RootUser;
+import com.secure_srm.services.BaseService;
 
 import java.util.Set;
 

@@ -42,8 +42,10 @@ public class Student extends BaseEntity {
     @ManyToMany
     private Set<SubjectClassList> subjectClassLists = new HashSet<>();
 
-
     @JsonIgnore
     @ManyToOne
     private FormGroupList formGroupList;
+
+    @OneToOne
+    private ContactDetail contactDetail;
 }
