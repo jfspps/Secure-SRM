@@ -47,7 +47,7 @@ class UserControllerTest extends SecurityCredentialsTest {
     void welcomePage() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("welcome"));
+                .andExpect(view().name("SRM_home"));
     }
 
     //this fails with Spring Security with any username ('random' is effectively replaced with anyString())

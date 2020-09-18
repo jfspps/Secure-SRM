@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class UserController {
 
     @GetMapping({"/", "/welcome"})
     public String welcomePage() {
-        return "welcome";
+        return "SRM_home";
     }
 
     //this overrides the default Spring Security login page

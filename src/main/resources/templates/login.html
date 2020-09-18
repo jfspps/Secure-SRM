@@ -9,34 +9,35 @@
 <nav th:replace="fragments/navNoSearch :: nav"></nav>
 
 <div class="container">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="row-md-12">
-            <h1>Login page</h1>
-
             <!--this uses many of the Spring Security defaults-->
             <!--<p th:if="${loginError}" class="error" style="color: red">Wrong user or password</p>-->
 
             <div th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']?.message} == 'Bad credentials'">Invalid Username or Password</div>
             <div th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']?.message} == 'User account is locked'">User Account is Locked.</div>
 
-            <form th:action="@{/login}" method="post">
-                <table>
-                    <tr>
-                        <td><label for="username">Username</label>:
-                            <input type="text" id="username" name="username" autofocus="autofocus" autocomplete="off"/></td>
-                    </tr>
-                    <tr>
-                        <td><label for="password">Password</label>:
-                            <input type="password" id="password" name="password" /></td>
-                    </tr>
-                    <tr>
-                        <td><label for="remember-me">Remember me</label>:
-                        <input type="checkbox" id="remember-me" name="remember-me"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="submit" value="Log in" /></td>
-                    </tr>
-                </table>
+            <form th:action="@{/login}" method="post" class="form-signin">
+                <div class="text-center mb-4">
+                    <h1 class="h3 mb-3 font-weight-normal">Please enter your login details</h1>
+                </div>
+
+                <div class="form-label-group">
+                    <input type="text" id="username" class="form-control" name="username" autofocus required autocomplete="off"/>
+                    <label for="username">Username: </label>
+                </div>
+
+                <div class="form-label-group">
+                    <input type="password" id="password" name="password" class="form-control" required />
+                    <label for="password">Password</label>
+                </div>
+
+                <div class="checkbox mb-3">
+                    <label for="remember-me">Remember me: </label>
+                    <input type="checkbox" id="remember-me" name="remember-me">
+                </div>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
             </form>
         </div>
     </div>

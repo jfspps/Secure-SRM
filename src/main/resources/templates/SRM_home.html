@@ -14,11 +14,11 @@
             <h1>Spring Security Web-login Demo</h1>
 
             <div sec:authorize="isAuthenticated()">
-                <p>You are already logged in as "<b><span sec:authentication="name"></span></b>". Navigation options above.</p>
+                <p>You are logged in as "<b><span sec:authentication="name"></span></b>"</p>
             </div>
 
             <div sec:authorize="!isAuthenticated()">
-                <p><a href="/authenticated">Proceed</a> to the login page</p>
+                <p><a href="/login">Proceed</a> to the login page</p>
             </div>
         </div>
     </div>
