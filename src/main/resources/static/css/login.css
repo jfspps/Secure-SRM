@@ -12,6 +12,36 @@ body {
     padding-bottom: 20px;
     background-color: #f5f5f5;
 }
+#navigationHeader {
+    background-color: lightgray;
+    padding-top: 5px;
+}
+
+#navigationOptionsL {
+    margin-bottom: 3px;
+    padding: 8px;
+    /*background-color: lightgray;*/
+    border: 3px solid cornflowerblue;
+}
+
+#navigationBoxheaderL {
+    padding: 8px;
+    margin-top: 3px;
+    background-color: cornflowerblue;
+}
+
+#navigationOptionsR {
+    margin-bottom: 3px;
+    padding: 8px;
+    /*background-color: burlywood;*/
+    border: 3px solid lightcoral;
+}
+
+#navigationBoxheaderR {
+    padding: 8px;
+    margin-top: 3px;
+    background-color: lightcoral;
+}
 
 .form-signin {
     width: 100%;

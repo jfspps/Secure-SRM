@@ -5,21 +5,75 @@
 <head th:replace="fragments/header :: baseHead(~{::title})">
     <title>Welcome page</title>
 </head>
-<body>
+<body style="background-color: mintcream">
 <nav th:replace="fragments/navNoSearch :: nav"></nav>
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="row-md-12">
-            <h1>Spring Security Web-login Demo</h1>
+        <div class="col" id="navigationHeader">
+            <h3>Welcome</h3>
 
             <div sec:authorize="isAuthenticated()">
-                <p>You are logged in as "<b><span sec:authentication="name"></span></b>"</p>
+                <p>You are logged in with the username "<b><span sec:authentication="name"></span></b>". Click the desired option to view or edit (if authorised)</p>
             </div>
 
             <div sec:authorize="!isAuthenticated()">
                 <p><a href="/login">Proceed</a> to the login page</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" sec:authorize="hasAuthority('teacher.update')">
+    <div class="row justify-content-center">
+        <div class="col-md-7 rounded-top" id="navigationBoxheaderR">
+            <h4>Academic data</h4>
+        </div>
+        <div class="col-md-7 rounded-bottom" id="navigationOptionsR">
+
+            <h5>Students' scores</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-info">View student scores by form group</button></p>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-info">View student scores by subject class</button></p>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-info">View student scores by subject</button></p>
+            <h5>Assignments</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-secondary">View assignments by teacher</button></p>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-secondary">View assignments by subject</button></p>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-secondary">View assignment thresholds and awards/grades</button></p>
+            <h5>Student reports</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-primary">View student reports/comments by assignment</button></p>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-primary">View reports to parents</button></p>
+        </div>
+    </div>
+</div>
+
+<div class="container" sec:authorize="hasAuthority('teacher.update')">
+    <div class="row justify-content-center">
+        <div class="col-md-7 rounded-top" id="navigationBoxheaderL">
+            <h4>Personnel data</h4>
+        </div>
+        <div class="col-md-7 rounded-bottom" id="navigationOptionsL">
+            <h5>Students</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-info">View student summary</button></p>
+            <h5>Guardians</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-secondary">View guardian summary</button></p>
+            <h5>Teachers</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-primary">View teacher summary</button></p>
+        </div>
+    </div>
+</div>
+
+<div class="container" sec:authorize="isAuthenticated()">
+    <div class="row justify-content-center" sec:authorize="!hasAuthority('teacher.update')">
+        <div class="col-md-7 rounded-top" id="navigationBoxheaderL">
+            <h4>Student data</h4>
+        </div>
+        <div class="col-md-7 rounded-bottom" id="navigationOptionsL">
+            <h5>Student</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-info">View student details</button></p>
+            <h5>Guardian</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-secondary">View guardian details</button></p>
+            <h5>Teacher</h5>
+            <p><button type="button" class="btn btn-sm btn-block btn-outline-primary">View teacher details</button></p>
         </div>
     </div>
 </div>
