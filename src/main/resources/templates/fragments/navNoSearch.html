@@ -41,12 +41,11 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dbDropdown">
                     <div class="dropdown-header" sec:authorize="hasAuthority('guardian.read')">Username: <span
                             sec:authentication="name"></span></div>
-                    <form class="dropdown-item" th:action="@{/login}" method="get">
+                    <a class="dropdown-header" href="/authenticated" sec:authorize="hasAuthority('teacher.read')"><i class="far fa-list-alt"></i> User Account summary</a>
+                    <form class="dropdown-item" th:action="@{/login}" method="get" sec:authorize="!isAuthenticated()">
                         <button type="submit" class="btn btn-group-sm btn-outline-info"><i class="fas fa-sign-in-alt"></i> LOGIN</button>
                     </form>
-                    <a class="dropdown-item" href="/authenticated" sec:authorize="hasAuthority('teacher.read')"><i class="far fa-list-alt"></i> User Account summary</a>
-                    <div class="dropdown-divider"></div>
-                    <form class="dropdown-item" th:action="@{/logout}" method="post">
+                    <form class="dropdown-item" th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
                         <button type="submit" class="btn btn-group-sm btn-outline-warning"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
                     </form>
                 </div>
