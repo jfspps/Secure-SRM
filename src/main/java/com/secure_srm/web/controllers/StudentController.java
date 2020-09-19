@@ -37,7 +37,7 @@ public class StudentController {
         if(lastName == null || lastName.isEmpty()){
             model.addAttribute("students", studentService.findAll());
         } else {
-            model.addAttribute("students", studentService.findAllByLastNameLike(lastName));
+            model.addAttribute("students", studentService.findAllByLastNameContainingIgnoreCase(lastName));
         }
         return "/SRM/students/studentIndex";
     }
