@@ -85,6 +85,7 @@ public class StudentController {
         if (studentService.findByFirstLastAndMiddleNames(
                 student.getFirstName(), student.getLastName(), student.getMiddleNames()) == null) {
             Student savedStudent = studentService.save(student);
+            //head straight to the update page to edit other properties
             return "redirect:/students/" + savedStudent.getId() + "/edit";
         } else {
             log.info("Current student is already on file");
@@ -128,22 +129,11 @@ public class StudentController {
             return "/SRM/students/updateStudent";
         }
 
-        Student savedStudent;
-        if (studentService.findById(Long.valueOf(studentId)) == null){
-            savedStudent = studentService.save(Student.builder()
-                    .firstName(student.getFirstName())
-                    .middleNames(student.getMiddleNames())
-                    .lastName(student.getLastName())
-                    .build());
-            model.addAttribute("newStudent", "Student saved to database");
-        } else {
-            Student studentOnFile = studentService.findById(Long.valueOf(studentId));
-            studentOnFile.setFirstName(student.getFirstName());
-            studentOnFile.setMiddleNames(student.getMiddleNames());
-            studentOnFile.setLastName(student.getLastName());
-            savedStudent = studentService.save(studentOnFile);
-            model.addAttribute("newStudent", "Changes saved to the database");
-        }
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+        studentOnFile.setFirstName(student.getFirstName());
+        studentOnFile.setMiddleNames(student.getMiddleNames());
+        studentOnFile.setLastName(student.getLastName());
+        Student savedStudent = studentService.save(studentOnFile);
 
         model.addAttribute("student", savedStudent);
         model.addAttribute("guardians", savedStudent.getGuardians());
@@ -151,6 +141,7 @@ public class StudentController {
         model.addAttribute("teacher", savedStudent.getTeacher());
         model.addAttribute("formGroupList", savedStudent.getFormGroupList());
         model.addAttribute("subjectClassLists", savedStudent.getSubjectClassLists());
+        model.addAttribute("newStudent", "Changes saved to the database");
         return "/SRM/students/studentDetails";
     }
 }

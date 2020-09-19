@@ -16,12 +16,18 @@
                 <a class="nav-link dropdown-toggle" id="webLoginDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">Navigation</a>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
-                    <div class="dropdown-header">Web-login navigation</div>
-                    <a class="dropdown-item" href="/"><i class="fas fa-chalkboard-teacher"></i> SRM home page</a>
+                    <div class="dropdown-header"><i class="fas fa-chalkboard-teacher"></i> SRM navigation</div>
+                    <a class="dropdown-item" href="/">SRM home page</a>
+                    <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
+                    <a class="dropdown-item" th:href="@{/students/new}">New student</a>
+                    <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>
+                    <a class="dropdown-item" th:href="@{/teachers/new}">New teacher</a>
+                    <a class="dropdown-item" th:href="@{/guardians/index}">Guardian summary</a>
+                    <a class="dropdown-item" th:href="@{/guardians/new}">New guardian</a>
                     <div class="dropdown-divider"></div>
-                    <div class="dropdown-header">Weblogin accounts</div>
-                    <a class="dropdown-item" href="/userPage"><i class="fas fa-users"></i> View DB user records</a>
-                    <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" href="/adminPage"><i class="fas fa-user-edit"></i> Edit DB user records</a>
+                    <div class="dropdown-header"><i class="fas fa-user-edit"></i> Weblogin accounts</div>
+                    <a class="dropdown-item" href="/userPage">View DB user records</a>
+                    <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" href="/adminPage">Edit DB user records</a>
                 </div>
             </li>
             <li class="nav-item dropdown">

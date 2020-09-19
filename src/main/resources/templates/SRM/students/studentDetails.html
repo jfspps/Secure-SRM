@@ -8,7 +8,7 @@
 <body>
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
 
-<div class="container" sec:authorize="isAuthenticated()">
+<div class="container" sec:authorize="hasAuthority('teacher.read')">
     <div class="row">
         <div class="col">
             <h2>Student details</h2>

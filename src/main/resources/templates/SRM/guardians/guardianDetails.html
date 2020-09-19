@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Guardian details</title>
+</head>
+<body>
+<nav th:replace="fragments/navGuardianSearch :: nav"></nav>
+
+<div class="container" sec:authorize="hasAuthority('teacher.read')">
+    <div class="row">
+        <div class="col">
+            <h2>Guardian details</h2>
+        </div>
+    </div>
+    <br/>
+    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+    <form th:object="${guardian}" method="get">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Guardian name</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{firstName}">First name to appear here</label>
+                <label size="50" th:text="*{lastName}">Last name to appear here</label>
+            </div>
+            <!--/*@thymesVar id="newGuardian" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${newGuardian != null}">
+                <p class="alert alert-info" th:text="${newGuardian}"></p>
+            </span>
+        </div>
+        <br/>
+
+        <div class="row align-items-start" th:if="${students.isEmpty()}">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Student name</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${'No students registered to this Guardian'}"></label>
+            </div>
+        </div>
+        <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
+        <div class="row align-items-start" th:unless="${students.isEmpty()}" th:each="student: ${students}">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Student name</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}">
+                    Student name to appear here</label>
+            </div>
+        </div>
+        <br/>
+
+        <span th:if="${guardian.getAddress() == null}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>No address on file</b></label>
+                </div>
+            </div>
+        </span>
+        <span th:unless="${guardian.getAddress() == null}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>Address line 1</b></label>
+                </div>
+                <div class="col-sm-8">
+                    <label size="50" th:text="*{address.firstLine}">First line of address to appear here</label>
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>Address line 2</b></label>
+                </div>
+                <div class="col-sm-8">
+                    <label size="50" th:text="*{address.secondLine}">Second line of address to appear here</label>
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>Address postcode</b></label>
+                </div>
+                <div class="col-sm-8">
+                    <label size="50" th:text="*{address.postcode}">Postcode to appear here</label>
+                </div>
+            </div>
+        </span>
+        <br/>
+
+        <span th:if="${guardian.contactDetail == null}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>No contact details on file</b></label>
+                </div>
+            </div>
+        </span>
+        <span th:unless="${guardian.contactDetail == null}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>Phone number</b></label>
+                </div>
+                <div class="col-sm-8">
+                    <label size="50" th:text="*{contactDetail.phoneNumber}">Phone number to appear here</label>
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label" size="30"><b>Email address</b></label>
+                </div>
+                <div class="col-sm-8">
+                    <label size="50" th:text="*{contactDetail.email}">Email to appear here</label>
+                </div>
+            </div>
+        </span>
+
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Some other variable</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:remove="all">Info about other variables goes here</label>
+                <label size="50" th:text="${'ID of Guardian is ' + guardian.getId()}"></label>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-10">
+                <a class="btn btn-outline-info" href="/guardians/index" role="button">Guardian index</a>
+                <a class="btn btn-outline-warning" th:href="@{/guardians/{guardianId}/edit(guardianId=${guardian.id})}"
+                   role="button">Edit record</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

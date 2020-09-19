@@ -29,7 +29,7 @@
                 <td class="px-3"></td>
             </span>
             <span th:unless="${guardian == null}">
-                <th class="px-3"><a th:href="@{/guardians/{id}/edit(id=${guardian.id})}" th:text="${guardian.id}"></a></th>
+                <th class="px-3"><a th:href="@{/guardians/{id}(id=${guardian.id})}" th:text="${guardian.id}"></a></th>
                 <td class="px-3" th:text="${guardian.firstName}"></td>
                 <td class="px-3" th:text="${guardian.lastName}"></td>
             </span>
