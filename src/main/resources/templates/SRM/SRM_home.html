@@ -6,7 +6,7 @@
     <title>Welcome page</title>
 </head>
 <body style="background-color: mintcream">
-<nav th:replace="fragments/navNoSearch :: nav"></nav>
+<nav th:replace="fragments/navSearch :: nav"></nav>
 
 <div class="container-fluid">
     <div class="row">
@@ -26,54 +26,58 @@
 
 <div class="container" sec:authorize="hasAuthority('teacher.update')">
     <div class="row justify-content-center">
-        <div class="col-md-7 rounded-top" id="navigationBoxheaderR">
-            <h4>Academic data</h4>
+        <div class="col-md-6 col-sm-9">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    Academic data
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Students' scores</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by form group</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject class</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject</a></p>
+                    <h5 class="card-title">Assignments</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignments by teacher</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignments by subject</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignment thresholds and awards/grades</a></p>
+                    <h5 class="card-title">Student reports</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Student reports/comments by assignment</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Reports to parents</a></p>
+                </div>
+            </div>
         </div>
-        <div class="col-md-7 rounded-bottom" id="navigationOptionsR">
-
-            <h5>Students' scores</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">View student scores by form group</a></p>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-info">View student scores by subject class</a></p>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-info">View student scores by subject</a></p>
-            <h5>Assignments</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">View assignments by teacher</a></p>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">View assignments by subject</a></p>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">View assignment thresholds and awards/grades</a></p>
-            <h5>Student reports</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">View student reports/comments by assignment</a></p>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">View reports to parents</a></p>
+        <div class="col-md-6 col-sm-9">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    Personnel data
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">Student summary</a></p>
+                    <h5 class="card-title">Guardians</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Guardian summary</a></p>
+                    <h5 class="card-title">Teachers</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Teacher summary</a></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container" sec:authorize="hasAuthority('teacher.update')">
-    <div class="row justify-content-center">
-        <div class="col-md-7 rounded-top" id="navigationBoxheaderL">
-            <h4>Personnel data</h4>
-        </div>
-        <div class="col-md-7 rounded-bottom" id="navigationOptionsL">
-            <h5>Students</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-info">View student summary</a></p>
-            <h5>Guardians</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">View guardian summary</a></p>
-            <h5>Teachers</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">View teacher summary</a></p>
-        </div>
-    </div>
-</div>
-
-<div class="container" sec:authorize="isAuthenticated()">
-    <div class="row justify-content-center" sec:authorize="!hasAuthority('teacher.update')">
-        <div class="col-md-7 rounded-top" id="navigationBoxheaderL">
+<div class="container" sec:authorize="!hasAuthority('teacher.update')">
+    <div class="row justify-content-center" sec:authorize="isAuthenticated()">
+        <div class="col-md-7 rounded-top navigationBoxheaderL">
             <h4>Student data</h4>
         </div>
-        <div class="col-md-7 rounded-bottom" id="navigationOptionsL">
+    </div>
+    <div class="row justify-content-center" sec:authorize="isAuthenticated()">
+        <div class="col-md-7 rounded-bottom navigationOptionsL">
             <h5>Student</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-info">View student details</a></p>
+            <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Student details</a></p>
             <h5>Guardian</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">View guardian details</a></p>
+            <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Guardian details</a></p>
             <h5>Teacher</h5>
-            <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">View teacher details</a></p>
+            <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Teacher details</a></p>
         </div>
     </div>
 </div>

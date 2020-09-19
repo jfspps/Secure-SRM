@@ -50,6 +50,11 @@ public class StudentSDjpaService implements StudentService {
     }
 
     @Override
+    public Set<Student> findAllByLastNameContainingIgnoreCase(String lastName) {
+        return new HashSet<>(studentRepository.findAllByLastNameContainingIgnoreCase(lastName));
+    }
+
+    @Override
     public Set<Student> findAllByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
         return new HashSet<>(studentRepository.findAllByFirstNameLikeAndLastNameLike(firstName, lastName));
     }

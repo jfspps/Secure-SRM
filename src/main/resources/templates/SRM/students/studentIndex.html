@@ -23,7 +23,7 @@
         <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
         <tr th:each="student: ${students}">
             <th class="px-3"><a role="button" class="btn btn-sm btn-outline-info"
-                                th:href="@{/#}" th:text="${student.id}"></a></th>
+                                th:href="@{/students/{studentID}(studentID=${student.id})}" th:text="${student.id}"></a></th>
             <td class="px-3" th:text="${student.firstName}"></td>
             <td class="px-3" th:text="${student.lastName}"></td>
 
