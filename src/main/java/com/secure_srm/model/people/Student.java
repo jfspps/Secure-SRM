@@ -7,6 +7,7 @@ import com.secure_srm.model.security.TeacherUser;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,9 +20,13 @@ import java.util.Set;
 public class Student extends BaseEntity {
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
+    @Size(min = 1, max = 255)
     private String firstName;
 
+    @Size(min = 1, max = 255)
     private String lastName;
+
+    private String middleNames;
 
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)

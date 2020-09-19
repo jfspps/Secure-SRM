@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Student index</title>
+    <title>Update student</title>
 </head>
 <body>
 <nav th:replace="fragments/navSearch :: nav"></nav>
@@ -29,6 +29,9 @@
                         <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
+
+                <input size="100" placeholder="Middle names" th:field="*{middleNames}"/>
+
                 <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
                 <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
                     <ul>
@@ -50,7 +53,7 @@
                         <label th:text="${guardian.firstName} + ' ' + ${guardian.lastName}"></label>
                     </div>
                     <a th:href="@{/guardians/student/{studentId}/edit(studentId=${student.id})}" class="btn btn-sm btn-outline-info">Update current guardian</a></span>
-                    <a th:href="@{/#}" class="btn btn-sm btn-outline-info">Assign to a different guardian</a></span>
+                    <a th:href="@{/#}" class="btn btn-sm btn-outline-info">Assign to a different guardian</a>
             </div>
         </div>
         <br/>

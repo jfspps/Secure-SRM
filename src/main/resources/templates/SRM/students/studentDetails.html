@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Student index</title>
+    <title>Student details</title>
 </head>
 <body>
 <nav th:replace="fragments/navSearch :: nav"></nav>
@@ -23,8 +23,13 @@
             </div>
             <div class="col-sm-8">
                 <label size="50" th:text="*{firstName}">First name to appear here</label>
+                <label size="100" th:text="*{middleNames}">Middle names to appear here</label>
                 <label size="50" th:text="*{lastName}">Last name to appear here</label>
             </div>
+            <!--/*@thymesVar id="newStudent" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${newStudent != null}">
+                <p class="alert alert-info" th:text="${newStudent}"></p>
+            </span>
         </div>
         <br/>
         <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->

@@ -7,6 +7,7 @@ import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherDelete;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import com.secure_srm.web.permissionAnnot.TeacherUpdate;
@@ -67,6 +68,42 @@ public class StudentController {
         }
     }
 
+    @TeacherCreate
+    @GetMapping("/new")
+    public String getNewStudent(Model model) {
+        model.addAttribute("student", Student.builder().build());
+        return "/SRM/students/newStudent";
+    }
+
+    @TeacherCreate
+    @PostMapping("/new")
+    public String postNewStudent(@Valid @ModelAttribute("student") Student student, BindingResult bindingResult,
+                                             Model model) {
+        if (bindingResult.hasErrors()){
+            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            return "/SRM/students/newStudent";
+        }
+
+        // save() handles the id allocation (no further intervention needed for new saves)
+        if (studentService.findByFirstLastAndMiddleNames(
+                student.getFirstName(), student.getLastName(), student.getMiddleNames()) == null) {
+            Student savedStudent = studentService.save(student);
+            return "redirect:/students/" + savedStudent.getId() + "/edit";
+        } else {
+            log.info("Current student is already on file");
+            model.addAttribute("newStudent", "Student already on file, record presented here");
+            Student found = studentService.findByFirstLastAndMiddleNames(
+                            student.getFirstName(), student.getLastName(), student.getMiddleNames());
+            model.addAttribute("student", found);
+            model.addAttribute("guardians", found.getGuardians());
+            model.addAttribute("contactDetail", found.getContactDetail());
+            model.addAttribute("teacher", found.getTeacher());
+            model.addAttribute("formGroupList", found.getFormGroupList());
+            model.addAttribute("subjectClassLists", found.getSubjectClassLists());
+            return "/SRM/students/studentDetails";
+        }
+    }
+
     @TeacherUpdate
     @GetMapping("/{studentID}/edit")
     public String getStudentDetailsEdit(@PathVariable String studentID, Model model) {
@@ -74,7 +111,6 @@ public class StudentController {
             log.debug("Student with ID: " + studentID + " not found");
             throw new NotFoundException("Student not found");
         } else {
-            Student found = studentService.findById(Long.valueOf(studentID));
             model.addAttribute("student", studentService.findById(Long.valueOf(studentID)));
             return "/SRM/students/updateStudent";
         }
@@ -89,12 +125,29 @@ public class StudentController {
             return "/SRM/students/updateStudent";
         }
 
-        //recall all other variables and pass to the DB
-        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
-        studentOnFile.setFirstName(student.getFirstName());
-        studentOnFile.setLastName(student.getLastName());
+        Student savedStudent;
+        if (studentService.findById(Long.valueOf(studentId)) == null){
+            savedStudent = studentService.save(Student.builder()
+                    .firstName(student.getFirstName())
+                    .middleNames(student.getMiddleNames())
+                    .lastName(student.getLastName())
+                    .build());
+            model.addAttribute("newStudent", "Student saved to database");
+        } else {
+            Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+            studentOnFile.setFirstName(student.getFirstName());
+            studentOnFile.setMiddleNames(student.getMiddleNames());
+            studentOnFile.setLastName(student.getLastName());
+            savedStudent = studentService.save(studentOnFile);
+            model.addAttribute("newStudent", "Changes saved to the database");
+        }
 
-        Student savedStudent = studentService.save(studentOnFile);
-        return "redirect:/students/" + savedStudent.getId();
+        model.addAttribute("student", savedStudent);
+        model.addAttribute("guardians", savedStudent.getGuardians());
+        model.addAttribute("contactDetail", savedStudent.getContactDetail());
+        model.addAttribute("teacher", savedStudent.getTeacher());
+        model.addAttribute("formGroupList", savedStudent.getFormGroupList());
+        model.addAttribute("subjectClassLists", savedStudent.getSubjectClassLists());
+        return "/SRM/students/studentDetails";
     }
 }
