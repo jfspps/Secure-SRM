@@ -13,6 +13,8 @@ public interface StudentService extends BaseService<Student, Long> {
 
     Student findByFirstAndLastName(String firstName, String lastName);
 
+    Student findByFirstLastAndMiddleNames(String firstName, String lastName, String middleNames);
+
     Set<Student> findAllByLastNameLike(String lastName);
 
     Set<Student> findAllByLastNameContainingIgnoreCase(String lastName);

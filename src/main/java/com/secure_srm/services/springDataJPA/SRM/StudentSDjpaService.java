@@ -45,6 +45,11 @@ public class StudentSDjpaService implements StudentService {
     }
 
     @Override
+    public Student findByFirstLastAndMiddleNames(String firstName, String lastName, String middleNames) {
+        return studentRepository.findByFirstNameAndLastNameAndMiddleNames(firstName, lastName, middleNames).orElse(null);
+    }
+
+    @Override
     public Set<Student> findAllByLastNameLike(String lastName) {
         return new HashSet<>(studentRepository.findAllByLastNameLike(lastName));
     }

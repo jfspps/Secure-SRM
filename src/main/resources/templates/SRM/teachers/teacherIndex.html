@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Student index</title>
+</head>
+<body>
+<nav th:replace="fragments/navTeacherSearch :: nav"></nav>
+
+<!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+<div class="container-fluid px-0">
+    <table class="table table-hover table-sm table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th class="px-3">ID</th>
+            <th class="px-3">First name</th>
+            <th class="px-3">Last name</th>
+            <th class="px-3">Department</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="teacher: ${teachers}">
+            <th class="px-3"><a th:href="@{/teachers/{id}/edit(id=${teacher.id})}" th:text="${teacher.id}"></a></th>
+            <td class="px-3" th:text="${teacher.firstName}"></td>
+            <td class="px-3" th:text="${teacher.lastName}"></td>
+            <td class="px-3" th:text="${teacher.department}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

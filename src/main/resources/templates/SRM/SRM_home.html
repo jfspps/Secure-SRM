@@ -6,7 +6,7 @@
     <title>Welcome page</title>
 </head>
 <body style="background-color: mintcream">
-<nav th:replace="fragments/navSearch :: nav"></nav>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
 
 <div class="container-fluid">
     <div class="row">
@@ -54,10 +54,13 @@
                 <div class="card-body">
                     <h5 class="card-title">Students</h5>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">Student summary</a></p>
-                    <h5 class="card-title">Guardians</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Guardian summary</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">Create new student record</a></p>
                     <h5 class="card-title">Teachers</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Teacher summary</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/teachers/index}">Teacher summary</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">Create new teacher record</a></p>
+                    <h5 class="card-title">Guardians</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/index}">Guardian summary</a></p>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/new}">Create new guardian record</a></p>
                 </div>
             </div>
         </div>

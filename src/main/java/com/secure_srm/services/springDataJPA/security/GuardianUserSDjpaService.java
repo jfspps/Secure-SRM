@@ -54,6 +54,11 @@ public class GuardianUserSDjpaService implements GuardianUserService {
     }
 
     @Override
+    public Set<GuardianUser> findAllByLastNameContainingIgnoreCase(String lastName) {
+        return guardianUserRepository.findAllByLastNameContainingIgnoreCase(lastName);
+    }
+
+    @Override
     public Set<GuardianUser> findAllByFirstNameAndLastName(String firstName, String lastName) {
         return guardianUserRepository.findAllByFirstNameAndLastName(firstName, lastName);
     }
