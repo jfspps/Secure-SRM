@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class UserController {
 
     @GetMapping({"/", "/welcome"})
     public String welcomePage() {
-        return "welcome";
+        return "/SRM/SRM_home";
     }
 
     //this overrides the default Spring Security login page
@@ -123,9 +122,8 @@ public class UserController {
     @TeacherRead
     @GetMapping("/listUsers")
     public String listUsers(Model model) {
-        Set<User> userSet = new HashSet<>();
         //userSet is never null if user has one of the above roles
-        userSet.addAll(userService.findAll());
+        Set<User> userSet = new HashSet<>(userService.findAll());
         model.addAttribute("usersFound", userSet);
         User currentUser = userService.findByUsername(getUsername());
         model.addAttribute("userID", currentUser.getId());

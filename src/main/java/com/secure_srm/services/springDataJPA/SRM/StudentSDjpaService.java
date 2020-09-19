@@ -46,16 +46,12 @@ public class StudentSDjpaService implements StudentService {
 
     @Override
     public Set<Student> findAllByLastNameLike(String lastName) {
-        Set<Student> students = new HashSet<>();
-        students.addAll(studentRepository.findAllByLastNameLike(lastName));
-        return students;
+        return new HashSet<>(studentRepository.findAllByLastNameLike(lastName));
     }
 
     @Override
     public Set<Student> findAllByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
-        Set<Student> students = new HashSet<>();
-        students.addAll(studentRepository.findAllByFirstNameLikeAndLastNameLike(firstName, lastName));
-        return students;
+        return new HashSet<>(studentRepository.findAllByFirstNameLikeAndLastNameLike(firstName, lastName));
     }
 
     @Override
@@ -77,11 +73,8 @@ public class StudentSDjpaService implements StudentService {
     //passing a JPA iterable<T> to a HashSet<T>
     @Override
     public Set<Student> findAll() {
-        log.info("findAll() from Spring Data JPA services");
-        Set<Student> students = new HashSet<>();
         //pass each student from the repo to students and return
-        students.addAll(studentRepository.findAll());
-        return students;
+        return new HashSet<>(studentRepository.findAll());
     }
 
     @Override
