@@ -221,9 +221,9 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         addressService.save(address2);
         log.debug("Addresses loaded to DB");
 
-        Student student1 = Student.builder().firstName("John").lastName("Smith").build();
-        Student student2 = Student.builder().firstName("Elizabeth").lastName("Jones").build();
-        Student student3 = Student.builder().firstName("Helen").lastName("Jones").build();
+        Student student1 = Student.builder().firstName("John").middleNames("").lastName("Smith").build();
+        Student student2 = Student.builder().firstName("Elizabeth").middleNames("").lastName("Jones").build();
+        Student student3 = Student.builder().firstName("Helen").middleNames("").lastName("Jones").build();
 
         TeacherUser teacher1 = teacherUserService.findByFirstNameAndLastName("Keith", "Jones");
         teacher1.setContactDetail(teacher1Contact);

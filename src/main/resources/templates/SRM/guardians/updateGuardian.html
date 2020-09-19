@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Update Guardian</title>
+</head>
+<body>
+<nav th:replace="fragments/navTeacherSearch :: nav"></nav>
+
+<div class="container" sec:authorize="hasAuthority('admin.update')">
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Guardian details</h2>
+        </div>
+    </div>
+    <br/>
+    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+    <form th:object="${guardian}" method="post" th:action="@{/guardians/{id}/edit(id=${guardian.id})}"
+          class="form-horizontal" id="add-guardian-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Guardian name</label>
+            </div>
+            <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Student records</label>
+            </div>
+            <div class="col-sm-8">
+                <span th:if="${guardian.getStudents() == null}">
+                    <label size="50" th:text="'No students on file'">Number of students</label><br/>
+                    <a th:href="@{/students/guardian/{guardianId}/edit(guardianId=${guardian.id})}"
+                       class="btn btn-sm btn-outline-info">Add student</a>
+                </span>
+                <span th:unless="${guardian.getStudents() == null}">
+                    <div th:each="student: ${guardian.getStudents()}">
+                        <label th:text="${student.firstName} + ' ' + ${student.lastName}"></label>
+                    </div>
+                        <a th:href="@{/students/guardian/{guardianId}/edit(guardianId=${guardian.id})}"
+                           class="btn btn-sm btn-outline-info">Edit student(s)</a>
+                </span>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Address</label>
+            </div>
+            <div class="col-sm-8">
+                    <span th:if="${guardian.getAddress() == null}">
+                        <label size="50" th:text="${'No address on file'}">Note</label><br/>
+                        <a th:href="@{/guardians/{id}/address/new(id=${guardian.id})}"
+                           class="btn btn-sm btn-outline-info">Add address</a></span>
+                <span th:unless="${guardian.getAddress() == null}">
+                        <label size="50" th:text="${guardian.getAddress().firstLine}">First line</label><br/>
+                        <label size="50" th:text="${guardian.getAddress().secondLine}">Second line</label><br/>
+                        <label size="50" th:text="${guardian.getAddress().postcode}">Postcode</label><br/>
+                        <a th:href="@{/guardians/{guardianId}/address/{addressId}/edit
+                        (guardianId=${guardian.getId()},addressId=${guardian.getAddress().getId()})}"
+                           class="btn btn-sm btn-outline-info">Edit address</a></span>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Contact details</label>
+            </div>
+            <div class="col-sm-8">
+                <div>
+                    <span th:if="${guardian.getContactDetail() == null}">
+                        <label size="50" th:text="${'No email address on file'}">Note</label><br/>
+                        <label size="50" th:text="${'No phone number on file'}">Note</label><br/>
+                        <a th:href="@{/guardians/{id}/contacts/new(id=${guardian.id})}"
+                           class="btn btn-sm btn-outline-info">Add contact details</a>
+                    </span>
+                    <span th:unless="${guardian.getContactDetail() == null}">
+                        <label size="50" th:text="${'Email: ' + guardian.contactDetail.email}">Email</label><br/>
+                        <label size="50"
+                                   th:text="${'Phone no: ' + guardian.contactDetail.phoneNumber}">Number</label><br/>
+                        <a th:href="@{/guardians/{id1}/contacts/{id2}/edit(id1=${guardian.id},id2=${guardian.contactDetail.id})}"
+                           class="btn btn-sm btn-outline-info">Edit contact details</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Save changes</button>
+            </div>
+            <div class="col-sm-8">
+                <a class="btn btn-outline-primary" th:href="@{/guardians/{guardianId}(guardianId=${guardian.id})}"
+                   role="button">View summary</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

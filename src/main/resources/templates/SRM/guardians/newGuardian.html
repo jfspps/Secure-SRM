@@ -3,21 +3,21 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>New student</title>
+    <title>Guardian index</title>
 </head>
 <body>
-<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<nav th:replace="fragments/navGuardianSearch :: nav"></nav>
 
 <div class="container" sec:authorize="hasAuthority('admin.create')">
     <br/>
     <div class="row">
         <div class="col">
-            <h2>New student record</h2>
+            <h2>Guardian details</h2>
         </div>
     </div>
     <br/>
-    <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
-    <form th:object="${student}" th:action="@{/students/new}" method="post" class="form-horizontal" id="add-student-form">
+    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+    <form th:object="${guardian}" method="post" th:action="@{/guardians/new}" class="form-horizontal" id="add-guardian-form">
         <div class="row align-items-start">
 
             <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
@@ -25,7 +25,7 @@
             </div>
 
             <div class="col-sm-2">
-                <label class="control-label">Student name</label>
+                <label class="control-label">Guardian name</label>
             </div>
             <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
                 <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
@@ -34,9 +34,6 @@
                         <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
-
-                <input size="50" placeholder="Middle names" th:field="*{middleNames}"/>
-
                 <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
                 <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
                     <ul>
@@ -48,11 +45,10 @@
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <button class="btn btn-info" type="submit">Add student</button>
+                <button class="btn btn-info" type="submit">Add guardian</button>
             </div>
         </div>
     </form>
-    <br/>
 </div>
 
 <footer th:replace="fragments/footer :: footer"></footer>
