@@ -3,12 +3,12 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Student index</title>
+    <title>Guardian index</title>
 </head>
 <body>
 <nav th:replace="fragments/navGuardianSearch :: nav"></nav>
 
-<div class="container-fluid px-0">
+<div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
     <table class="table table-hover table-sm table-striped">
         <thead class="thead-light">
         <tr>

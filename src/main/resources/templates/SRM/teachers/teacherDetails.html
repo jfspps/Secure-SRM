@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Teacher details</title>
+</head>
+<body>
+<nav th:replace="fragments/navTeacherSearch :: nav"></nav>
+
+<div class="container" sec:authorize="isAuthenticated()">
+    <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Teacher details</h2>
+        </div>
+    </div>
+    <br/>
+    <form th:object="${teacher}" method="get">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Name</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{firstName}">First name to appear here</label>
+                <label size="50" th:text="*{lastName}">Last name to appear here</label>
+            </div>
+            <!--/*@thymesVar id="newTeacher" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${newTeacher != null}">
+                <p class="alert alert-info" th:text="${newTeacher}"></p>
+            </span>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Department</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{department}">Department of...</label>
+            </div>
+        </div>
+        <br/>
+
+        <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+        <div class="row align-items-start" th:if="${teacher.getSubjects().isEmpty()}">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Subject taught</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${'No registered subjects on file'}"></label>
+            </div>
+        </div>
+        <div class="row align-items-start" th:unless="${teacher.getSubjects().isEmpty()}"
+             th:each="subject: ${subjectsTaught}">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Subject taught</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${subject.subjectName}">Subject name to appear here</label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Email address</b></label>
+            </div>
+            <div class="col-sm-8">
+                <span th:if="${teacher.contactDetail == null}">
+                    <label size="50">No email address on record</label>
+                </span>
+                <span th:unless="${teacher.contactDetail == null}">
+                    <label size="50" th:text="*{contactDetail.email}">Email address to appear here</label>
+                </span>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Phone number</b></label>
+            </div>
+            <div class="col-sm-8">
+                <span th:if="${teacher.contactDetail == null}">
+                    <label size="50">No phone number on record</label>
+                </span>
+                <span th:unless="${teacher.contactDetail == null}">
+                    <label size="50" th:text="*{contactDetail.phoneNumber}">Phone number to appear here</label>
+                </span>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Some other variable</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:remove="all">Info about other variables goes here</label>
+                <label size="50" th:text="${'ID of teacher is ' + teacher.getId()}"></label>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-10">
+                <a class="btn btn-outline-info" href="/teachers/index" role="button">Teacher index</a>
+                <a class="btn btn-outline-warning" th:href="@{/teachers/{teacherId}/edit(teacherId=${teacher.id})}"
+                   role="button">Edit record</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

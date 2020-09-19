@@ -8,7 +8,7 @@
 <body>
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
 
-<div class="container">
+<div class="container" sec:authorize="isAuthenticated()">
     <br/>
     <div class="row">
         <div class="col">

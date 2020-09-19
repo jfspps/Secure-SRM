@@ -9,7 +9,7 @@
 <nav th:replace="fragments/navTeacherSearch :: nav"></nav>
 
 <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-<div class="container-fluid px-0">
+<div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
     <table class="table table-hover table-sm table-striped">
         <thead class="thead-light">
         <tr>
@@ -21,7 +21,7 @@
         </thead>
         <tbody>
         <tr th:each="teacher: ${teachers}">
-            <th class="px-3"><a th:href="@{/teachers/{id}/edit(id=${teacher.id})}" th:text="${teacher.id}"></a></th>
+            <th class="px-3"><a th:href="@{/teachers/{id}(id=${teacher.id})}" th:text="${teacher.id}"></a></th>
             <td class="px-3" th:text="${teacher.firstName}"></td>
             <td class="px-3" th:text="${teacher.lastName}"></td>
             <td class="px-3" th:text="${teacher.department}"></td>

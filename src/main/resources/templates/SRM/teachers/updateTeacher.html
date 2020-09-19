@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Update teacher</title>
+</head>
+<body>
+<nav th:replace="fragments/navTeacherSearch :: nav"></nav>
+
+<div class="container" sec:authorize="isAuthenticated()">
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Teacher details</h2>
+        </div>
+    </div>
+    <br/>
+    <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <form th:object="${teacher}" th:action="@{/teachers/{teacherID}/edit(teacherID=${teacher.id})}"
+          method="post" class="form-horizontal" id="add-teacher-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Teacher name</label>
+            </div>
+            <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Department</label>
+            </div>
+            <div class="col-sm-8" th:class="${#fields.hasErrors('department')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="Department name" th:field="*{department}"/>
+                <span class="help-block" th:if="${#fields.hasErrors('department')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('department')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <br/>
+
+        <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+        <div class="row align-items-start" th:if="${teacher.getSubjects().isEmpty()}">
+            <div class="col-sm-2">
+                <label class="control-label">Subject title</label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50">(no subject on file)</label>
+            </div>
+        </div>
+        <div class="row align-items-start" th:unless="${teacher.getSubjects().isEmpty()}"
+             th:object="${subjectsTaught}" th:each="subject: ${subjectsTaught}">
+            <div class="col-sm-2">
+                <label class="control-label">Subject title</label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${subject.getSubjectName()}">Subject title goes here</label>
+                <a class="btn btn-sm btn-outline-info"
+                   th:href="@{/subjects/{subjectID}/edit(subjectID=${subject.getId()})}"
+                   th:text="${'Edit subject record'}"></a>
+                <a class="btn btn-sm btn-outline-info"
+                   th:href="@{/subjects/{subjectID}/remove(subjectID=${subject.getId()})}"
+                   th:text="${'Remove subject from teacher' + '''' + 's record'}"></a>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-8">
+                <a class="btn btn-sm btn-outline-info"
+                   th:href="@{/{teacherId}/subjects/add(teacherId=${teacher.getId()})}"
+                   th:text="${'Add a subject to teacher' + '''' + 's record'}"></a>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Contact details</label>
+            </div>
+            <div class="col-sm-8">
+                <span th:if="${teacher.getContactDetail() == null}">
+                    <label size="50" th:text="${'No email address on file'}">Note</label><br/>
+                    <label size="50" th:text="${'No phone number on file'}">Note</label><br/>
+                    <a th:href="@{/teachers/{id}/contacts/new(id=${teacher.id})}"
+                           class="btn btn-sm btn-outline-info">Add contact details</a>
+                </span>
+                <span th:unless="${teacher.getContactDetail() == null}">
+                    <label size="50" th:text="${'Email: ' + teacher.contactDetail.email}">Email</label><br/>
+                    <label size="50" th:text="${'Phone no: ' + teacher.contactDetail.phoneNumber}">Number</label><br/>
+                    <a th:href="@{/teachers/{id1}/contacts/{id2}/edit(id1=${teacher.id},id2=${teacher.contactDetail.id})}"
+                           class="btn btn-sm btn-outline-info">Edit contact details</a></span>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Save changes</button>
+            </div>
+            <div class="col-sm-8">
+                <a class="btn btn-outline-primary" th:href="@{/teachers/{teacherId}(teacherId=${teacher.id})}"
+                   role="button">View summary</a>
+            </div>
+        </div>
+    </form>
+    <br/>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>
