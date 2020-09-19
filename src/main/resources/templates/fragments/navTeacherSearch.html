@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+<nav th:fragment="nav" class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
+    <a class="navbar-brand" th:href="@{/}"><i class="fas fa-database"></i> SRM Web-login</a>
+    <!-- collapsable button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto" sec:authorize="hasAuthority('guardian.read')" >
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="webLoginDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">Navigation</a>
+                <div class="dropdown-menu" aria-labelledby="dbDropdown">
+                    <div class="dropdown-header">Web-login navigation</div>
+                    <a class="dropdown-item" href="/"><i class="fas fa-chalkboard-teacher"></i> SRM home page</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-header">Weblogin accounts</div>
+                    <a class="dropdown-item" href="/userPage"><i class="fas fa-users"></i> View DB user records</a>
+                    <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" href="/adminPage"><i class="fas fa-user-edit"></i> Edit DB user records</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="testRecordDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">Test record demo</a>
+                <div class="dropdown-menu" aria-labelledby="dbDropdown">
+                    <div class="dropdown-header">Test records</div>
+                    <a class="dropdown-item" th:href="@{/testRecord}"><i class="far fa-newspaper"></i> View/edit test records</a>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav ml-auto">
+            <!--        name="lastName" must match controller listStudents() parameter-->
+            <form class="form-inline my-2 my-lg-0" th:action="@{/teachers/index}" method="get" sec:authorize="hasAuthority('teacher.read')">
+                <input class="form-control mr-sm-2" type="text" name="lastName" placeholder="Teacher last name" aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Search</button>
+            </form>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user"></i> User account</a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dbDropdown">
+                    <div class="dropdown-header" sec:authorize="hasAuthority('guardian.read')">Username: <span
+                            sec:authentication="name"></span></div>
+                    <a class="dropdown-header" href="/authenticated" sec:authorize="hasAuthority('teacher.read')"><i class="far fa-list-alt"></i> User Account summary</a>
+                    <form class="dropdown-item" th:action="@{/login}" method="get" sec:authorize="!isAuthenticated()">
+                        <button type="submit" class="btn btn-group-sm btn-outline-info"><i class="fas fa-sign-in-alt"></i> LOGIN</button>
+                    </form>
+                    <form class="dropdown-item" th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+                        <button type="submit" class="btn btn-group-sm btn-outline-warning"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+</body>
+</html>

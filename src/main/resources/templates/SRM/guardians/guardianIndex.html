@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Student index</title>
+</head>
+<body>
+<nav th:replace="fragments/navGuardianSearch :: nav"></nav>
+
+<div class="container-fluid px-0">
+    <table class="table table-hover table-sm table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th class="px-3">ID</th>
+            <th class="px-3">First name</th>
+            <th class="px-3">Last name</th>
+            <th class="px-3">Phone Number</th>
+            <th class="px-3">Email address</th>
+            <th class="px-3">Postcode</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+        <tr th:each="guardian: ${guardians}">
+            <span th:if="${guardian == null}">
+                <th class="px-3"></th>
+                <td class="px-3">(No guardians on record)</td>
+                <td class="px-3"></td>
+            </span>
+            <span th:unless="${guardian == null}">
+                <th class="px-3"><a th:href="@{/guardians/{id}/edit(id=${guardian.id})}" th:text="${guardian.id}"></a></th>
+                <td class="px-3" th:text="${guardian.firstName}"></td>
+                <td class="px-3" th:text="${guardian.lastName}"></td>
+            </span>
+            <span th:if="${guardian.contactDetail == null}">
+                <td class="px-3" >(No record)</td>
+                <td class="px-3" >(No record)</td>
+            </span>
+            <span th:unless="${guardian.contactDetail == null}">
+                <td class="px-3" th:text="${guardian.contactDetail.getPhoneNumber()}"></td>
+                <td class="px-3" th:text="${guardian.contactDetail.getEmail()}"></td>
+            </span>
+            <span th:if="${guardian.getAddress() == null}">
+                <td class="px-3">(No record)</td>
+            </span>
+            <span th:unless="${guardian.getAddress() == null}">
+                <td class="px-3" th:text="${guardian.address.getPostcode()}"></td>
+            </span>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

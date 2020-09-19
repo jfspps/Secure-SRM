@@ -6,7 +6,7 @@
     <title>Student index</title>
 </head>
 <body>
-<nav th:replace="fragments/navSearch :: nav"></nav>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
 
 <div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
     <table class="table table-hover table-sm table-striped my-auto mx-0">

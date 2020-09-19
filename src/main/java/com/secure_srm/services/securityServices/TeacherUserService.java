@@ -13,5 +13,7 @@ public interface TeacherUserService extends BaseService<TeacherUser, Long> {
 
     Set<TeacherUser> findAllByLastNameLike(String lastName);
 
+    Set<TeacherUser> findAllByLastNameContainingIgnoreCase(String lastName);
+
     Set<TeacherUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

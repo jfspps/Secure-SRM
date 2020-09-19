@@ -14,5 +14,7 @@ public interface GuardianUserRepository extends JpaRepository<GuardianUser, Long
 
     Set<GuardianUser> findAllByLastNameLike(String lastName);
 
+    Set<GuardianUser> findAllByLastNameContainingIgnoreCase(String lastName);
+
     Set<GuardianUser> findAllByFirstNameAndLastName(String firstName, String lastName);
 }

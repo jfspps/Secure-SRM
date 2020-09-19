@@ -49,6 +49,11 @@ public class TeacherUserSDjpaService implements TeacherUserService {
     }
 
     @Override
+    public Set<TeacherUser> findAllByLastNameContainingIgnoreCase(String lastName) {
+        return teacherUserRepository.findAllByLastNameContainingIgnoreCase(lastName);
+    }
+
+    @Override
     public Set<TeacherUser> findAllByLastNameLike(String lastName) {
         return teacherUserRepository.findAllByLastNameLike(lastName);
     }
