@@ -2,8 +2,10 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.BaseEntity;
+import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
+import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
@@ -30,6 +32,7 @@ public class GuardianController {
 
     private final GuardianUserService guardianUserService;
     private final StudentService studentService;
+    private final ContactDetailService contactDetailService;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
@@ -118,6 +121,8 @@ public class GuardianController {
         GuardianUser guardianOnFile = guardianUserService.findById(Long.valueOf(guardianId));
         guardianOnFile.setFirstName(guardian.getFirstName());
         guardianOnFile.setLastName(guardian.getLastName());
+
+        guardianOnFile.setContactDetail(contactDetailService.save(guardian.getContactDetail()));
 
         GuardianUser savedGuardian = guardianUserService.save(guardianOnFile);
         model.addAttribute("guardian", savedGuardian);

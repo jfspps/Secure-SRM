@@ -95,17 +95,14 @@
                 <label class="control-label">Contact details</label>
             </div>
             <div class="col-sm-8">
-                <span th:if="${teacher.getContactDetail() == null}">
-                    <label size="50" th:text="${'No email address on file'}">Note</label><br/>
-                    <label size="50" th:text="${'No phone number on file'}">Note</label><br/>
-                    <a th:href="@{/teachers/{id}/contacts/new(id=${teacher.id})}"
-                           class="btn btn-sm btn-outline-info">Add contact details</a>
-                </span>
-                <span th:unless="${teacher.getContactDetail() == null}">
-                    <label size="50" th:text="${'Email: ' + teacher.contactDetail.email}">Email</label><br/>
-                    <label size="50" th:text="${'Phone no: ' + teacher.contactDetail.phoneNumber}">Number</label><br/>
-                    <a th:href="@{/teachers/{id1}/contacts/{id2}/edit(id1=${teacher.id},id2=${teacher.contactDetail.id})}"
-                           class="btn btn-sm btn-outline-info">Edit contact details</a></span>
+                <div>
+                    <label for="emailAddress">Email address </label>
+                    <input id="emailAddress" size="40" th:field="*{contactDetail.email}"/>
+                    <br/>
+                    <label for="phoneNumber">Phone number</label>
+                    <input id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+                    <br/>
+                </div>
             </div>
         </div>
         <br/>

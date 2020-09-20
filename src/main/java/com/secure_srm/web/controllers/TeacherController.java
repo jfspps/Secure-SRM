@@ -3,6 +3,7 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
@@ -28,6 +29,7 @@ import java.util.Set;
 public class TeacherController {
 
     private final TeacherUserService teacherUserService;
+    private final ContactDetailService contactDetailService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -130,6 +132,8 @@ public class TeacherController {
         teacherOnFile.setFirstName(teacher.getFirstName());
         teacherOnFile.setLastName(teacher.getLastName());
         teacherOnFile.setDepartment(teacher.getDepartment());
+
+        teacherOnFile.setContactDetail(contactDetailService.save(teacher.getContactDetail()));
 
         TeacherUser savedTeacher = teacherUserService.save(teacherOnFile);
         model.addAttribute("teacher", savedTeacher);

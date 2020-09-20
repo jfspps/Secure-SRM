@@ -5,6 +5,7 @@ import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.SubjectService;
+import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.services.securityServices.TeacherUserService;
@@ -30,7 +31,7 @@ public class StudentController {
     private final StudentService studentService;
     private final GuardianUserService guardianUserService;
     private final TeacherUserService teacherUserService;
-    private final SubjectService subjectService;
+    private final ContactDetailService contactDetailService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -125,6 +126,9 @@ public class StudentController {
         studentOnFile.setFirstName(student.getFirstName());
         studentOnFile.setMiddleNames(student.getMiddleNames());
         studentOnFile.setLastName(student.getLastName());
+
+        studentOnFile.setContactDetail(contactDetailService.save(student.getContactDetail()));
+
         Student savedStudent = studentService.save(studentOnFile);
 
         updateStudentModel(model, savedStudent);
