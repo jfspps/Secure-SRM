@@ -1,4 +1,4 @@
-# Student Record Management #
+# Secure Student Record Management (Secure-SRM) #
 
 ## Overview ##
 
@@ -8,11 +8,11 @@ Student record management is a Spring based academic database which stores and p
 
 The model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
-## Current and future work ##
+## Current and future work of Secure-SRM ##
 
 At present, the original SRM project can handle personal data (student, teacher and guardian contact details etc.). Following the integration of SRM with Web-login, work will proceed to extend the functionality of SRM with the development of 'Secure'SRM'. New features will include the storage and retrieval of academic related records, notably school assignment models (homework, performances, quizzes and mock exams), student results, grade mappings and results summaries.
 
-## SRM web-login overview ##
+## Web-login specific overview ##
 
 Here is summary of the main classes pertaining to authentication and authorisation:
 
