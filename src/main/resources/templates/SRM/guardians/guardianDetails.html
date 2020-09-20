@@ -47,8 +47,8 @@
                 <label class="control-label" size="30"><b>Student name</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}">
-                    Student name to appear here</label>
+                <label size="50"><a th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}"
+                                    th:href="@{/students/{studentId}(studentId=${student.id})}"></a></label>
             </div>
         </div>
         <br/>

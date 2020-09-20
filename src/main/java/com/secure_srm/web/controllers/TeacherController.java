@@ -3,6 +3,8 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.services.academicServices.SubjectService;
+import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
@@ -28,6 +30,8 @@ import java.util.Set;
 public class TeacherController {
 
     private final TeacherUserService teacherUserService;
+    private final ContactDetailService contactDetailService;
+    private final SubjectService subjectService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -131,10 +135,44 @@ public class TeacherController {
         teacherOnFile.setLastName(teacher.getLastName());
         teacherOnFile.setDepartment(teacher.getDepartment());
 
+        teacherOnFile.setContactDetail(contactDetailService.save(teacher.getContactDetail()));
+
         TeacherUser savedTeacher = teacherUserService.save(teacherOnFile);
         model.addAttribute("teacher", savedTeacher);
         model.addAttribute("subjectsTaught", savedTeacher.getSubjects());
         model.addAttribute("newTeacher", "Teacher details updated");
+        return "/SRM/teachers/teacherDetails";
+    }
+
+    @AdminUpdate
+    @GetMapping("/{teacherId}/subjects")
+    public String getUpdateSubject(Model model, @PathVariable String teacherId){
+        if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
+            log.debug("Teacher with ID: " + teacherId + " not found");
+            throw new NotFoundException("Teacher not found");
+        } else {
+            model.addAttribute("subjectSet", subjectService.findAll());
+            model.addAttribute("teacher", teacherUserService.findById(Long.valueOf(teacherId)));
+            return "/SRM/academicRecords/subjectSet";
+        }
+    }
+
+    @AdminUpdate
+    @PostMapping("/{teacherId}/subjects")
+    public String postUpdateSubject(Model model, @PathVariable String teacherId,
+                                    @ModelAttribute("teacher") TeacherUser teacher){
+        TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
+
+        teacherOnFile.setSubjects(teacher.getSubjects());
+        teacher.getSubjects().stream().forEach(subject -> {
+            subject.getTeachers().add(teacherOnFile);
+            subjectService.save(subject);
+        });
+
+        TeacherUser saved = teacherUserService.save(teacherOnFile);
+        model.addAttribute("teacher", saved);
+        model.addAttribute("subjectsTaught", saved.getSubjects());
+        model.addAttribute("newTeacher", "Teacher subject details updated");
         return "/SRM/teachers/teacherDetails";
     }
 }

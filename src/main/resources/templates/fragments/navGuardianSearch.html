@@ -18,12 +18,14 @@
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header"><i class="fas fa-chalkboard-teacher"></i> SRM navigation</div>
                     <a class="dropdown-item" href="/">SRM home page</a>
+                    <div class="dropdown-header">New...</div>
+                    <a class="dropdown-item" th:href="@{/students/new}">Student</a>
+                    <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
+                    <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                    <div class="dropdown-header">Show...</div>
                     <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
-                    <a class="dropdown-item" th:href="@{/students/new}">New student</a>
                     <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>
-                    <a class="dropdown-item" th:href="@{/teachers/new}">New teacher</a>
                     <a class="dropdown-item" th:href="@{/guardians/index}">Guardian summary</a>
-                    <a class="dropdown-item" th:href="@{/guardians/new}">New guardian</a>
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-header"><i class="fas fa-user-edit"></i> Weblogin accounts</div>
                     <a class="dropdown-item" href="/userPage">View DB user records</a>

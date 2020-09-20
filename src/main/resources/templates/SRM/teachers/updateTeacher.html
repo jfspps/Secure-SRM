@@ -55,37 +55,31 @@
         <br/>
 
         <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
-        <div class="row align-items-start" th:if="${teacher.getSubjects().isEmpty()}">
+        <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Subject title</label>
+                <label class="control-label">Subject(s) taught</label>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-8" th:if="${teacher.getSubjects().isEmpty()}">
                 <label size="50">(no subject on file)</label>
             </div>
-        </div>
-        <div class="row align-items-start" th:unless="${teacher.getSubjects().isEmpty()}"
-             th:object="${subjectsTaught}" th:each="subject: ${subjectsTaught}">
-            <div class="col-sm-2">
-                <label class="control-label">Subject title</label>
-            </div>
-            <div class="col-sm-8">
-                <label size="50" th:text="${subject.getSubjectName()}">Subject title goes here</label>
-                <a class="btn btn-sm btn-outline-info"
-                   th:href="@{/subjects/{subjectID}/edit(subjectID=${subject.getId()})}"
-                   th:text="${'Edit subject record'}"></a>
-                <a class="btn btn-sm btn-outline-info"
-                   th:href="@{/subjects/{subjectID}/remove(subjectID=${subject.getId()})}"
-                   th:text="${'Remove subject from teacher' + '''' + 's record'}"></a>
+            <div class="col-sm-8" th:unless="${teacher.getSubjects().isEmpty()}"
+                 th:object="${subjectsTaught}" >
+                <div th:each="subject: ${subjectsTaught}">
+                    <label><a th:text="${subject.getSubjectName()}"
+                              th:href="@{/subjects/{subjectID}/edit(subjectID=${subject.getId()})}"></a>
+                    </label>
+                </div>
             </div>
         </div>
+
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-2">
             </div>
             <div class="col-sm-8">
                 <a class="btn btn-sm btn-outline-info"
-                   th:href="@{/{teacherId}/subjects/add(teacherId=${teacher.getId()})}"
-                   th:text="${'Add a subject to teacher' + '''' + 's record'}"></a>
+                   th:href="@{/teachers/{teacherId}/subjects(teacherId=${teacher.id})}"
+                   th:text="${'Add/remove subject'}"></a>
             </div>
         </div>
         <br/>
@@ -95,17 +89,14 @@
                 <label class="control-label">Contact details</label>
             </div>
             <div class="col-sm-8">
-                <span th:if="${teacher.getContactDetail() == null}">
-                    <label size="50" th:text="${'No email address on file'}">Note</label><br/>
-                    <label size="50" th:text="${'No phone number on file'}">Note</label><br/>
-                    <a th:href="@{/teachers/{id}/contacts/new(id=${teacher.id})}"
-                           class="btn btn-sm btn-outline-info">Add contact details</a>
-                </span>
-                <span th:unless="${teacher.getContactDetail() == null}">
-                    <label size="50" th:text="${'Email: ' + teacher.contactDetail.email}">Email</label><br/>
-                    <label size="50" th:text="${'Phone no: ' + teacher.contactDetail.phoneNumber}">Number</label><br/>
-                    <a th:href="@{/teachers/{id1}/contacts/{id2}/edit(id1=${teacher.id},id2=${teacher.contactDetail.id})}"
-                           class="btn btn-sm btn-outline-info">Edit contact details</a></span>
+                <div>
+                    <label for="emailAddress">Email address </label>
+                    <input id="emailAddress" size="40" th:field="*{contactDetail.email}"/>
+                    <br/>
+                    <label for="phoneNumber">Phone number</label>
+                    <input id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+                    <br/>
+                </div>
             </div>
         </div>
         <br/>

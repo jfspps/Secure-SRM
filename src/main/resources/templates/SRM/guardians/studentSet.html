@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Update student set</title>
+</head>
+<body>
+<nav th:replace="fragments/navGuardianSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container" sec:authorize="hasAuthority('admin.update')">
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Guardian details</h2>
+        </div>
+    </div>
+    <br/>
+
+    <form method="get" th:action="@{/guardians/{guardianId}/addRemoveStudents/search(guardianId=${guardian.id})}"
+          class="form-horizontal" id="remove-tutor-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Student search</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="StudentLastName" placeholder="Student last name" aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine student list</button>
+            </div>
+        </div>
+    </form>
+
+    <br />
+    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+    <form th:object="${guardian}" method="post" th:action="@{/guardians/{guardianId}/addRemoveStudents(guardianId=${guardian.id})}"
+          class="form-horizontal" id="change-studentSet-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Students registered to: '
+                 + guardian.getFirstName() + ' ' + guardian.getLastName()}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="px-3">Student name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
+                        <tr th:each="student: ${studentSet}">
+                            <td>
+                                <input type="checkbox" th:field="*{students}" th:value="${student.id}" />
+                                <label th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}"></label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <button class="btn btn-info" type="submit">Submit changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>
