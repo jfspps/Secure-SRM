@@ -125,4 +125,44 @@ public class GuardianController {
         model.addAttribute("newGuardian", "Changes saved to the database");
         return "/SRM/guardians/guardianDetails";
     }
+
+    @AdminUpdate
+    @GetMapping("/{guardianId}/addRemoveStudents")
+    public String getGuardian_studentSet(Model model, @PathVariable String guardianId){
+        if (guardianUserService.findById(Long.valueOf(guardianId)) == null) {
+            log.debug("Guardian with ID: " + guardianId + " not found");
+            throw new NotFoundException("Guardian not found");
+        } else {
+            Set<Student> studentSet = studentService.findAll();
+            model.addAttribute("studentSet", studentSet);
+            model.addAttribute("guardian", guardianUserService.findById(Long.valueOf(guardianId)));
+            return "/SRM/guardians/studentSet";
+        }
+    }
+
+    @AdminUpdate
+    @PostMapping("/{guardianId}/addRemoveStudents")
+    public String postGuardian_studentSet(@ModelAttribute("guardian") GuardianUser guardian, @PathVariable String guardianId,
+                                          Model model) {
+
+        log.debug("Current students registered with guardian passed:" + guardian.getStudents().size());
+
+        GuardianUser guardianUserOnFile = guardianUserService.findById(Long.valueOf(guardianId));
+        log.debug("Current students registered with guardian on file:"
+                + guardianUserOnFile.getStudents().size());
+
+        //assign students to Guardian and vice versa
+        guardianUserOnFile.setStudents(guardian.getStudents());
+        guardian.getStudents().stream().forEach(student -> {
+            student.getGuardians().add(guardianUserOnFile);
+            studentService.save(student);
+        });
+
+        GuardianUser saved = guardianUserService.save(guardianUserOnFile);
+
+        model.addAttribute("guardian", saved);
+        model.addAttribute("students", saved.getStudents());
+        model.addAttribute("newGuardian", "Registered students updated");
+        return "/SRM/guardians/guardianDetails";
+    }
 }

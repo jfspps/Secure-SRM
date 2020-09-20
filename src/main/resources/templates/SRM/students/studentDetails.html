@@ -33,15 +33,28 @@
             </span>
         </div>
         <br/>
-        <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
-        <div class="row align-items-start" th:each="guardian: ${guardians}">
+        <span th:if="${guardians.isEmpty()}">
+            <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+        <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Guardian name</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="${guardian.firstName + ' ' + guardian.lastName}">Guardian name to appear here</label>
+                <label size="50">Not registered with any guardians</label>
             </div>
         </div>
+        </span>
+        <span th:unless="${guardians.isEmpty()}">
+            <div class="row align-items-start" th:each="guardian: ${guardians}">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Guardian name</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50"><a th:text="${guardian.firstName + ' ' + guardian.lastName}"
+                                    th:href="@{/guardians/{guardianId}(guardianId=${guardian.id})}"></a></label>
+            </div>
+        </div>
+        </span>
         <br/>
 
         <!--/*@thymesVar id="contactDetail" type="com.secure_srm.model.people.ContactDetail"*/-->
@@ -86,7 +99,8 @@
                     <label size="50" >Not assigned to a tutor</label>
                 </span>
                 <span th:unless="${teacher == null}">
-                    <label size="50" th:text="${teacher.firstName + ' ' + teacher.lastName}">Name</label>
+                    <label size="50"><a th:text="${teacher.firstName + ' ' + teacher.lastName}"
+                                         th:href="@{/teachers/{teacherId}(teacherId=${teacher.id})}"></a></label>
                 </span>
             </div>
         </div>

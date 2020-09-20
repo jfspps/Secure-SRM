@@ -3,6 +3,7 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
+import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
@@ -56,12 +57,7 @@ public class StudentController {
             throw new NotFoundException("Student not found");
         } else {
             Student found = studentService.findById(Long.valueOf(studentID));
-            model.addAttribute("student", found);
-            model.addAttribute("guardians", found.getGuardians());
-            model.addAttribute("contactDetail", found.getContactDetail());
-            model.addAttribute("teacher", found.getTeacher());
-            model.addAttribute("formGroupList", found.getFormGroupList());
-            model.addAttribute("subjectClassLists", found.getSubjectClassLists());
+            updateStudentModel(model, found);
             return "/SRM/students/studentDetails";
         }
     }
@@ -93,12 +89,7 @@ public class StudentController {
             model.addAttribute("newStudent", "Student already on file, record presented here");
             Student found = studentService.findByFirstLastAndMiddleNames(
                             student.getFirstName(), student.getLastName(), student.getMiddleNames());
-            model.addAttribute("student", found);
-            model.addAttribute("guardians", found.getGuardians());
-            model.addAttribute("contactDetail", found.getContactDetail());
-            model.addAttribute("teacher", found.getTeacher());
-            model.addAttribute("formGroupList", found.getFormGroupList());
-            model.addAttribute("subjectClassLists", found.getSubjectClassLists());
+            updateStudentModel(model, found);
             return "/SRM/students/studentDetails";
         }
     }
@@ -136,13 +127,110 @@ public class StudentController {
         studentOnFile.setLastName(student.getLastName());
         Student savedStudent = studentService.save(studentOnFile);
 
-        model.addAttribute("student", savedStudent);
-        model.addAttribute("guardians", savedStudent.getGuardians());
-        model.addAttribute("contactDetail", savedStudent.getContactDetail());
-        model.addAttribute("teacher", savedStudent.getTeacher());
-        model.addAttribute("formGroupList", savedStudent.getFormGroupList());
-        model.addAttribute("subjectClassLists", savedStudent.getSubjectClassLists());
+        updateStudentModel(model, savedStudent);
         model.addAttribute("newStudent", "Changes saved to the database");
         return "/SRM/students/studentDetails";
+    }
+
+    @AdminUpdate
+    @GetMapping("/{studentId}/addRemoveGuardians")
+    public String getStudent_guardianSet(Model model, @PathVariable String studentId){
+        if (studentService.findById(Long.valueOf(studentId)) == null) {
+            log.debug("Student with ID: " + studentId + " not found");
+            throw new NotFoundException("Student not found");
+        } else {
+            Set<GuardianUser> guardianUserSet = guardianUserService.findAll();
+            model.addAttribute("guardianSet", guardianUserSet);
+            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+            return "/SRM/students/guardianSet";
+        }
+    }
+
+    @AdminUpdate
+    @PostMapping("/{studentId}/addRemoveGuardians")
+    public String postStudent_guardianSet(@ModelAttribute("student") Student student, @PathVariable String studentId,
+                                          Model model) {
+
+        log.debug("Current guardians registered with student passed:" + student.getGuardians().size());
+
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+        log.debug("Current guardians registered with student on file:"
+                + studentOnFile.getGuardians().size());
+
+        //assign students to Guardian and vice versa
+        studentOnFile.setGuardians(student.getGuardians());
+        student.getGuardians().stream().forEach(guardianUser -> {
+            guardianUser.getStudents().add(studentOnFile);
+            guardianUserService.save(guardianUser);
+        });
+
+        Student saved = studentService.save(studentOnFile);
+
+        updateStudentModel(model, saved);
+        model.addAttribute("newStudent", "Registered guardians updated");
+        return "/SRM/students/studentDetails";
+    }
+
+    @AdminUpdate
+    @GetMapping("{studentId}/addRemoveTutor")
+    public String getChangeTutor(Model model, @PathVariable String studentId){
+        if (studentService.findById(Long.valueOf(studentId)) == null) {
+            log.debug("Student with ID: " + studentId + " not found");
+            throw new NotFoundException("Student not found");
+        } else {
+            Set<TeacherUser> teacherUserSet = teacherUserService.findAll();
+            model.addAttribute("teacherSet", teacherUserSet);
+            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+            return "/SRM/students/personalTutor";
+        }
+    }
+
+    @AdminUpdate
+    @PostMapping("/{studentId}/addRemoveTutor")
+    public String postChangeTutor(@ModelAttribute("student") Student student, @PathVariable String studentId,
+                                          Model model) {
+
+        log.debug("Current teacher registered with student passed:" + student.getTeacher().getFirstName() +
+                    ' ' + student.getTeacher().getLastName());
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+
+        if (studentOnFile.getTeacher() == null){
+            log.debug("Student on file is not assigned a tutor");
+        } else {
+            log.debug("Current teacher registered with student on file:" + studentOnFile.getTeacher().getFirstName() +
+                    ' ' + studentOnFile.getTeacher().getLastName());
+        }
+
+        //assign teacher to Student (currently, TeacherUser is not mapped to Student)
+        studentOnFile.setTeacher(student.getTeacher());
+
+        Student saved = studentService.save(studentOnFile);
+
+        updateStudentModel(model, saved);
+        model.addAttribute("newStudent", "Tutor assignment updated");
+        return "/SRM/students/studentDetails";
+    }
+
+    @AdminUpdate
+    @PostMapping("/{studentId}/removeTutor")
+    public String postRemoveTutor(@PathVariable String studentId, Model model) {
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+
+        studentOnFile.setTeacher(null);
+        Student saved = studentService.save(studentOnFile);
+
+        updateStudentModel(model, saved);
+        model.addAttribute("newStudent", "Tutor assignment removed");
+        return "/SRM/students/studentDetails";
+    }
+
+    @TeacherRead
+    private void updateStudentModel(Model model, Student found) {
+        model.addAttribute("student", found);
+        model.addAttribute("guardians", found.getGuardians());
+        model.addAttribute("contactDetail", found.getContactDetail());
+        model.addAttribute("teacher", found.getTeacher());
+        model.addAttribute("formGroupList", found.getFormGroupList());
+        model.addAttribute("subjectClassLists", found.getSubjectClassLists());
     }
 }

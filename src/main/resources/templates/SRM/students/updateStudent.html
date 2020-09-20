@@ -55,6 +55,8 @@
                                   th:href="@{/guardians/{guardianId}/edit(guardianId=${guardian.id})}"></a> </label>
                     </div>
                 </span>
+                <a th:href="@{/students/{studentId}/addRemoveGuardians(studentId=${student.id})}"
+                   class="btn btn-sm btn-outline-info">Add/remove guardian</a>
             </div>
         </div>
         <br/>
@@ -81,16 +83,19 @@
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Personal tutor</label>
+                <label class="control-label">Personal tutor (click name to edit)</label>
             </div>
             <div class="col-sm-8">
-                    <span th:if="${student.teacher == null}">
-                        <label size="50" th:text="${'Not registered with a tutor'}">Note</label><br/>
-                        <a th:href="@{/students/{studentId}/tutor/edit(studentId=${student.id})}" class="btn btn-sm btn-outline-info">Choose a tutor</a></span>
+                <span th:if="${student.teacher == null}">
+                    <label size="50" th:text="${'Not registered with a tutor'}">Note</label><br/>
+                </span>
                 <span th:unless="${student.teacher == null}">
-                        <label size="50" th:text="${'Personal tutor: ' + student.teacher.firstName + ' '
-                         + student.teacher.lastName}">Name</label><br/>
-                        <a th:href="@{/students/{studentId}/tutor/edit(studentId=${student.id})}" class="btn btn-sm btn-outline-info">Change tutor</a></span>
+                    <label size="50"><a th:text="${student.teacher.firstName + ' '
+                    + student.teacher.lastName}" th:href="@{/teachers/{teacherId}/edit(teacherId=${student.teacher.id})}">
+                    </a></label><br/>
+                </span>
+                <a th:href="@{/students/{studentId}/addRemoveTutor(studentId=${student.id})}"
+                   class="btn btn-sm btn-outline-info">Assign/change tutor</a>
             </div>
         </div>
         <br/>

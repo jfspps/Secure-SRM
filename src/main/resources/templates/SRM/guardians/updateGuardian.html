@@ -47,8 +47,6 @@
             <div class="col-sm-8">
                 <span th:if="${guardian.getStudents() == null}">
                     <label size="50" th:text="'No students on file'">Number of students</label><br/>
-                    <a th:href="@{/students/guardian/{guardianId}/edit(guardianId=${guardian.id})}"
-                       class="btn btn-sm btn-outline-info">Add student</a>
                 </span>
                 <span th:unless="${guardian.getStudents() == null}">
                     <div th:each="student: ${guardian.getStudents()}">
@@ -56,6 +54,8 @@
                                   th:href="@{/students/{studentID}/edit(studentID=${student.id})}"></a></label>
                     </div>
                 </span>
+                <a th:href="@{/guardians/{guardianId}/addRemoveStudents(guardianId=${guardian.id})}"
+                   class="btn btn-sm btn-outline-info">Add/remove student</a>
             </div>
         </div>
         <br/>
