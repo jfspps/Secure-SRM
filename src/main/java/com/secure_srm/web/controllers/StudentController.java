@@ -146,6 +146,25 @@ public class StudentController {
         }
     }
 
+    //search function to refine list of Guardians registered to Student
+    @AdminUpdate
+    @GetMapping("/{studentId}/addRemoveGuardians/search")
+    public String getRefineGuardianList(Model model, @PathVariable String studentId, String GuardianLastName){
+        if (studentService.findById(Long.valueOf(studentId)) == null) {
+            log.debug("Student with ID: " + studentId + " not found");
+            throw new NotFoundException("Student not found");
+        } else {
+            if (GuardianLastName == null || GuardianLastName.isEmpty()) {
+                model.addAttribute("guardianSet", guardianUserService.findAll());
+            } else {
+                model.addAttribute("guardianSet",
+                        guardianUserService.findAllByLastNameContainingIgnoreCase(GuardianLastName));
+            }
+            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+            return "/SRM/students/guardianSet";
+        }
+    }
+
     @AdminUpdate
     @PostMapping("/{studentId}/addRemoveGuardians")
     public String postStudent_guardianSet(@ModelAttribute("student") Student student, @PathVariable String studentId,
@@ -180,6 +199,25 @@ public class StudentController {
         } else {
             Set<TeacherUser> teacherUserSet = teacherUserService.findAll();
             model.addAttribute("teacherSet", teacherUserSet);
+            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+            return "/SRM/students/personalTutor";
+        }
+    }
+
+    //search function to refine list of Teeachers who can be assigned as the tutor
+    @AdminUpdate
+    @GetMapping("/{studentId}/addRemoveTutor/search")
+    public String getRefineTutorList(Model model, @PathVariable String studentId, String TutorLastName){
+        if (studentService.findById(Long.valueOf(studentId)) == null) {
+            log.debug("Student with ID: " + studentId + " not found");
+            throw new NotFoundException("Student not found");
+        } else {
+            if (TutorLastName == null || TutorLastName.isEmpty()) {
+                model.addAttribute("teacherSet", teacherUserService.findAll());
+            } else {
+                model.addAttribute("teacherSet",
+                        teacherUserService.findAllByLastNameContainingIgnoreCase(TutorLastName));
+            }
             model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
             return "/SRM/students/personalTutor";
         }

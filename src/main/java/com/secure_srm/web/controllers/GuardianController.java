@@ -140,6 +140,24 @@ public class GuardianController {
         }
     }
 
+    //search function to refine list of Students registered to Guardian
+    @AdminUpdate
+    @GetMapping("/{guardianId}/addRemoveStudents/search")
+    public String getRefineStudentList(Model model, @PathVariable String guardianId, String StudentLastName){
+        if (guardianUserService.findById(Long.valueOf(guardianId)) == null) {
+            log.debug("Guardian with ID: " + guardianId + " not found");
+            throw new NotFoundException("Guardian not found");
+        } else {
+            if (StudentLastName == null || StudentLastName.isEmpty()) {
+                model.addAttribute("studentSet", studentService.findAll());
+            } else {
+                model.addAttribute("studentSet", studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
+            }
+            model.addAttribute("guardian", guardianUserService.findById(Long.valueOf(guardianId)));
+            return "/SRM/guardians/studentSet";
+        }
+    }
+
     @AdminUpdate
     @PostMapping("/{guardianId}/addRemoveStudents")
     public String postGuardian_studentSet(@ModelAttribute("guardian") GuardianUser guardian, @PathVariable String guardianId,
