@@ -7,6 +7,7 @@
 </head>
 <body>
 <nav th:replace="fragments/navTeacherSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
 <div class="container" sec:authorize="hasAuthority('admin.update')">
     <br/>
@@ -41,7 +42,7 @@
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Student records</label>
+                <label class="control-label">Student records (click name to edit)</label>
             </div>
             <div class="col-sm-8">
                 <span th:if="${guardian.getStudents() == null}">
@@ -51,10 +52,9 @@
                 </span>
                 <span th:unless="${guardian.getStudents() == null}">
                     <div th:each="student: ${guardian.getStudents()}">
-                        <label th:text="${student.firstName} + ' ' + ${student.lastName}"></label>
+                        <label><a th:text="${student.firstName} + ' ' + ${student.lastName}"
+                                  th:href="@{/students/{studentID}/edit(studentID=${student.id})}"></a></label>
                     </div>
-                        <a th:href="@{/students/guardian/{guardianId}/edit(guardianId=${guardian.id})}"
-                           class="btn btn-sm btn-outline-info">Edit student(s)</a>
                 </span>
             </div>
         </div>

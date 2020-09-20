@@ -1,10 +1,11 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
+import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
+import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
-import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
@@ -12,13 +13,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ import java.util.Set;
 public class GuardianController {
 
     private final GuardianUserService guardianUserService;
+    private final StudentService studentService;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
@@ -36,7 +39,7 @@ public class GuardianController {
     @TeacherRead
     @GetMapping({"", "/", "/index"})
     public String listGuardians(Model model, String lastName) {
-        if(lastName == null || lastName.isEmpty()){
+        if (lastName == null || lastName.isEmpty()) {
             model.addAttribute("guardians", guardianUserService.findAll());
         } else {
             model.addAttribute("guardians", guardianUserService.findAllByLastNameContainingIgnoreCase(lastName));
@@ -54,8 +57,8 @@ public class GuardianController {
     @AdminCreate
     @PostMapping("/new")
     public String postNewGuardian(@Valid @ModelAttribute("guardian") GuardianUser guardian,
-                                              BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()){
+                                  BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(objectError -> log.info(objectError.toString()));
             return "/SRM/guardians/newGuardian";
         }
@@ -88,7 +91,7 @@ public class GuardianController {
     @AdminUpdate
     @GetMapping("/{guardianId}/edit")
     public String getGuardianEdit(@PathVariable String guardianId, Model model) {
-        if (guardianUserService.findById(Long.valueOf(guardianId)) == null){
+        if (guardianUserService.findById(Long.valueOf(guardianId)) == null) {
             log.debug("Guardian with ID: " + guardianId + " not found");
             throw new NotFoundException("Guardian not found");
         } else {
@@ -101,8 +104,8 @@ public class GuardianController {
     @AdminUpdate
     @PostMapping("/{guardianId}/edit")
     public String postGuardianUpdate(@Valid @ModelAttribute("guardian") GuardianUser guardian, BindingResult bindingResult,
-                                            @PathVariable String guardianId, Model model) {
-        if (bindingResult.hasErrors()){
+                                     @PathVariable String guardianId, Model model) {
+        if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             GuardianUser guardianOnFile = guardianUserService.findById(Long.valueOf(guardianId));
             guardian.setAddress(guardianOnFile.getAddress());
