@@ -6,7 +6,7 @@ This project is a combination of two projects, Student Record Management [SRM](h
 
 Student record management is a Spring based academic database which stores and processes student academic data. Web-login provides the Spring Security frontend, with authentication and authorisation functionality.
 
-The model entities are saved to an in-memory H2 database or in a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
+The model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
 ## Current and future work ##
 
