@@ -65,17 +65,15 @@
                 <label class="control-label">Address</label>
             </div>
             <div class="col-sm-8">
-                    <span th:if="${guardian.getAddress() == null}">
-                        <label size="50" th:text="${'No address on file'}">Note</label><br/>
-                        <a th:href="@{/guardians/{id}/address/new(id=${guardian.id})}"
-                           class="btn btn-sm btn-outline-info">Add address</a></span>
-                <span th:unless="${guardian.getAddress() == null}">
-                        <label size="50" th:text="${guardian.getAddress().firstLine}">First line</label><br/>
-                        <label size="50" th:text="${guardian.getAddress().secondLine}">Second line</label><br/>
-                        <label size="50" th:text="${guardian.getAddress().postcode}">Postcode</label><br/>
-                        <a th:href="@{/guardians/{guardianId}/address/{addressId}/edit
-                        (guardianId=${guardian.getId()},addressId=${guardian.getAddress().getId()})}"
-                           class="btn btn-sm btn-outline-info">Edit address</a></span>
+                <label for="firstLine">First line </label>
+                <input id="firstLine" size="40" th:field="*{address.firstLine}"/>
+                <br/>
+                <label for="secondLine">Second line</label>
+                <input id="secondLine" size="40" th:field="*{address.secondLine}"/>
+                <br/>
+                <label for="postCode">Post code</label>
+                <input id="postCode" size="40" th:field="*{address.postcode}"/>
+                <br/>
             </div>
         </div>
         <br/>

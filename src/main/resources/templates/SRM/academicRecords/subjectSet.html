@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Subject details</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container" sec:authorize="hasAuthority('admin.update')">
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Subject details</h2>
+        </div>
+    </div>
+
+    <br/>
+    <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <form th:object="${teacher}" method="post" th:action="@{/teachers/{teacherId}/subjects(teacherId=${teacher.id})}"
+          class="form-horizontal" id="change-studentSet-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Subjects taught by '
+                 + teacher.getFirstName() + ' ' + teacher.getLastName()}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Subject title</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+                    <tr th:each="subject: ${subjectSet}">
+                        <td>
+                            <input type="checkbox" th:field="*{subjects}" th:value="${subject.id}"/>
+                            <label th:text="${subject.subjectName}"></label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Submit changes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

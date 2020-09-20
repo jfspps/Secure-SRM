@@ -25,15 +25,17 @@
                 <label>Guardian search</label>
             </div>
             <div class="col-sm-8">
-                <input class="form-control mr-sm-2" type="text" name="GuardianLastName" placeholder="Guardian last name" aria-label="Search" maxlength="50">
+                <input class="form-control mr-sm-2" type="text" name="GuardianLastName" placeholder="Guardian last name"
+                       aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine Guardian list</button>
             </div>
         </div>
     </form>
 
-    <br />
+    <br/>
     <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
-    <form th:object="${student}" method="post" th:action="@{/students/{studentId}/addRemoveGuardians(studentId=${student.id})}"
+    <form th:object="${student}" method="post"
+          th:action="@{/students/{studentId}/addRemoveGuardians(studentId=${student.id})}"
           class="form-horizontal" id="change-studentSet-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -48,22 +50,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
-                        <tr th:each="guardian: ${guardianSet}">
-                            <td>
-                                <input type="checkbox" th:field="*{guardians}" th:value="${guardian.id}" />
-                                <label th:text="${guardian.firstName + ' ' + guardian.lastName}"></label>
-                            </td>
-                        </tr>
+                    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+                    <tr th:each="guardian: ${guardianSet}">
+                        <td>
+                            <input type="checkbox" th:field="*{guardians}" th:value="${guardian.id}"/>
+                            <label th:text="${guardian.firstName + ' ' + guardian.lastName}"></label>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="row align-items-start">
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <button class="btn btn-info" type="submit">Submit changes</button>
-                </div>
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Submit changes</button>
             </div>
         </div>
     </form>

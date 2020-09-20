@@ -138,8 +138,7 @@ public class GuardianController {
             log.debug("Guardian with ID: " + guardianId + " not found");
             throw new NotFoundException("Guardian not found");
         } else {
-            Set<Student> studentSet = studentService.findAll();
-            model.addAttribute("studentSet", studentSet);
+            model.addAttribute("studentSet", studentService.findAll());
             model.addAttribute("guardian", guardianUserService.findById(Long.valueOf(guardianId)));
             return "/SRM/guardians/studentSet";
         }

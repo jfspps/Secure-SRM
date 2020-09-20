@@ -143,8 +143,7 @@ public class StudentController {
             log.debug("Student with ID: " + studentId + " not found");
             throw new NotFoundException("Student not found");
         } else {
-            Set<GuardianUser> guardianUserSet = guardianUserService.findAll();
-            model.addAttribute("guardianSet", guardianUserSet);
+            model.addAttribute("guardianSet", guardianUserService.findAll());
             model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
             return "/SRM/students/guardianSet";
         }
@@ -201,8 +200,7 @@ public class StudentController {
             log.debug("Student with ID: " + studentId + " not found");
             throw new NotFoundException("Student not found");
         } else {
-            Set<TeacherUser> teacherUserSet = teacherUserService.findAll();
-            model.addAttribute("teacherSet", teacherUserSet);
+            model.addAttribute("teacherSet", teacherUserService.findAll());
             model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
             return "/SRM/students/personalTutor";
         }
