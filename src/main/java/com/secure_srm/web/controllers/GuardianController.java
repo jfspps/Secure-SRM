@@ -2,9 +2,11 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.BaseEntity;
+import com.secure_srm.model.people.Address;
 import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
+import com.secure_srm.services.peopleServices.AddressService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
@@ -33,6 +35,7 @@ public class GuardianController {
     private final GuardianUserService guardianUserService;
     private final StudentService studentService;
     private final ContactDetailService contactDetailService;
+    private final AddressService addressService;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
@@ -67,6 +70,9 @@ public class GuardianController {
         }
 
         if (guardianUserService.findByFirstNameAndLastName(guardian.getFirstName(), guardian.getLastName()) == null) {
+            addressService.save(guardian.getAddress());
+            contactDetailService.save(guardian.getContactDetail());
+
             GuardianUser savedGuardian = guardianUserService.save(guardian);
             //head straight to the update page to edit other properties
             return "redirect:/guardians/" + savedGuardian.getId() + "/edit";

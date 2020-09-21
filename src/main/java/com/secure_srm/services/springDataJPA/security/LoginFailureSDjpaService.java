@@ -43,7 +43,7 @@ public class LoginFailureSDjpaService implements LoginFailureService {
 
     @Override
     public List<LoginFailure> findAllByUserAndCreatedDateIsAfter(User user, Timestamp timestamp) {
-        return loginFailureRepository.findAllByUserAndCreatedDateIsAfter(user, timestamp);
+        return loginFailureRepository.findAllByUserAndCreatedDateIsAfterOrderById(user, timestamp);
     }
 
     @Override

@@ -18,10 +18,12 @@
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header"><i class="fas fa-chalkboard-teacher"></i> SRM navigation</div>
                     <a class="dropdown-item" href="/">SRM home page</a>
-                    <div class="dropdown-header">New...</div>
-                    <a class="dropdown-item" th:href="@{/students/new}">Student</a>
-                    <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
-                    <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                    <span sec:authorize="hasAuthority('admin.create')">
+                        <div class="dropdown-header">New...</div>
+                        <a class="dropdown-item" th:href="@{/students/new}">Student</a>
+                        <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
+                        <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                    </span>
                     <div class="dropdown-header">Show...</div>
                     <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
                     <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>

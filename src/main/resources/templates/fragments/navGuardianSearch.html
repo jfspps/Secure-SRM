@@ -18,10 +18,12 @@
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header"><i class="fas fa-chalkboard-teacher"></i> SRM navigation</div>
                     <a class="dropdown-item" href="/">SRM home page</a>
-                    <div class="dropdown-header">New...</div>
-                    <a class="dropdown-item" th:href="@{/students/new}">Student</a>
-                    <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
-                    <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                    <span sec:authorize="hasAuthority('admin.create')">
+                        <div class="dropdown-header">New...</div>
+                        <a class="dropdown-item" th:href="@{/students/new}">Student</a>
+                        <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
+                        <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                    </span>
                     <div class="dropdown-header">Show...</div>
                     <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
                     <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>
@@ -43,6 +45,7 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
+
             <!--        name="lastName" must match controller listStudents() parameter-->
             <form class="form-inline my-2 my-lg-0" th:action="@{/guardians/index}" method="get" sec:authorize="hasAuthority('teacher.read')">
                 <input class="form-control mr-sm-2" type="text" name="lastName" placeholder="Guardian last name" aria-label="Search" maxlength="50">

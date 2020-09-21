@@ -3,6 +3,7 @@ package com.secure_srm.services;
 import com.secure_srm.model.TestRecord;
 import com.secure_srm.model.security.User;
 
+import java.util.List;
 import java.util.Set;
 
 public interface TestRecordService {
@@ -19,6 +20,8 @@ public interface TestRecordService {
         Set<TestRecord> findAllTestRecordsByUsername(String username);
 
         Set<TestRecord> findAll();
+
+        List<TestRecord> findAllByOrderById();
 
         void delete(TestRecord objectT);
 

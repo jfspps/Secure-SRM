@@ -10,5 +10,5 @@ import java.util.List;
 public interface LoginFailureRepository extends JpaRepository<LoginFailure, Long> {
 
     //handle lockout
-    List<LoginFailure> findAllByUserAndCreatedDateIsAfter(User user, Timestamp timestamp);
+    List<LoginFailure> findAllByUserAndCreatedDateIsAfterOrderById(User user, Timestamp timestamp);
 }

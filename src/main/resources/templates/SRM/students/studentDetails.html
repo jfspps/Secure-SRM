@@ -40,7 +40,7 @@
                 <label class="control-label" size="30"><b>Guardian name</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50">Not registered with any guardians</label>
+                <label size="50">(Not registered with any guardians)</label>
             </div>
         </div>
         </span>
@@ -64,10 +64,10 @@
                     <label class="control-label" size="30"><b>Email address</b></label>
                 </div>
                 <div class="col-sm-8">
-                <span th:if="${contactDetail == null}">
-                    <label size="50">No email address on record</label>
+                <span th:if="${contactDetail.email.isEmpty()}">
+                    <label size="50">(No email address on record)</label>
                 </span>
-                    <span th:unless="${contactDetail == null}">
+                    <span th:unless="${contactDetail.email.isEmpty()}">
                     <label size="50" th:text="*{email}">Email address to appear here</label>
                 </span>
                 </div>
@@ -78,10 +78,10 @@
                     <label class="control-label" size="30"><b>Phone number</b></label>
                 </div>
                 <div class="col-sm-8">
-                <span th:if="${contactDetail == null}">
-                    <label size="50">No phone number on record</label>
+                <span th:if="${contactDetail.phoneNumber.isEmpty()}">
+                    <label size="50">(No phone number on record)</label>
                 </span>
-                    <span th:unless="${contactDetail == null}">
+                    <span th:unless="${contactDetail.phoneNumber.isEmpty()}">
                     <label size="50" th:text="*{phoneNumber}">Phone number to appear here</label>
                 </span>
                 </div>
@@ -96,7 +96,7 @@
             </div>
             <div class="col-sm-8">
                 <span th:if="${teacher == null}">
-                    <label size="50" >Not assigned to a tutor</label>
+                    <label size="50" >(Not assigned to a tutor)</label>
                 </span>
                 <span th:unless="${teacher == null}">
                     <label size="50"><a th:text="${teacher.firstName + ' ' + teacher.lastName}"
@@ -112,7 +112,7 @@
             </div>
             <div class="col-sm-8">
                 <span th:if="${formGroupList == null}">
-                    <label size="50">Not assigned to a group</label>
+                    <label size="50">(Not assigned to a group)</label>
                 </span>
                 <span th:unless="${formGroupList == null}">
                     <label size="50" th:text="*{groupName}">Form group name to appear here</label>
@@ -127,7 +127,7 @@
             </div>
             <div class="col-sm-8">
                 <span th:if="${student.getSubjectClassLists().size() == 0}">
-                    <label size="50">Not registered for any subjects</label>
+                    <label size="50">(Not registered for any subjects)</label>
                 </span>
                 <!--/*@thymesVar id="subjectList" type="com.secure_srm.model.people.SubjectClassList"*/-->
                 <span th:unless="${student.getSubjectClassLists().size() == 0}" th:each="subjectList: ${subjectClassLists}">
@@ -150,7 +150,8 @@
         <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/students/index" role="button">Student index</a>
-                <a class="btn btn-outline-warning" th:href="@{/students/{studentId}/edit(studentId=${student.id})}" role="button">Edit record</a>
+                <a class="btn btn-outline-warning" th:href="@{/students/{studentId}/edit(studentId=${student.id})}"
+                   role="button" sec:authorize="hasAuthority('admin.update')">Edit record</a>
             </div>
         </div>
     </form>

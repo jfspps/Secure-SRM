@@ -49,7 +49,7 @@ public class TestRecordController {
             model.addAttribute("testRecords", testRecordService.findAllTestRecordsByUsername(user.getUsername()));
         } else {
             //if the user falls under AdminUser, UserUser or TeacherUser...
-            model.addAttribute("testRecords", testRecordService.findAll());
+            model.addAttribute("testRecords", testRecordService.findAllByOrderById());
         }
         model.addAttribute("userID", user.getId());
         return "testRecord";
@@ -170,7 +170,7 @@ public class TestRecordController {
     }
 
     // 'ancillary' methods
-
+    @TeacherUpdate
     private void printTestRecordCreateErrors(BindingResult TRbindingResult, BindingResult GbindingResult) {
         TRbindingResult.getAllErrors().forEach(objectError -> {
             log.debug("testRecord: " + objectError.toString());  //use to build custom messages
@@ -181,6 +181,7 @@ public class TestRecordController {
         log.debug("TestRecord not saved to DB");
     }
 
+    @TeacherUpdate
     private void printTestRecordCreateErrors(BindingResult TRbindingResult) {
         TRbindingResult.getAllErrors().forEach(objectError -> {
             log.debug("testRecord: " + objectError.toString());  //use to build custom messages
@@ -188,20 +189,24 @@ public class TestRecordController {
         log.debug("TestRecord not saved to DB");
     }
 
+    @TeacherUpdate
     private void saveTestRecordWithGuardian(TestRecord testRecord, User guardianUser) {
         TestRecord saved = testRecordService.createTestRecord(testRecord.getRecordName(), guardianUser.getUsername());
         log.debug("Received guardianUser with id: " + saved.getUser().getId()
                 + " and username: " + saved.getUser().getUsername());
     }
 
+    @TeacherUpdate
     private boolean testRecordBelongsToGuardian(TestRecord TRfound, User gfound) {
             return TRfound.getUser().getId().equals(gfound.getId());
     }
 
+    @TeacherUpdate
     private boolean TestRecord_GuardianNameFields_AreEmpty(TestRecord testRecord, User guardianUser) {
         return testRecord.getRecordName().isEmpty() || guardianUser.getUsername().isEmpty();
     }
 
+    @TeacherUpdate
     private void updateTestRecord_recordName(TestRecord testRecord, String testRecordID) {
         TestRecord testRecordOnFile = testRecordService.findById(Long.valueOf(testRecordID));
         testRecordService.updateTestRecord(Long.valueOf(testRecordID),

@@ -38,7 +38,7 @@
                 <label class="control-label" size="30"><b>Student name</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="${'No students registered to this Guardian'}"></label>
+                <label size="50" th:text="${'(No students registered to this Guardian)'}"></label>
             </div>
         </div>
         <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
@@ -53,66 +53,64 @@
         </div>
         <br/>
 
-        <span th:if="${guardian.getAddress() == null}">
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>No address on file</b></label>
-                </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Address line 1</b></label>
             </div>
-        </span>
-        <span th:unless="${guardian.getAddress() == null}">
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>Address line 1</b></label>
-                </div>
-                <div class="col-sm-8">
-                    <label size="50" th:text="*{address.firstLine}">First line of address to appear here</label>
-                </div>
+            <div class="col-sm-8" th:if="${guardian.address.firstLine.isEmpty()}">
+                <label size="50">(record not found)</label>
             </div>
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>Address line 2</b></label>
-                </div>
-                <div class="col-sm-8">
-                    <label size="50" th:text="*{address.secondLine}">Second line of address to appear here</label>
-                </div>
+            <div class="col-sm-8" th:unless="${guardian.address.firstLine.isEmpty()}">
+                <label size="50" th:text="*{address.firstLine}">First line of address to appear here</label>
             </div>
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>Address postcode</b></label>
-                </div>
-                <div class="col-sm-8">
-                    <label size="50" th:text="*{address.postcode}">Postcode to appear here</label>
-                </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Address line 2</b></label>
             </div>
-        </span>
+            <div class="col-sm-8" th:if="${guardian.address.secondLine.isEmpty()}">
+                <label size="50">(record not found)</label>
+            </div>
+            <div class="col-sm-8" th:unless="${guardian.address.secondLine.isEmpty()}">
+                <label size="50" th:text="*{address.secondLine}">Second line of address to appear here</label>
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Address postcode</b></label>
+            </div>
+            <div class="col-sm-8" th:if="${guardian.address.postcode.isEmpty()}">
+                <label size="50">(record not found)</label>
+            </div>
+            <div class="col-sm-8" th:unless="${guardian.address.postcode.isEmpty()}">
+                <label size="50" th:text="*{address.postcode}">Postcode to appear here</label>
+            </div>
+        </div>
         <br/>
 
-        <span th:if="${guardian.contactDetail == null}">
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>No contact details on file</b></label>
-                </div>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Email address</b></label>
             </div>
-        </span>
-        <span th:unless="${guardian.contactDetail == null}">
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>Phone number</b></label>
-                </div>
-                <div class="col-sm-8">
-                    <label size="50" th:text="*{contactDetail.phoneNumber}">Phone number to appear here</label>
-                </div>
+            <div class="col-sm-8" th:if="${guardian.contactDetail.email.isEmpty()}">
+                <label size="50">(No email on record)</label>
             </div>
-            <div class="row align-items-start">
-                <div class="col-sm-2">
-                    <label class="control-label" size="30"><b>Email address</b></label>
-                </div>
-                <div class="col-sm-8">
-                    <label size="50" th:text="*{contactDetail.email}">Email to appear here</label>
-                </div>
+            <div class="col-sm-8" th:unless="${guardian.contactDetail.email.isEmpty()}">
+                <label size="50" th:text="*{contactDetail.email}">Email to appear here</label>
             </div>
-        </span>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Phone number</b></label>
+            </div>
+            <div class="col-sm-8" th:if="${guardian.contactDetail.phoneNumber.isEmpty()}">
+                <label size="50">(No phone number on record)</label>
+            </div>
+            <div class="col-sm-8" th:unless="${guardian.contactDetail.phoneNumber.isEmpty()}">
+                <label size="50" th:text="*{contactDetail.phoneNumber}">Phone number to appear here</label>
+            </div>
+        </div>
 
         <br/>
         <div class="row align-items-start">
@@ -129,7 +127,7 @@
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/guardians/index" role="button">Guardian index</a>
                 <a class="btn btn-outline-warning" th:href="@{/guardians/{guardianId}/edit(guardianId=${guardian.id})}"
-                   role="button">Edit record</a>
+                   role="button" sec:authorize="hasAuthority('admin.update')">Edit record</a>
             </div>
         </div>
     </form>
