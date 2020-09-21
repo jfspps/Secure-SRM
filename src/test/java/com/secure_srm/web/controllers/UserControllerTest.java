@@ -151,7 +151,7 @@ class UserControllerTest extends SecurityCredentialsTest {
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
     @ParameterizedTest
     void loginAuthHttpBasic_AllUsers_Authenticated(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/authenticated").with(httpBasic(username, pwd)))
+        mockMvc.perform(get("/authenticated").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("authenticated"))
                 .andExpect(model().attributeExists("user"))

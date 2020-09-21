@@ -1,7 +1,9 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
+import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.security.*;
+import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.securityServices.*;
 import com.secure_srm.web.permissionAnnot.*;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class UserController {
     private final GuardianUserService guardianUserService;
     private final AdminUserService adminUserService;
     private final PasswordEncoder passwordEncoder;
+    private final ContactDetailService contactDetailService;
 
     private final String INVALID_USERNAME = "User's username length must be >= 8 characters";
     private final String INVALID_ADMIN_NAME = "AdminUser's name length must be >= 8 characters";
@@ -71,7 +74,52 @@ public class UserController {
         User user = userService.findByUsername(getUsername());
         model.addAttribute("userID", user.getId());
         model.addAttribute("user", getUsername());
+        if (user.getAdminUser() != null){
+            model.addAttribute("contactDetails", user.getAdminUser().getContactDetail());
+        } else if (user.getTeacherUser() != null){
+            model.addAttribute("contactDetails", user.getTeacherUser().getContactDetail());
+        } else if (user.getGuardianUser() != null){
+            model.addAttribute("contactDetails", user.getGuardianUser().getContactDetail());
+        }
         return "authenticated";
+    }
+
+    /**
+     * Processes contact detail changes via the 'Account Settings' dropdown
+     * */
+    @GuardianUpdate
+    @PostMapping("/editContactDetails/{userID}")
+    public String updateContactDetails(@PathVariable("userID") String userID, Model model,
+                                       @ModelAttribute("contactDetails") ContactDetail contactDetail){
+        if (userService.findById(Long.valueOf(userID)) == null){
+            log.debug("Cannot update contact details with given ID");
+            throw new NotFoundException("User with given ID not found");
+        } else {
+            User userOnFile = userService.findById(Long.valueOf(userID));
+            ContactDetail savedContacts;
+            if (userOnFile.getAdminUser() != null){
+                ContactDetail contactsOnFile = userOnFile.getAdminUser().getContactDetail();
+                savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
+                userOnFile.getAdminUser().setContactDetail(savedContacts);
+            } else if (userOnFile.getTeacherUser() != null){
+                ContactDetail contactsOnFile = userOnFile.getTeacherUser().getContactDetail();
+                savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
+                userOnFile.getTeacherUser().setContactDetail(savedContacts);
+            } else if (userOnFile.getGuardianUser() != null){
+                ContactDetail contactsOnFile = userOnFile.getGuardianUser().getContactDetail();
+                savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
+                userOnFile.getGuardianUser().setContactDetail(savedContacts);
+            } else {
+                model.addAttribute("contactDetailFeedback", "Contact details not updated");
+                model.addAttribute("contactDetails", ContactDetail.builder()
+                        .email("(not saved)").phoneNumber("(not saved)").build());
+                return "/authenticated";
+            }
+            userService.save(userOnFile);
+            model.addAttribute("contactDetailFeedback", "Contact details updated");
+            model.addAttribute("contactDetails", savedContacts);
+            return "/authenticated";
+        }
     }
 
     @GuardianRead
@@ -158,7 +206,8 @@ public class UserController {
 
     @AdminUpdate
     @PostMapping("/changePassword/{userID}")
-    public String postChangePassword(@PathVariable String userID, @Valid @ModelAttribute("currentUser") User passwordChangeUser,
+    public String postChangePassword(@PathVariable String userID,
+                                     @Valid @ModelAttribute("currentUser") User passwordChangeUser,
                                      BindingResult bindingResult) {
         if (userService.findById(Long.valueOf(userID)) != null) {
             if (passwordIsOK(bindingResult, true, passwordChangeUser.getPassword())) {
@@ -224,19 +273,21 @@ public class UserController {
 
         checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword());
         checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername());
-        checksOut = firstName_lastName_isOK(adminBindingResult, checksOut, newAdminUser.getFirstName(), newAdminUser.getLastName());
+        checksOut = firstName_lastName_isOK(adminBindingResult, checksOut, newAdminUser.getFirstName(),
+                newAdminUser.getLastName());
 
         if (!checksOut) {
             return "adminCreate";
         }
 
-        // At present, Weblogin saves new AdminUser and User concurrently (treated as one entity) since we require a User password.
+        // At present, Weblogin saves new AdminUser and User concurrently (treated as one entity) since we require a
+        // User password.
         // Different AdminUsers associated with the same User would require more functionality not offered here.
         // We proceed here assuming that different AdminUsers can be associated with the same User.
 
         // New Users, with given Roles, are instantiated before AdminUsers. One AdminUser is associated with many Users.
-        // All User usernames and hence Users are unique. Check that the new AdminUser is not registering with a User it is already
-        // associated with
+        // All User usernames and hence Users are unique. Check that the new AdminUser is not registering with a User
+        // it is already associated with
         User userFound = userAlreadyExists(newUser.getUsername());
         AdminUser adminUserFound = adminUserAlreadyExists(newAdminUser.getFirstName(), newAdminUser.getLastName());
         if (userFound != null) {
@@ -265,10 +316,7 @@ public class UserController {
     @AdminUpdate
     @GetMapping("/updateAdmin/{adminUserID}")
     public String getUpdateAdmin(Model model, @PathVariable String adminUserID) {
-        if (userService.findById(Long.valueOf(adminUserID)) == null) {
-            log.debug("User with ID " + adminUserID + " not found");
-            throw new NotFoundException();
-        }
+        checkUserId(adminUserID);
         User user = userService.findById(Long.valueOf(adminUserID));
         //guard against wrong adminUser by user ID
         if (user.getAdminUser() == null) {
@@ -286,27 +334,17 @@ public class UserController {
     @AdminUpdate
     @PostMapping("/updateAdmin/{adminUserID}")
     public String postUpdateAdminWithID(@PathVariable String adminUserID,
-                                        @Valid @ModelAttribute("currentUser") User currentUser, BindingResult userBindingResult,
+                                        @Valid @ModelAttribute("currentUser") User currentUser,
+                                        BindingResult userBindingResult,
                                         @Valid @ModelAttribute("currentAdminUser") AdminUser currentAdminUser,
                                         BindingResult adminBindingResult, Model model) {
-        if (userService.findById(Long.valueOf(adminUserID)) == null) {
-            throw new NotFoundException("User with given ID not found. No updates committed.");
-        }
+        checkUserId(adminUserID);
 
         User userToBeUpdated = userService.findById(Long.valueOf(adminUserID));
         //either the username is empty or is already on file
         boolean allGood = true;
-        if (userBindingResult.hasErrors()) {
-            model.addAttribute("usernameError", INVALID_USERNAME);
-            allGood = false;
-        } else if (userAlreadyExists(currentUser.getUsername()) == null
-                || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
-            //User not on file or username was not changed
-            userToBeUpdated.setUsername(currentUser.getUsername());
-        } else {
-            model.addAttribute("usernameExists", "Username already taken");
-            allGood = false;
-        }
+        allGood = checkUsername(currentUser, userBindingResult, model, userToBeUpdated, allGood,
+                userAlreadyExists(currentUser.getUsername()));
 
         //either the adminUser name field is empty or is already on file
         if (adminBindingResult.hasErrors()) {
@@ -386,7 +424,8 @@ public class UserController {
                         user.getUsername().equals(userFound.getUsername()))) {
                     log.debug("TeacherUser is already registered with the given User");
                     teacherBindingResult.rejectValue("teacherUserName", "exists",
-                            "TeacherUser provided is already registered with given User. Please change the TeacherUser name.");
+                            "TeacherUser provided is already registered with given User. Please change the" +
+                                    " TeacherUser name.");
                     return "teacherCreate";
                 }
             }
@@ -399,10 +438,7 @@ public class UserController {
     @AdminUpdate
     @GetMapping("/updateTeacher/{teacherUserID}")
     public String getUpdateTeacher(Model model, @PathVariable String teacherUserID) {
-        if (userService.findById(Long.valueOf(teacherUserID)) == null) {
-            log.debug("User with ID " + teacherUserID + " not found");
-            throw new NotFoundException();
-        }
+        checkUserId(teacherUserID);
         User user = userService.findById(Long.valueOf(teacherUserID));
         if (user.getTeacherUser() == null) {
             log.debug("No teacherUser associated with given user");
@@ -422,23 +458,13 @@ public class UserController {
                                     @Valid @ModelAttribute("currentUser") User currentUser, BindingResult userBindingResult,
                                     @Valid @ModelAttribute("currentTeacherUser") TeacherUser currentTeacherUser,
                                     BindingResult teacherBindingResult, Model model) {
-        if (userService.findById(Long.valueOf(teacherUserID)) == null) {
-            throw new NotFoundException("User with given ID not found. No updates committed.");
-        }
+        checkUserId(teacherUserID);
 
         User userToBeUpdated = userService.findById(Long.valueOf(teacherUserID));
         //either the username is empty or is already on file
         boolean allGood = true;
-        if (userBindingResult.hasErrors()) {
-            model.addAttribute("usernameError", INVALID_USERNAME);
-            allGood = false;
-        } else if (userAlreadyExists(currentUser.getUsername()) == null
-                || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
-            userToBeUpdated.setUsername(currentUser.getUsername());
-        } else {
-            model.addAttribute("usernameExists", "Username already taken");
-            allGood = false;
-        }
+        allGood = checkUsername(currentUser, userBindingResult, model, userToBeUpdated, allGood,
+                userAlreadyExists(currentUser.getUsername()));
 
         //either the teacherUser name field is empty or is already on file
         if (teacherBindingResult.hasErrors()) {
@@ -515,14 +541,16 @@ public class UserController {
         }
 
         User userFound = userAlreadyExists(newUser.getUsername());
-        GuardianUser guardianUserFound = guardianUserAlreadyExists(newGuardianUser.getFirstName(), newGuardianUser.getLastName());
+        GuardianUser guardianUserFound = guardianUserAlreadyExists(newGuardianUser.getFirstName(),
+                newGuardianUser.getLastName());
         if (userFound != null) {
             if (guardianUserFound != null) {
                 if (guardianUserFound.getUsers().stream().anyMatch(user ->
                         user.getUsername().equals(userFound.getUsername()))) {
                     log.debug("GuardianUser is already registered with the given User");
                     guardianBindingResult.rejectValue("guardianUserName", "exists",
-                            "GuardianUser provided is already registered with given User. Please change the GuardianUser name.");
+                            "GuardianUser provided is already registered with given User. Please change" +
+                                    " the GuardianUser name.");
                     return "guardianCreate";
                 }
             }
@@ -535,10 +563,7 @@ public class UserController {
     @AdminUpdate
     @GetMapping("/updateGuardian/{guardianUserID}")
     public String getUpdateGuardian(Model model, @PathVariable String guardianUserID) {
-        if (userService.findById(Long.valueOf(guardianUserID)) == null) {
-            log.debug("User with ID " + guardianUserID + " not found");
-            throw new NotFoundException();
-        }
+        checkUserId(guardianUserID);
         User user = userService.findById(Long.valueOf(guardianUserID));
         if (user.getGuardianUser() == null) {
             log.debug("No guardianUser associated with given user");
@@ -558,23 +583,13 @@ public class UserController {
                                     @Valid @ModelAttribute("currentUser") User currentUser, BindingResult userBindingResult,
                                     @Valid @ModelAttribute("currentGuardianUser") GuardianUser currentGuardianUser,
                                     BindingResult guardianBindingResult, Model model) {
-        if (userService.findById(Long.valueOf(guardianUserID)) == null) {
-            throw new NotFoundException("User with given ID not found. No updates committed.");
-        }
+        checkUserId(guardianUserID);
 
         User userToBeUpdated = userService.findById(Long.valueOf(guardianUserID));
         //either the username is empty or is already on file
         boolean allGood = true;
-        if (userBindingResult.hasErrors()) {
-            model.addAttribute("usernameError", INVALID_USERNAME);
-            allGood = false;
-        } else if (userService.findByUsername(currentUser.getUsername()) == null
-                || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
-            userToBeUpdated.setUsername(currentUser.getUsername());
-        } else {
-            model.addAttribute("usernameExists", "Username already taken");
-            allGood = false;
-        }
+        allGood = checkUsername(currentUser, userBindingResult, model, userToBeUpdated, allGood,
+                userService.findByUsername(currentUser.getUsername()));
 
         //either the adminUser name field is empty or is already on file
         if (guardianBindingResult.hasErrors()) {
@@ -617,6 +632,45 @@ public class UserController {
 
     // end of CRUD ops ==========================================================================================
     //the following methods are called by the above controller methods only if the required parameters are verified
+
+    /**
+     * Validates a submitted username and checks if it already exists on the DB
+     * */
+    @AdminUpdate
+    private boolean checkUsername(User currentUser, BindingResult userBindingResult, Model model,
+                                  User userToBeUpdated, boolean allGood, User user) {
+        if (userBindingResult.hasErrors()) {
+            model.addAttribute("usernameError", INVALID_USERNAME);
+            allGood = false;
+        } else if (user == null
+                || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
+            //User not on file or username was not changed
+            userToBeUpdated.setUsername(currentUser.getUsername());
+        } else {
+            model.addAttribute("usernameExists", "Username already taken");
+            allGood = false;
+        }
+        return allGood;
+    }
+
+    /**
+     * Checks a user ID prior to a GET request
+     * */
+    @TeacherUpdate
+    private void checkUserId(String userID) {
+        if (userService.findById(Long.valueOf(userID)) == null) {
+            log.debug("User with ID " + userID + " not found");
+            throw new NotFoundException("User with given ID not found");
+        }
+    }
+
+    /**Updates contact details*/
+    @GuardianUpdate
+    private ContactDetail syncAndSaveContacts(ContactDetail newDetails, ContactDetail contactsOnFile) {
+        contactsOnFile.setEmail(newDetails.getEmail());
+        contactsOnFile.setPhoneNumber(newDetails.getPhoneNumber());
+        return contactDetailService.save(contactsOnFile);
+    }
 
     /**
      * inserts URL path related Strings dependent on the Usertype (AdminUser, TeacherUser or GuardianUser)
@@ -723,11 +777,13 @@ public class UserController {
     private void newTeacherUser(TeacherUser newTeacherUser, User newUser) {
         Role teacherRole = roleService.findByRoleName("TEACHER");
         TeacherUser savedTeacherUser = teacherUserService.save(
-                TeacherUser.builder().firstName(newTeacherUser.getFirstName()).lastName(newTeacherUser.getLastName()).build());
+                TeacherUser.builder()
+                        .firstName(newTeacherUser.getFirstName()).lastName(newTeacherUser.getLastName()).build());
         User savedUser = userService.save(User.builder().teacherUser(savedTeacherUser)
                 .username(newUser.getUsername()).password(passwordEncoder.encode(newUser.getPassword()))
                 .role(teacherRole).build());
-        log.debug("New Teacher name: " + savedUser.getTeacherUser().getFirstName() + " " + savedUser.getTeacherUser().getLastName()
+        log.debug("New Teacher name: " + savedUser.getTeacherUser().getFirstName()
+                + " " + savedUser.getTeacherUser().getLastName()
                 + ", with username " + savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
     }
 
@@ -747,11 +803,13 @@ public class UserController {
     private void newGuardianUser(GuardianUser newGuardianUser, User newUser) {
         Role guardianRole = roleService.findByRoleName("GUARDIAN");
         GuardianUser savedGuardianUser = guardianUserService.save(
-                GuardianUser.builder().firstName(newGuardianUser.getFirstName()).lastName(newGuardianUser.getLastName()).build());
+                GuardianUser.builder()
+                        .firstName(newGuardianUser.getFirstName()).lastName(newGuardianUser.getLastName()).build());
         User savedUser = userService.save(User.builder().guardianUser(savedGuardianUser)
                 .username(newUser.getUsername()).password(passwordEncoder.encode(newUser.getPassword()))
                 .role(guardianRole).build());
-        log.debug("New Guardian name: " + savedUser.getGuardianUser().getFirstName() + " " + savedUser.getGuardianUser().getLastName()
+        log.debug("New Guardian name: " + savedUser.getGuardianUser().getFirstName()
+                + " " + savedUser.getGuardianUser().getLastName()
                 + ", with username " + savedUser.getUsername() + " and ID: " + savedUser.getId() + " added");
     }
 
@@ -849,7 +907,8 @@ public class UserController {
             teacherUserService.deleteById(teacherUserId);
             log.debug("TeacherUser, " + teacherUserName + ", User set is now empty and has been deleted");
         } else {
-            log.debug("TeacherUser, " + teacherUserName + ", has " + teacherUser.getUsers().size() + " remaining Users associated");
+            log.debug("TeacherUser, " + teacherUserName + ", has " + teacherUser.getUsers().size()
+                    + " remaining Users associated");
         }
 
         userService.deleteById(userID);
@@ -872,7 +931,8 @@ public class UserController {
             guardianUserService.deleteById(guardianUserId);
             log.debug("GuardianUser, " + guardianUserName + ", User set is now empty and has been deleted");
         } else {
-            log.debug("GuardianUser, " + guardianUserName + ", has " + guardianUser.getUsers().size() + " remaining Users associated");
+            log.debug("GuardianUser, " + guardianUserName + ", has " + guardianUser.getUsers().size()
+                    + " remaining Users associated");
         }
 
         userService.deleteById(userID);
