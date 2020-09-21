@@ -26,7 +26,7 @@
             </div>
 
             <div class="col-sm-2">
-                <label class="control-label">Guardian name</label>
+                <label class="control-label">Guardian name (required)</label>
             </div>
             <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
                 <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
@@ -43,7 +43,31 @@
                 </span>
             </div>
         </div>
-        <br/>
+        <br />
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Guardian address (optional)</label>
+            </div>
+            <div class="col-sm-8">
+                <input placeholder="Address first line" id="firstLine" size="40" th:field="*{address.firstLine}"/>
+                <br />
+                <input placeholder="Address second line" id="secondLine" size="40" th:field="*{address.secondLine}"/>
+                <br />
+                <input placeholder="Post code" id="postCode" size="40" th:field="*{address.postcode}"/>
+            </div>
+        </div>
+        <br />
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Guardian contact details (optional)</label>
+            </div>
+            <div class="col-sm-8">
+                <input placeholder="Email address" id="email" size="40" th:field="*{contactDetail.email}"/>
+                <br />
+                <input placeholder="Phone number" id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+            </div>
+        </div>
+        <br />
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <button class="btn btn-info" type="submit">Add guardian</button>

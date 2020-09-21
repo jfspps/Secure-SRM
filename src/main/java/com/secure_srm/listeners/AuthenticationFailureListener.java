@@ -67,7 +67,7 @@ public class AuthenticationFailureListener {
 
     //note that failures persists even if the user logs in successfully before being locked out
     private void lockAccount(User user) {
-        List<LoginFailure> failures = loginFailureRepository.findAllByUserAndCreatedDateIsAfter(user,
+        List<LoginFailure> failures = loginFailureRepository.findAllByUserAndCreatedDateIsAfterOrderById(user,
                 Timestamp.valueOf(LocalDateTime.now().minusHours(LOCKOUTHOURS)));
 
         if(failures.size() > LOGINATTEMPTS){

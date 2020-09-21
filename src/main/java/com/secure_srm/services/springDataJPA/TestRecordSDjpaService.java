@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,13 +69,18 @@ public class TestRecordSDjpaService implements TestRecordService {
     }
 
     @Override
+    public List<TestRecord> findAllByOrderById() {
+        return testRecordRepository.findAllByOrderById();
+    }
+
+    @Override
     public TestRecord findById(Long id) {
         return testRecordRepository.findById(id).orElse(null);
     }
 
     @Override
     public Set<TestRecord> findAllTestRecordsByUsername(String username) {
-        return testRecordRepository.findAllByUser_Username(username);
+        return testRecordRepository.findAllByUser_UsernameOrderById(username);
     }
 
     @Override

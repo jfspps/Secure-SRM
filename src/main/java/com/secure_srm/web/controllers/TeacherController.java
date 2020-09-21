@@ -83,6 +83,7 @@ public class TeacherController {
         }
 
         if (teacherUserService.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName()) == null) {
+            contactDetailService.save(teacher.getContactDetail());
             TeacherUser savedTeacher = teacherUserService.save(teacher);
             //head straight to the update page to edit other properties
             return "redirect:/teachers/" + savedTeacher.getId() + "/edit";

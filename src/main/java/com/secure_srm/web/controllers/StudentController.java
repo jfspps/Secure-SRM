@@ -82,6 +82,7 @@ public class StudentController {
         // save() handles the id allocation (no further intervention needed for new saves)
         if (studentService.findByFirstLastAndMiddleNames(
                 student.getFirstName(), student.getLastName(), student.getMiddleNames()) == null) {
+            contactDetailService.save(student.getContactDetail());
             Student savedStudent = studentService.save(student);
             //head straight to the update page to edit other properties
             return "redirect:/students/" + savedStudent.getId() + "/edit";
