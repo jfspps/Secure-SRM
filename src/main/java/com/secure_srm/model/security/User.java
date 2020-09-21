@@ -116,8 +116,4 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     //testRecord mappings, one user to many testRecords
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<TestRecord> testRecords;
-
-    //transferred to Student, Teacher and Guardian??? wait and see
-    @OneToOne
-    private ContactDetail contactDetail;
 }

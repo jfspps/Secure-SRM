@@ -16,7 +16,19 @@ At present, the original SRM project can handle personal data (student, teacher 
 
 Here is summary of the main classes pertaining to authentication and authorisation:
 
-[/com/secure_srm/bootstrap](/src/main/java/com/secure_srm/bootstrap/security)
+[/com/secure_srm/SpringSecurityInitializer](/src/main/java/com/secure_srm/SpringSecurityInitializer.java)
+
+The purpose of `SpringSecurityInitializer` is to load springSecurityFilterChain:
+
+__Key filters in the chain are (in order)__
+- SecurityContextPersistenceFilter (restores Authentication from JSESSIONID)
+- UsernamePasswordAuthenticationFilter (performs authentication)
+- ExceptionTranslationFilter (catch security exceptions from FilterSecurityInterceptor)
+- FilterSecurityInterceptor (may throw authentication and authorization exceptions)
+
+(source: https://stackoverflow.com/questions/41480102/how-spring-security-filter-chain-works)
+
+[/com/secure_srm/bootstrap](/src/main/java/com/secure_srm/bootstrap/DataLoader_SDjpa.java)
 
 + `DataLoader_SDjpa` Initialises Roles, Authorities (permissions) and user accounts if the current database is void of user accounts
 

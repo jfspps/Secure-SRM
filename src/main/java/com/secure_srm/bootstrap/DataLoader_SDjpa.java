@@ -136,8 +136,20 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         // Instantiating the admin users (this must be done after Users)
         // AdminUsers can store non-Security related fields (department, academic year etc.)
         // Note, UserName is not Username
-        AdminUser johnSmith = adminUserService.save(AdminUser.builder().firstName("John").lastName("Smith").build());
-        AdminUser amySmith = adminUserService.save(AdminUser.builder().firstName("Amy").lastName("Smith").build());
+        AdminUser johnSmith = AdminUser.builder().firstName("John").lastName("Smith").build();
+        AdminUser amySmith = AdminUser.builder().firstName("Amy").lastName("Smith").build();
+
+        //set contact details to Admin
+        ContactDetail johnContacts = contactDetailService.save(
+                ContactDetail.builder().email("jsAdmin@school.com").phoneNumber("92874328").build());
+        ContactDetail amyContacts = contactDetailService.save(
+                ContactDetail.builder().email("asAdmin@school.com").phoneNumber("46364345").build());
+        johnSmith.setContactDetail(johnContacts);
+        amySmith.setContactDetail(amyContacts);
+
+        //save Adminuser's
+        adminUserService.save(johnSmith);
+        adminUserService.save(amySmith);
 
         //passwords are not displayed on the schema...?
         User johnSmithUser = userService.save(User.builder().username("johnsmith")
@@ -209,15 +221,15 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         contactDetailService.save(teacher2Contact);
 
         ContactDetail guardianContactDetail1 = ContactDetail.builder().phoneNumber("3479324732").email("guardian1@email.com").build();
-        contactDetailService.save(guardianContactDetail1);
         ContactDetail guardianContactDetail2 = ContactDetail.builder().phoneNumber("02374320427").email("guardian2@email.com").build();
+        contactDetailService.save(guardianContactDetail1);
         contactDetailService.save(guardianContactDetail2);
         log.debug("Contact details loaded to DB");
 
         //addresses
         Address address1 = Address.builder().firstLine("88 Penine Way").secondLine("Farnborough").postcode("CHG9475JF").build();
-        addressService.save(address1);
         Address address2 = Address.builder().firstLine("7B Gossfer Drive").secondLine("Racoon City").postcode("ZJGKF97657DD").build();
+        addressService.save(address1);
         addressService.save(address2);
         log.debug("Addresses loaded to DB");
 
