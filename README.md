@@ -1,16 +1,18 @@
-# Student Record Management #
+# Secure Student Record Management (Secure-SRM) #
 
 ## Overview ##
 
-This project is a combination of two project, Student Record Management [SRM](https://github.com/jfspps/SRM-Spring) and [Web-login](https://github.com/jfspps/Spring_weblogin).
+This project is a combination of two projects, Student Record Management [SRM](https://github.com/jfspps/SRM-Spring) and [Web-login](https://github.com/jfspps/Spring_weblogin).
 
 Student record management is a Spring based academic database which stores and processes student academic data. Web-login provides the Spring Security frontend, with authentication and authorisation functionality.
 
-## SRM project overview ##
+The model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
-The model entities are saved to an in-memory H2 database or in a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
+## Current and future work of Secure-SRM ##
 
-## SRM web-login overview ##
+At present, the original SRM project can handle personal data (student, teacher and guardian contact details etc.). Following the integration of SRM with Web-login, work will proceed to extend the functionality of SRM with the development of 'Secure'SRM'. New features will include the storage and retrieval of academic related records, notably school assignment models (homework, performances, quizzes and mock exams), student results, grade mappings and results summaries.
+
+## Web-login specific overview ##
 
 Here is summary of the main classes pertaining to authentication and authorisation:
 
@@ -76,5 +78,3 @@ Contains SQL scripts for MySQL credentials and Secure-SRM entities.
 Contains the CSS, HTTP custom response Thymeleaf templates, and remaining front-end for Secure-SRM.
 
 The file [messages.properties](/src/main/resources/messages.properties) handles front-end user feedback messages related to form feedback. the file [schema.sql](/src/main/resources/schema.sql) is recognised by Spring Boot and establishes persistent, database storage of user sessions.
-
-
