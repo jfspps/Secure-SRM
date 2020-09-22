@@ -115,7 +115,7 @@
                     <label size="50">(Not assigned to a group)</label>
                 </span>
                 <span th:unless="${formGroupList == null}">
-                    <label size="50" th:text="*{groupName}">Form group name to appear here</label>
+                    <label size="50"><a th:text="*{groupName}" th:href="@{/formGroupList/{formID}(formID=${formGroupList.id})}"></a></label>
                 </span>
             </div>
         </div>

@@ -31,14 +31,14 @@
             <td class="px-3" th:text="${student.lastName}"></td>
 
             <span th:if="${student.contactDetail == null}">
-                <td class="px-3">No phone number on record</td>
+                <td class="px-3">(No phone number on record)</td>
             </span>
             <span th:unless="${student.contactDetail == null}">
                 <td class="px-3" th:text="${student.contactDetail.phoneNumber}"></td>
             </span>
 
             <span th:if="${student.teacher == null}">
-                <td class="px-3">Not assigned a tutor</td>
+                <td class="px-3">(Not assigned a tutor)</td>
             </span>
             <span th:unless="${student.teacher == null}">
                 <td class="px-3"
