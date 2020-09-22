@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Form groups</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
+    <table class="table table-hover table-sm table-striped my-auto mx-0">
+        <thead class="thead-light">
+            <tr>
+                <th class="px-3">ID</th>
+                <th class="px-3">Personal Tutor</th>
+                <th class="px-3">Group name</th>
+                <th class="px-3">No. of students</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--/*@thymesVar id="formGroup" type="com.secure_srm.model.people.FormGroupList"*/-->
+            <tr th:each="formGroup: ${formGroups}">
+            <th class="px-3"><a role="button" class="btn btn-sm btn-outline-info"
+                                    th:href="@{/formGroupList/{id}(id=${formGroup.id})}" th:text="${formGroup.id}"></a></th>
+            <td class="px-3" th:text="${formGroup.teacher.firstName + ' ' + formGroup.teacher.lastName}"></td>
+            <td class="px-3" th:text="${formGroup.groupName}"></td>
+            <td class="px-3" th:text="${formGroup.studentList.size()}"></td>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

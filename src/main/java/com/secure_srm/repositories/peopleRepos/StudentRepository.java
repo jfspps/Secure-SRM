@@ -3,6 +3,7 @@ package com.secure_srm.repositories.peopleRepos;
 import com.secure_srm.model.people.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,4 +31,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Set<Student> findAllByLastNameContainingIgnoreCase(String lastName);
 
     Set<Student> findAllByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    List<Student> findAllByOrderByLastName();
 }

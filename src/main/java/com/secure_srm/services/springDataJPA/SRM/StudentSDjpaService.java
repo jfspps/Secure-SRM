@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -61,6 +62,11 @@ public class StudentSDjpaService implements StudentService {
     @Override
     public Set<Student> findAllByFirstNameLikeAndLastNameLike(String firstName, String lastName) {
         return new HashSet<>(studentRepository.findAllByFirstNameLikeAndLastNameLike(firstName, lastName));
+    }
+
+    @Override
+    public List<Student> findAllByOrderByLastName() {
+        return studentRepository.findAllByOrderByLastName();
     }
 
     @Override

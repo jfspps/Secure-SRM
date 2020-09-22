@@ -3,6 +3,7 @@ package com.secure_srm.services.peopleServices;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.services.BaseService;
 
+import java.util.List;
 import java.util.Set;
 
 public interface StudentService extends BaseService<Student, Long> {
@@ -20,4 +21,6 @@ public interface StudentService extends BaseService<Student, Long> {
     Set<Student> findAllByLastNameContainingIgnoreCase(String lastName);
 
     Set<Student> findAllByFirstNameLikeAndLastNameLike(String firstName, String lastName);
+
+    List<Student> findAllByOrderByLastName();
 }

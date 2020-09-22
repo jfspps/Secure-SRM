@@ -179,13 +179,15 @@ public class GuardianController {
         log.debug("Current students registered with guardian on file:"
                 + guardianUserOnFile.getStudents().size());
 
-        //assign students to Guardian and vice versa
-        guardianUserOnFile.setStudents(guardian.getStudents());
+        //assign added students to Guardian and vice versa
         guardian.getStudents().stream().forEach(student -> {
             student.getGuardians().add(guardianUserOnFile);
             studentService.save(student);
         });
 
+        //todo: update removed students
+
+        guardianUserOnFile.setStudents(guardian.getStudents());
         GuardianUser saved = guardianUserService.save(guardianUserOnFile);
 
         model.addAttribute("guardian", saved);
