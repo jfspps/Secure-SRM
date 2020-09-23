@@ -1,14 +1,9 @@
 package com.secure_srm.web.controllers;
 
-import com.secure_srm.services.securityServices.AdminUserService;
-import com.secure_srm.services.securityServices.GuardianUserService;
-import com.secure_srm.services.securityServices.TeacherUserService;
-import com.secure_srm.services.securityServices.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithAnonymousUser;

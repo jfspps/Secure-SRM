@@ -170,24 +170,34 @@ public class GuardianController {
 
     @AdminUpdate
     @PostMapping("/{guardianId}/addRemoveStudents")
-    public String postGuardian_studentSet(@ModelAttribute("guardian") GuardianUser guardian, @PathVariable String guardianId,
+    public String postGuardian_studentSet(@ModelAttribute("guardian") GuardianUser formGuardian, @PathVariable String guardianId,
                                           Model model) {
 
-        log.debug("Current students registered with guardian passed:" + guardian.getStudents().size());
+        log.debug("Current students registered with guardian passed:" + formGuardian.getStudents().size());
 
         GuardianUser guardianUserOnFile = guardianUserService.findById(Long.valueOf(guardianId));
         log.debug("Current students registered with guardian on file:"
                 + guardianUserOnFile.getStudents().size());
 
-        //assign added students to Guardian and vice versa
-        guardian.getStudents().stream().forEach(student -> {
-            student.getGuardians().add(guardianUserOnFile);
+        //removed is the guardianUserOnFile - guardian passed
+        Set<Student> removed = new HashSet<>(guardianUserOnFile.getStudents());
+        removed.removeIf(formGuardian.getStudents()::contains);
+
+        //update students' (removed) Guardians Set
+        removed.forEach(student -> {
+            student.getGuardians().remove(guardianUserOnFile);
+            guardianUserOnFile.getStudents().remove(student);
             studentService.save(student);
         });
 
-        //todo: update removed students
+        //assign added students to Guardian and vice versa
+        formGuardian.getStudents().stream().forEach(student -> {
+            student.getGuardians().add(guardianUserOnFile);
+            formGuardian.getStudents().add(student);
+            studentService.save(student);
+        });
 
-        guardianUserOnFile.setStudents(guardian.getStudents());
+        guardianUserOnFile.setStudents(formGuardian.getStudents());
         GuardianUser saved = guardianUserService.save(guardianUserOnFile);
 
         model.addAttribute("guardian", saved);
