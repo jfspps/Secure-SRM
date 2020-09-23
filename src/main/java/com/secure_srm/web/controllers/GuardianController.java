@@ -173,18 +173,14 @@ public class GuardianController {
     public String postGuardian_studentSet(@ModelAttribute("guardian") GuardianUser formGuardian, @PathVariable String guardianId,
                                           Model model) {
 
-        log.debug("Current students registered with guardian passed:" + formGuardian.getStudents().size());
-
         GuardianUser guardianUserOnFile = guardianUserService.findById(Long.valueOf(guardianId));
-        log.debug("Current students registered with guardian on file:"
-                + guardianUserOnFile.getStudents().size());
 
-        //removed is the guardianUserOnFile - guardian passed
-        Set<Student> removed = new HashSet<>(guardianUserOnFile.getStudents());
-        removed.removeIf(formGuardian.getStudents()::contains);
+        //build set of removed students
+        Set<Student> removedStudents = new HashSet<>(guardianUserOnFile.getStudents());
+        removedStudents.removeIf(formGuardian.getStudents()::contains);
 
-        //update students' (removed) Guardians Set
-        removed.forEach(student -> {
+        //update removed students' GuardianSet property and guardianUserOnFile StudentSet
+        removedStudents.forEach(student -> {
             student.getGuardians().remove(guardianUserOnFile);
             guardianUserOnFile.getStudents().remove(student);
             studentService.save(student);

@@ -20,6 +20,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.Set;
 
 @Controller
@@ -163,14 +164,22 @@ public class StudentController {
     public String postStudent_guardianSet(@ModelAttribute("student") Student student, @PathVariable String studentId,
                                           Model model) {
 
-        log.debug("Current guardians registered with student passed:" + student.getGuardians().size());
-
         Student studentOnFile = studentService.findById(Long.valueOf(studentId));
-        log.debug("Current guardians registered with student on file:"
-                + studentOnFile.getGuardians().size());
 
-        //assign students to Guardian and vice versa
+        //new Set of guardians removed
+        Set<GuardianUser> removedGuardians = new HashSet<>(studentOnFile.getGuardians());
+        removedGuardians.removeIf(student.getGuardians()::contains);
+
+        //remove this student from removedGuardians' guardians and save
+        removedGuardians.forEach(guardianUser -> {
+            guardianUser.getStudents().remove(studentOnFile);
+            guardianUserService.save(guardianUser);
+        });
+
+        //overwrite studentOnFile's guardian set
         studentOnFile.setGuardians(student.getGuardians());
+
+        //sync Guardians with new set of
         student.getGuardians().stream().forEach(guardianUser -> {
             guardianUser.getStudents().add(studentOnFile);
             guardianUserService.save(guardianUser);
@@ -214,17 +223,7 @@ public class StudentController {
     @PostMapping("/{studentId}/addRemoveTutor")
     public String postChangeTutor(@ModelAttribute("student") Student student, @PathVariable String studentId,
                                           Model model) {
-
-        log.debug("Current teacher registered with student passed:" + student.getTeacher().getFirstName() +
-                    ' ' + student.getTeacher().getLastName());
         Student studentOnFile = studentService.findById(Long.valueOf(studentId));
-
-        if (studentOnFile.getTeacher() == null){
-            log.debug("Student on file is not assigned a tutor");
-        } else {
-            log.debug("Current teacher registered with student on file:" + studentOnFile.getTeacher().getFirstName() +
-                    ' ' + studentOnFile.getTeacher().getLastName());
-        }
 
         //assign teacher to Student (currently, TeacherUser is not mapped to Student)
         studentOnFile.setTeacher(student.getTeacher());

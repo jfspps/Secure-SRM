@@ -61,6 +61,29 @@ public class GuardianUserControllerTest_IT extends UserControllerTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
+    void getRefineGuardianList(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/students/1/addRemoveGuardians/search").with(httpBasic(username, pwd))
+                .param("GuardianLastName", ""))
+                .andExpect(view().name("/SRM/students/guardianSet"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("student"))
+                .andExpect(model().attributeExists("guardianSet"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void getRefineStudentList(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/guardians/1/addRemoveStudents/search").with(httpBasic(username, pwd))
+                .param("GuardianLastName", ""))
+                .andExpect(view().name("/SRM/guardians/studentSet"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("guardian"))
+                .andExpect(model().attributeExists("studentSet"));
+    }
+
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
     void getUpdateGuardian(String username, String pwd) throws Exception {
         mockMvc.perform(get("/updateGuardian/5").with(httpBasic(username, pwd)))
                 .andExpect(status().isOk())
