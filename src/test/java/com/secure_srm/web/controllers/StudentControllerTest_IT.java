@@ -218,6 +218,17 @@ class StudentControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
+    void getRefineGuardianList(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/students/1/addRemoveGuardians/search").with(httpBasic(username, pwd))
+                .param("GuardianLastName", ""))
+                .andExpect(view().name("/SRM/students/guardianSet"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("student"))
+                .andExpect(model().attributeExists("guardianSet"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
     void getUpdateTutorForm(String username, String pwd) throws Exception{
         mockMvc.perform(get("/students/3/addRemoveTutor").with(httpBasic(username, pwd)))
                 .andExpect(status().isOk())

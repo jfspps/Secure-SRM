@@ -25,7 +25,6 @@ public class FormGroupListController {
 
     private final FormGroupListService formGroupListService;
     private final StudentService studentService;
-    private final TeacherUserService teacherUserService;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {

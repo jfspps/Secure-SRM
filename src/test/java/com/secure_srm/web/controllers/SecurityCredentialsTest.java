@@ -1,6 +1,7 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.services.academicServices.SubjectService;
+import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,6 +24,9 @@ public abstract class SecurityCredentialsTest {
 
     @Autowired
     SubjectService subjectService;
+
+    @Autowired
+    FormGroupListService formGroupListService;
 
     protected MockMvc mockMvc;
 
