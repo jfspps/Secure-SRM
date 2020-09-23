@@ -243,6 +243,31 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         TeacherUser teacher2 = teacherUserService.findByFirstNameAndLastName("Mary", "Manning");
         teacher2.setContactDetail(teacher2Contact);
 
+        //academic details
+        Subject subject1 = Subject.builder().subjectName("Mathematics").build();
+        Set<TeacherUser> teachers1 = new HashSet<>();
+        teachers1.add(teacher1);
+        subject1.setTeachers(teachers1);
+        Set<Subject> teacher1subjects = new HashSet<>();
+        teacher1subjects.add(subject1);
+        teacher1.setSubjects(teacher1subjects);
+
+        Subject subject2 = Subject.builder().subjectName("English").build();
+        Set<TeacherUser> teachers2 = new HashSet<>();
+        teachers2.add(teacher2);
+        subject2.setTeachers(teachers2);
+        Set<Subject> teacher2subjects = new HashSet<>();
+        teacher2subjects.add(subject2);
+        teacher2.setSubjects(teacher2subjects);
+
+        subjectService.save(subject1);
+        subjectService.save(subject2);
+        log.debug("Subjects loaded to DB");
+
+        teacherUserService.save(teacher1);
+        teacherUserService.save(teacher2);
+        log.debug("Teachers re-loaded to DB");
+
         GuardianUser guardian1 = guardianUserService.findByFirstNameAndLastName("Paul", "Smith");
         guardian1.setAddress(address1);
         guardian1.setContactDetail(guardianContactDetail1);
@@ -297,30 +322,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         student2.setFormGroupList(formGroupList2);
         student3.setFormGroupList(formGroupList2);
 
-        //academic details
-        Subject subject1 = Subject.builder().subjectName("Mathematics").build();
-        Set<TeacherUser> teachers1 = new HashSet<>();
-        teachers1.add(teacher1);
-        subject1.setTeachers(teachers1);
-        Set<Subject> teacher1subjects = new HashSet<>();
-        teacher1subjects.add(subject1);
-        teacher1.setSubjects(teacher1subjects);
 
-        Subject subject2 = Subject.builder().subjectName("English").build();
-        Set<TeacherUser> teachers2 = new HashSet<>();
-        teachers2.add(teacher2);
-        subject2.setTeachers(teachers2);
-        Set<Subject> teacher2subjects = new HashSet<>();
-        teacher2subjects.add(subject2);
-        teacher2.setSubjects(teacher2subjects);
-
-        subjectService.save(subject1);
-        subjectService.save(subject2);
-        log.debug("Subjects loaded to DB");
-
-        teacherUserService.save(teacher1);
-        teacherUserService.save(teacher2);
-        log.debug("Teachers re-loaded to DB");
 
         formGroupListService.save(formGroupList1);
         formGroupListService.save(formGroupList2);

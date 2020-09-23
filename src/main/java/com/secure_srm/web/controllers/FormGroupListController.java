@@ -14,9 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -96,13 +94,25 @@ public class FormGroupListController {
                                       @ModelAttribute("formGroup") FormGroupList formGroupList){
 
         FormGroupList listOnFile = formGroupListService.findById(Long.valueOf(groupID));
-        //update each added student
-        formGroupList.getStudentList().forEach(student -> {
-            student.setFormGroupList(listOnFile);
+
+        //copy listOnFile student set and remove those from formGroupList
+        Set<Student> removed = new HashSet<>(listOnFile.getStudentList());
+        removed.removeIf(formGroupList.getStudentList()::contains);
+
+        //clear removed students' formGroupList property and update the formGroupList on file
+        removed.forEach(student -> {
+            student.setFormGroupList(null);
+            student.setTeacher(null);
+            listOnFile.getStudentList().remove(student);
             studentService.save(student);
         });
 
-        //todo: update removed students
+        //update each added student
+        formGroupList.getStudentList().forEach(student -> {
+            student.setFormGroupList(listOnFile);
+            student.setTeacher(listOnFile.getTeacher());
+            studentService.save(student);
+        });
 
         listOnFile.setStudentList(formGroupList.getStudentList());
         FormGroupList saved = formGroupListService.save(listOnFile);

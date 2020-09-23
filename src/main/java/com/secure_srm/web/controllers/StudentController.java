@@ -53,14 +53,12 @@ public class StudentController {
     @TeacherRead
     @GetMapping("/{studentID}")
     public String getStudentDetails(@PathVariable String studentID, Model model){
-        if (studentService.findById(Long.valueOf(studentID)) == null){
-            log.debug("Student with ID: " + studentID + " not found");
-            throw new NotFoundException("Student not found");
-        } else {
-            Student found = studentService.findById(Long.valueOf(studentID));
-            updateStudentModel(model, found);
-            return "/SRM/students/studentDetails";
-        }
+        checkStudentID(studentID);
+
+        Student found = studentService.findById(Long.valueOf(studentID));
+        updateStudentModel(model, found);
+        return "/SRM/students/studentDetails";
+
     }
 
     @AdminCreate
@@ -99,13 +97,10 @@ public class StudentController {
     @AdminUpdate
     @GetMapping("/{studentID}/edit")
     public String getUpdateStudent(@PathVariable String studentID, Model model) {
-        if (studentService.findById(Long.valueOf(studentID)) == null){
-            log.debug("Student with ID: " + studentID + " not found");
-            throw new NotFoundException("Student not found");
-        } else {
-            model.addAttribute("student", studentService.findById(Long.valueOf(studentID)));
-            return "/SRM/students/updateStudent";
-        }
+        checkStudentID(studentID);
+
+        model.addAttribute("student", studentService.findById(Long.valueOf(studentID)));
+        return "/SRM/students/updateStudent";
     }
 
     @AdminUpdate
@@ -140,33 +135,27 @@ public class StudentController {
     @AdminUpdate
     @GetMapping("/{studentId}/addRemoveGuardians")
     public String getStudent_guardianSet(Model model, @PathVariable String studentId){
-        if (studentService.findById(Long.valueOf(studentId)) == null) {
-            log.debug("Student with ID: " + studentId + " not found");
-            throw new NotFoundException("Student not found");
-        } else {
-            model.addAttribute("guardianSet", guardianUserService.findAll());
-            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
-            return "/SRM/students/guardianSet";
-        }
+        checkStudentID(studentId);
+
+        model.addAttribute("guardianSet", guardianUserService.findAll());
+        model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+        return "/SRM/students/guardianSet";
     }
 
     //search function to refine list of Guardians registered to Student
     @AdminUpdate
     @GetMapping("/{studentId}/addRemoveGuardians/search")
     public String getRefineGuardianList(Model model, @PathVariable String studentId, String GuardianLastName){
-        if (studentService.findById(Long.valueOf(studentId)) == null) {
-            log.debug("Student with ID: " + studentId + " not found");
-            throw new NotFoundException("Student not found");
+        checkStudentID(studentId);
+
+        if (GuardianLastName == null || GuardianLastName.isEmpty()) {
+            model.addAttribute("guardianSet", guardianUserService.findAll());
         } else {
-            if (GuardianLastName == null || GuardianLastName.isEmpty()) {
-                model.addAttribute("guardianSet", guardianUserService.findAll());
-            } else {
-                model.addAttribute("guardianSet",
-                        guardianUserService.findAllByLastNameContainingIgnoreCase(GuardianLastName));
-            }
-            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
-            return "/SRM/students/guardianSet";
+            model.addAttribute("guardianSet", guardianUserService.findAllByLastNameContainingIgnoreCase(GuardianLastName));
         }
+
+        model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+        return "/SRM/students/guardianSet";
     }
 
     @AdminUpdate
@@ -195,35 +184,30 @@ public class StudentController {
     }
 
     @AdminUpdate
-    @GetMapping("{studentId}/addRemoveTutor")
+    @GetMapping("/{studentId}/addRemoveTutor")
     public String getChangeTutor(Model model, @PathVariable String studentId){
-        if (studentService.findById(Long.valueOf(studentId)) == null) {
-            log.debug("Student with ID: " + studentId + " not found");
-            throw new NotFoundException("Student not found");
-        } else {
-            model.addAttribute("teacherSet", teacherUserService.findAll());
-            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
-            return "/SRM/students/personalTutor";
-        }
+        checkStudentID(studentId);
+
+        model.addAttribute("teacherSet", teacherUserService.findAll());
+        model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+        return "/SRM/students/personalTutor";
     }
 
     //search function to refine list of Teeachers who can be assigned as the tutor
     @AdminUpdate
     @GetMapping("/{studentId}/addRemoveTutor/search")
     public String getRefineTutorList(Model model, @PathVariable String studentId, String TutorLastName){
-        if (studentService.findById(Long.valueOf(studentId)) == null) {
-            log.debug("Student with ID: " + studentId + " not found");
-            throw new NotFoundException("Student not found");
+        checkStudentID(studentId);
+
+        if (TutorLastName == null || TutorLastName.isEmpty()) {
+            model.addAttribute("teacherSet", teacherUserService.findAll());
         } else {
-            if (TutorLastName == null || TutorLastName.isEmpty()) {
-                model.addAttribute("teacherSet", teacherUserService.findAll());
-            } else {
-                model.addAttribute("teacherSet",
+            model.addAttribute("teacherSet",
                         teacherUserService.findAllByLastNameContainingIgnoreCase(TutorLastName));
-            }
-            model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
-            return "/SRM/students/personalTutor";
         }
+
+        model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
+        return "/SRM/students/personalTutor";
     }
 
     @AdminUpdate
@@ -263,6 +247,19 @@ public class StudentController {
         updateStudentModel(model, saved);
         model.addAttribute("newStudent", "Tutor assignment removed");
         return "/SRM/students/studentDetails";
+    }
+
+    @TeacherRead
+    private void checkStudentID(String studentID) {
+        try{
+            if (studentService.findById(Long.valueOf(studentID)) == null) {
+                log.debug("Student with ID: " + studentID + " not found");
+                throw new NotFoundException("Student not found");
+            }
+        } catch (NumberFormatException err){
+            log.debug("Long number format not submitted");
+            throw new NotFoundException("Student not found");
+        }
     }
 
     @TeacherRead

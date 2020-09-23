@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Slf4j
 @SpringBootTest
-class TestRecordControllerTest extends SecurityCredentialsTest {
+class TestRecordControllerTest_IT extends SecurityCredentialsTest {
 
     //tests will fail unless set to @Transactional (Spring Security does not have JPA persistence)
 
