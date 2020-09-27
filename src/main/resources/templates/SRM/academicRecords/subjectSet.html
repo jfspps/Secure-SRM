@@ -16,8 +16,6 @@
             <h2>Subject details</h2>
         </div>
     </div>
-
-    <br/>
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
     <form th:object="${teacher}" method="post" th:action="@{/teachers/{teacherId}/subjects(teacherId=${teacher.id})}"
           class="form-horizontal" id="change-studentSet-form">

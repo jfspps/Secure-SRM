@@ -16,7 +16,6 @@
             <h2>Guardian details</h2>
         </div>
     </div>
-    <br/>
     <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
     <form th:object="${guardian}" method="post" th:action="@{/guardians/{id}/edit(id=${guardian.id})}"
           class="form-horizontal" id="add-guardian-form">

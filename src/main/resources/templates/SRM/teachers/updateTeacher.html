@@ -16,7 +16,6 @@
             <h2>Teacher details</h2>
         </div>
     </div>
-    <br/>
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
     <form th:object="${teacher}" th:action="@{/teachers/{teacherID}/edit(teacherID=${teacher.id})}"
           method="post" class="form-horizontal" id="add-teacher-form">
