@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Guardian index</title>
+    <title>New Guardian</title>
 </head>
 <body>
 <nav th:replace="fragments/navGuardianSearch :: nav"></nav>
@@ -13,10 +13,9 @@
     <br/>
     <div class="row">
         <div class="col">
-            <h2>Guardian details</h2>
+            <h2>New guardian record</h2>
         </div>
     </div>
-    <br/>
     <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
     <form th:object="${guardian}" method="post" th:action="@{/guardians/new}" class="form-horizontal" id="add-guardian-form">
         <div class="row align-items-start">

@@ -322,8 +322,6 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         student2.setFormGroupList(formGroupList2);
         student3.setFormGroupList(formGroupList2);
 
-
-
         formGroupListService.save(formGroupList1);
         formGroupListService.save(formGroupList2);
         log.debug("FormGroupList loaded to DB");
