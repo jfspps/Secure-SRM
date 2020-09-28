@@ -50,7 +50,8 @@
                         <tr th:each="tutor: ${teacherSet}">
                             <td>
                                 <input type="radio" th:field="*{teacher}" th:value="${tutor.id}" />
-                                <label th:text="${tutor.firstName + ' ' + tutor.lastName}"></label>
+                                <label><a th:text="${tutor.firstName + ' ' + tutor.lastName}"
+                                th:href="@{/teachers/{teacherId}(teacherId=${tutor.id})}"></a></label>
                             </td>
                         </tr>
                     </tbody>

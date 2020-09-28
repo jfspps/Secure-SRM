@@ -52,7 +52,8 @@
                     <tr th:each="guardian: ${guardianSet}">
                         <td>
                             <input type="checkbox" th:field="*{guardians}" th:value="${guardian.id}"/>
-                            <label th:text="${guardian.firstName + ' ' + guardian.lastName}"></label>
+                            <label><a th:text="${guardian.firstName + ' ' + guardian.lastName}"
+                            th:href="@{/guardians/{guardianId}(guardianId=${guardian.id})}"></a></label>
                         </td>
                     </tr>
                     </tbody>

@@ -29,6 +29,11 @@ public class SubjectSDjpaService implements SubjectService {
     }
 
     @Override
+    public Set<Subject> findBySubjectNameContainingIgnoreCase(String subjectTitle) {
+        return subjectRepository.findAllBySubjectNameContainingIgnoreCase(subjectTitle);
+    }
+
+    @Override
     public Subject save(Subject object) {
         return subjectRepository.save(object);
     }

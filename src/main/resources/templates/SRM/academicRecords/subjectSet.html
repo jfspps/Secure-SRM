@@ -10,7 +10,6 @@
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
 <div class="container" sec:authorize="hasAuthority('admin.update')">
-    <br/>
     <div class="row">
         <div class="col">
             <h2>Subject details</h2>
@@ -36,7 +35,8 @@
                     <tr th:each="subject: ${subjectSet}">
                         <td>
                             <input type="checkbox" th:field="*{subjects}" th:value="${subject.id}"/>
-                            <label th:text="${subject.subjectName}"></label>
+                            <label><a th:text="${subject.subjectName}"
+                            th:href="@{/subjects/{subjectId}(subjectId=${subject.id})}"></a></label>
                         </td>
                     </tr>
                     </tbody>
