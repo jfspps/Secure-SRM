@@ -3,6 +3,7 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
+import com.secure_srm.services.securityServices.TeacherUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public abstract class SecurityCredentialsTest {
 
     @Autowired
     SubjectService subjectService;
+
+    @Autowired
+    TeacherUserService teacherUserService;
 
     @Autowired
     FormGroupListService formGroupListService;

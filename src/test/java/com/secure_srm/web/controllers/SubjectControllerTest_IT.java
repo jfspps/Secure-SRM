@@ -31,7 +31,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest
-    void searchSubjects(String username, String pwd) throws Exception {
+    void searchSubjects_updateSubject(String username, String pwd) throws Exception {
         mockMvc.perform(get("/subjects").with(httpBasic(username, pwd)).with(csrf())
                 .param("subjectTitle", "english"))
                 .andExpect(status().is(200))
@@ -51,6 +51,43 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attribute("subjects", hasSize(1)));
     }
 
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void getNewSubject_updateSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjects/new").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/newSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(2)));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void searchTeachers_newSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjects/new/teachers/search").with(httpBasic(username, pwd)).with(csrf())
+                .param("TeacherLastName", "jones"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/newSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(1)));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postNewSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/subjects/new").with(httpBasic(username, pwd)).with(csrf())
+                .param("subjectName", "new subject")
+                .flashAttr("teachers", teacherUserService.findAll()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attributeExists("subjectTeachersFeedback"))
+                .andExpect(model().attribute("teachers", hasSize(2)));
+    }
+
     //subject 1 is Mathematics, subject 2 is English
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest
@@ -61,6 +98,18 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/academicRecords/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void searchTeachers_updateSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjects/1/teachers/search").with(httpBasic(username, pwd)).with(csrf())
+                .param("TeacherLastName", "manning"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(1)));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")

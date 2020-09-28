@@ -54,7 +54,7 @@ public class Student extends BaseEntity implements Comparable<Student>{
     @OneToOne
     private ContactDetail contactDetail;
 
-    //custom comparator (list students by lastName and then firstName
+    //custom comparator (list students by lastName and then firstName)
     @Override
     public int compareTo(Student input) {
         String bothNames = this.lastName + ' ' + this.firstName;

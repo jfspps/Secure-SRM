@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Update subject</title>
+    <title>New subject</title>
 </head>
 <body>
 <nav th:replace="fragments/navSubjectSearch :: nav"></nav>
@@ -13,18 +13,18 @@
 <div class="container" sec:authorize="hasAuthority('teacher.read')">
     <div class="row">
         <div class="col">
-            <h2 th:text="${'Teachers of ' + subject.subjectName}"></h2>
+            <h2>New subject</h2>
         </div>
     </div>
 
-    <form method="get" th:action="@{/subjects/{subjectId}/teachers/search(subjectId=${subject.id})}"
+    <form method="get" th:action="@{/subjects/new/teachers/search}"
           class="form-horizontal" id="refine-teachers-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label>Teacher search</label>
             </div>
             <div class="col-sm-8">
-                <p>Perform searches before filling in fields. Submitting a search will reset all changes on this form.</p>
+                <p>Perform searches before filling in fields. Submitting a search will reset all data on this form.</p>
                 <input class="form-control mr-sm-2" type="text" name="TeacherLastName" placeholder="Teacher last name"
                        aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine Teacher list</button>
@@ -34,7 +34,7 @@
     <br />
 
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-    <form th:object="${subject}" method="post" th:action="@{/subjects/{subjectId}/teachers(subjectId=${subject.id})}"
+    <form th:object="${subject}" method="post" th:action="@{/subjects/new}"
           class="form-horizontal" id="change-teacherSet-form">
         <div class="row align-items-start">
             <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
