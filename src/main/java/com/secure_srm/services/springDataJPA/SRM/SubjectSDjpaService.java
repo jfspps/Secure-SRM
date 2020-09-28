@@ -29,7 +29,7 @@ public class SubjectSDjpaService implements SubjectService {
     }
 
     @Override
-    public Set<Subject> findBySubjectNameLikeIgnoreCase(String subjectTitle) {
+    public Set<Subject> findBySubjectNameContainingIgnoreCase(String subjectTitle) {
         return subjectRepository.findAllBySubjectNameContainingIgnoreCase(subjectTitle);
     }
 

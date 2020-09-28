@@ -9,5 +9,5 @@ import java.util.Set;
 public interface SubjectService extends BaseService<Subject, Long> {
     Subject findBySubjectName(String subjectName);
 
-    Set<Subject> findBySubjectNameLikeIgnoreCase(String subjectTitle);
+    Set<Subject> findBySubjectNameContainingIgnoreCase(String subjectTitle);
 }

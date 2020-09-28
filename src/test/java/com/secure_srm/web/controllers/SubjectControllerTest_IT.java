@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -48,5 +49,27 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/academicRecords/subjectIndex"))
                 .andExpect(model().attribute("subjects", hasSize(1)));
+    }
+
+    //subject 1 is Mathematics, subject 2 is English
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void listSubjectTeachers(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjects/1").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
+                .andExpect(model().attributeExists("subject"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void removeSubjectTeachers(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
+                .andExpect(model().attributeExists("subjectTeachersFeedback"))
+                .andExpect(model().attributeExists("subject"));
     }
 }
