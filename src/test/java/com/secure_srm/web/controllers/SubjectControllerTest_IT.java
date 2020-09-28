@@ -54,7 +54,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
     //subject 1 is Mathematics, subject 2 is English
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest
-    void listSubjectTeachers(String username, String pwd) throws Exception {
+    void getUpdateSubject(String username, String pwd) throws Exception {
         mockMvc.perform(get("/subjects/1").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
@@ -64,12 +64,24 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
-    void removeSubjectTeachers(String username, String pwd) throws Exception {
-        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf()))
+    void postUpdateSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
+                .param("subjectName", "Mathematics"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
                 .andExpect(model().attributeExists("subjectTeachersFeedback"))
+                .andExpect(model().attributeExists("subject"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postUpdateSubject_BlankSubjectTitle(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
+                .param("subjectName", ""))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
                 .andExpect(model().attributeExists("subject"));
     }
 }

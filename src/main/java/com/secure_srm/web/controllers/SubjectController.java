@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,7 +47,7 @@ public class SubjectController {
 
     @TeacherRead
     @GetMapping("/{subjectID}")
-    public String getSubjectTeachers(Model model, @PathVariable("subjectID") String subjectId) {
+    public String getUpdateSubject(Model model, @PathVariable("subjectID") String subjectId) {
         if (subjectService.findById(Long.valueOf(subjectId)) == null){
             log.debug("Subject not found");
             throw new NotFoundException("Subject not found");
@@ -58,9 +60,22 @@ public class SubjectController {
 
     @AdminUpdate
     @PostMapping("/{subjectID}/teachers")
-    public String postSubjectTeachers(Model model, @PathVariable("subjectID") String subjectId,
-                                      @ModelAttribute("subject") Subject subjectSubmitted) {
+    public String postUpdateSubject(Model model, @PathVariable("subjectID") String subjectId,
+        @Valid @ModelAttribute("subject") Subject subjectSubmitted, BindingResult result) {
+        if (result.hasErrors()){
+            log.debug("Problems with subject details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            Subject onFile = subjectService.findById(Long.valueOf(subjectId));
+            subjectSubmitted.setId(Long.valueOf(subjectId));
+            subjectSubmitted.setSubjectName(onFile.getSubjectName());
+            subjectSubmitted.setTeachers(onFile.getTeachers());
+            model.addAttribute("subject", subjectSubmitted);
+            return "/SRM/academicRecords/subjectTeachers";
+        }
+
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
+        subjectOnFile.setSubjectName(subjectSubmitted.getSubjectName());
+
         Set<TeacherUser> teachersRemoved = new HashSet<>(subjectOnFile.getTeachers());
 
         //teacherRemoved contains teachers who have been removed from the Subject's teacherSet
@@ -77,7 +92,7 @@ public class SubjectController {
 
         //not adding teachers currently, so no need to updated newly added Teacher's SubjectSet
 
-        model.addAttribute("subjectTeachersFeedback", saved.getSubjectName() + " updated");
+        model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
         return "/SRM/academicRecords/subjectTeachers";
     }

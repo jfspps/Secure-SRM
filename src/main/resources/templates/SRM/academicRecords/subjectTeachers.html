@@ -6,7 +6,7 @@
     <title>Subject teachers</title>
 </head>
 <body>
-<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<nav th:replace="fragments/navSubjectSearch :: nav"></nav>
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
 <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
@@ -16,9 +16,29 @@
             <h2 th:text="${'Teachers of ' + subject.subjectName}"></h2>
         </div>
     </div>
+
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
     <form th:object="${subject}" method="post" th:action="@{/subjects/{subjectId}/teachers(subjectId=${subject.id})}"
           class="form-horizontal" id="change-teacherSet-form">
+        <div class="row align-items-start">
+            <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+                <p>Errors with form data listed below</p>
+            </div>
+
+            <div class="col-sm-2">
+                <label class="control-label">Subject title</label>
+            </div>
+            <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="Subject title" th:field="*{subjectName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('subjectName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('subjectName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+
+        <br />
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" th:text="${'Subject teachers'}"></label>
