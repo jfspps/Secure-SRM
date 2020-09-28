@@ -5,6 +5,7 @@ import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,57 @@ public class SubjectController {
             model.addAttribute("subjects", subjectService.findBySubjectNameContainingIgnoreCase(subjectTitle));
         }
         return "/SRM/academicRecords/subjectIndex";
+    }
+
+    @AdminCreate
+    @GetMapping("/new")
+    public String getNewSubject(Model model) {
+        Subject newSubject = Subject.builder().subjectName("").build();
+        model.addAttribute("teachers", teacherUserService.findAll());
+        model.addAttribute("subject", newSubject);
+        return "/SRM/academicRecords/newSubject";
+    }
+
+    @TeacherRead
+    @GetMapping("/new/teachers/search")
+    public String getNewSubject_SearchTeachers(Model model, @ModelAttribute("subject") Subject subjectSubmitted,
+                                               String TeacherLastName) {
+        if (TeacherLastName == null || TeacherLastName.isEmpty()){
+            model.addAttribute("teachers", teacherUserService.findAll());
+        } else {
+            model.addAttribute("teachers", teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName));
+        }
+
+        //note that subjectSubmitted is not saved to the DB, and is composed of a new Subject with a blank subject title
+        model.addAttribute("subject", subjectSubmitted);
+        return "/SRM/academicRecords/newSubject";
+    }
+
+    @AdminCreate
+    @PostMapping("/new")
+    public String postNewSubject(@Valid @ModelAttribute("subject") Subject subjectSubmitted,
+                                 BindingResult result, Model model) {
+        if (result.hasErrors()){
+            log.debug("Problems with subject details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("subject", subjectSubmitted);
+            model.addAttribute("teachers", teacherUserService.findAll());
+            return "/SRM/academicRecords/newSubject";
+        }
+
+        Subject saved = subjectService.save(subjectSubmitted);
+
+        //update the Teacher's selected
+        subjectSubmitted.getTeachers().forEach(teacherUser -> {
+            teacherUser.getSubjects().add(saved);
+            teacherUserService.save(teacherUser);
+        });
+
+        log.debug("New subject saved");
+        model.addAttribute("subjectTeachersFeedback", "New subject \"" + saved.getSubjectName() + "\"" + " saved");
+        model.addAttribute("subject", saved);
+        model.addAttribute("teachers", teacherUserService.findAll());
+        return "/SRM/academicRecords/updateSubject";
     }
 
     @TeacherRead
@@ -117,6 +169,7 @@ public class SubjectController {
         subjectOnFile.setTeachers(subjectSubmitted.getTeachers());
         Subject saved = subjectService.save(subjectOnFile);
 
+        log.debug("Subject updated");
         model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
         model.addAttribute("teachers", teacherUserService.findAll());
