@@ -4,6 +4,7 @@ import com.secure_srm.model.academic.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 //the implementation of the following methods is supplied automatically by JPA
 
@@ -11,4 +12,6 @@ import java.util.Optional;
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     Optional<Subject> findBySubjectName(String subjectName);
+
+    Set<Subject> findAllBySubjectNameContainingIgnoreCase(String subjectName);
 }
