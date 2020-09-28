@@ -65,7 +65,7 @@
                  th:object="${subjectsTaught}" >
                 <div th:each="subject: ${subjectsTaught}">
                     <label><a th:text="${subject.getSubjectName()}"
-                              th:href="@{/subjects/{subjectID}/edit(subjectID=${subject.getId()})}"></a>
+                              th:href="@{/subjects/{subjectID}(subjectID=${subject.id})}"></a>
                     </label>
                 </div>
             </div>

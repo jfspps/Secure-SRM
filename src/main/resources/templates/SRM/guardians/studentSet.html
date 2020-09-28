@@ -50,7 +50,8 @@
                         <tr th:each="student: ${studentSet}">
                             <td>
                                 <input type="checkbox" th:field="*{students}" th:value="${student.id}" />
-                                <label th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}"></label>
+                                <label><a th:text="${student.firstName + ' ' + student.middleNames + ' ' + student.lastName}"
+                                th:href="@{/students/{studentId}(studentId=${student.id})}"></a></label>
                             </td>
                         </tr>
                     </tbody>

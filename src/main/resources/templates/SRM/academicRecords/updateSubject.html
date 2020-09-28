@@ -17,6 +17,21 @@
         </div>
     </div>
 
+    <form method="get" th:action="@{/subjects/{subjectId}/teachers/search(subjectId=${subject.id})}"
+          class="form-horizontal" id="refine-teachers-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Teacher search</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="TeacherLastName" placeholder="Teacher last name"
+                       aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine Teacher list</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
     <form th:object="${subject}" method="post" th:action="@{/subjects/{subjectId}/teachers(subjectId=${subject.id})}"
           class="form-horizontal" id="change-teacherSet-form">
@@ -37,8 +52,8 @@
                 </span>
             </div>
         </div>
-
         <br />
+
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" th:text="${'Subject teachers'}"></label>
@@ -52,10 +67,11 @@
                     </thead>
                     <tbody>
                     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-                    <tr th:each="teacher: ${subject.getTeachers()}">
+                    <tr th:each="teacher: ${teachers}">
                         <td>
                             <input sec:authorize="hasAuthority('admin.update')" type="checkbox" th:field="*{teachers}" th:value="${teacher.id}"/>
-                            <label th:text="${teacher.firstName + ' ' + teacher.lastName}"></label>
+                            <label><a th:text="${teacher.firstName + ' ' + teacher.lastName}"
+                                      th:href="@{/teachers/{teacherId}(teacherId=${teacher.id})}"></a> </label>
                         </td>
                     </tr>
                     </tbody>

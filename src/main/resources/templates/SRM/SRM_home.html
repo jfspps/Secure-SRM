@@ -33,6 +33,9 @@
                     Academic data
                 </div>
                 <div class="card-body">
+                    <h5 class="card-title">Subjects and assignments</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects}">View subjects</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/assignments}">View assignments</a></p>
                     <h5 class="card-title">Students' scores</h5>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by form group</a></p>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject class</a></p>

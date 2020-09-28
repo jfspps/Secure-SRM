@@ -54,8 +54,28 @@ public class SubjectController {
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
+        model.addAttribute("teachers", teacherUserService.findAll());
         model.addAttribute("subject", subjectOnFile);
-        return "/SRM/academicRecords/subjectTeachers";
+        return "/SRM/academicRecords/updateSubject";
+    }
+
+    @TeacherRead
+    @GetMapping("/{subjectID}/teachers/search")
+    public String getUpdateSubject_SearchTeachers(Model model, @PathVariable("subjectID") String subjectId,
+                                                  String TeacherLastName) {
+        if (subjectService.findById(Long.valueOf(subjectId)) == null){
+            log.debug("Subject not found");
+            throw new NotFoundException("Subject not found");
+        }
+
+        if (TeacherLastName == null || TeacherLastName.isEmpty()){
+            model.addAttribute("teachers", teacherUserService.findAll());
+        } else {
+            model.addAttribute("teachers", teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName));
+        }
+
+        model.addAttribute("subject", subjectService.findById(Long.valueOf(subjectId)));
+        return "/SRM/academicRecords/updateSubject";
     }
 
     @AdminUpdate
@@ -70,7 +90,8 @@ public class SubjectController {
             subjectSubmitted.setSubjectName(onFile.getSubjectName());
             subjectSubmitted.setTeachers(onFile.getTeachers());
             model.addAttribute("subject", subjectSubmitted);
-            return "/SRM/academicRecords/subjectTeachers";
+            model.addAttribute("teachers", teacherUserService.findAll());
+            return "/SRM/academicRecords/updateSubject";
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
@@ -87,13 +108,18 @@ public class SubjectController {
             teacherUserService.save(teacherUser);
         });
 
+        //update newly added Teacher's subjectSet
+        subjectSubmitted.getTeachers().forEach(teacherUser -> {
+            teacherUser.getSubjects().add(subjectOnFile);
+            teacherUserService.save(teacherUser);
+        });
+
         subjectOnFile.setTeachers(subjectSubmitted.getTeachers());
         Subject saved = subjectService.save(subjectOnFile);
 
-        //not adding teachers currently, so no need to updated newly added Teacher's SubjectSet
-
         model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
-        return "/SRM/academicRecords/subjectTeachers";
+        model.addAttribute("teachers", teacherUserService.findAll());
+        return "/SRM/academicRecords/updateSubject";
     }
 }

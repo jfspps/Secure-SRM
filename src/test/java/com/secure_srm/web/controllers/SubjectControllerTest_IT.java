@@ -58,30 +58,35 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(get("/subjects/1").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
-                .andExpect(model().attributeExists("subject"));
+                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(2)));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
     void postUpdateSubject(String username, String pwd) throws Exception {
         mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
-                .param("subjectName", "Mathematics"))
+                .param("subjectName", "Mathematics")
+                .param("TeacherLastName", ""))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
+                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
                 .andExpect(model().attributeExists("subjectTeachersFeedback"))
-                .andExpect(model().attributeExists("subject"));
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(2)));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
     void postUpdateSubject_BlankSubjectTitle(String username, String pwd) throws Exception {
         mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
-                .param("subjectName", ""))
+                .param("subjectName", "")
+                .param("TeacherLastName", ""))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectTeachers"))
-                .andExpect(model().attributeExists("subject"));
+                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(2)));
     }
 }

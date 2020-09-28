@@ -35,7 +35,8 @@
                     <tr th:each="subject: ${subjectSet}">
                         <td>
                             <input type="checkbox" th:field="*{subjects}" th:value="${subject.id}"/>
-                            <label th:text="${subject.subjectName}"></label>
+                            <label><a th:text="${subject.subjectName}"
+                            th:href="@{/subjects/{subjectId}(subjectId=${subject.id})}"></a></label>
                         </td>
                     </tr>
                     </tbody>
