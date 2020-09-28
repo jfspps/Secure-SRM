@@ -46,9 +46,10 @@ public class GuardianController {
     @GetMapping({"", "/", "/index"})
     public String listGuardians(Model model, String lastName) {
         if (lastName == null || lastName.isEmpty()) {
-            model.addAttribute("guardians", guardianUserService.findAll());
+            model.addAttribute("guardians", sortGuardianSetByLastName(guardianUserService.findAll()));
         } else {
-            model.addAttribute("guardians", guardianUserService.findAllByLastNameContainingIgnoreCase(lastName));
+            model.addAttribute("guardians",
+                    sortGuardianSetByLastName(guardianUserService.findAllByLastNameContainingIgnoreCase(lastName)));
         }
         return "/SRM/guardians/guardianIndex";
     }
@@ -92,7 +93,7 @@ public class GuardianController {
         ModelAndView mav = new ModelAndView("/SRM/guardians/guardianDetails");
         GuardianUser guardian = guardianUserService.findById(Long.valueOf(guardianId));
         Set<Student> studentSet = guardian.getStudents();
-        mav.addObject("students", studentSet);
+        mav.addObject("students", sortStudentSetByLastName(studentSet));
         mav.addObject("guardian", guardian);
         return mav;
     }
@@ -132,7 +133,7 @@ public class GuardianController {
 
         GuardianUser savedGuardian = guardianUserService.save(guardianOnFile);
         model.addAttribute("guardian", savedGuardian);
-        model.addAttribute("students", savedGuardian.getStudents());
+        model.addAttribute("students", sortStudentSetByLastName(savedGuardian.getStudents()));
         model.addAttribute("newGuardian", "Changes saved to the database");
         return "/SRM/guardians/guardianDetails";
     }
@@ -144,7 +145,7 @@ public class GuardianController {
             log.debug("Guardian with ID: " + guardianId + " not found");
             throw new NotFoundException("Guardian not found");
         } else {
-            model.addAttribute("studentSet", studentService.findAll());
+            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
             model.addAttribute("guardian", guardianUserService.findById(Long.valueOf(guardianId)));
             return "/SRM/guardians/studentSet";
         }
@@ -159,9 +160,10 @@ public class GuardianController {
             throw new NotFoundException("Guardian not found");
         } else {
             if (StudentLastName == null || StudentLastName.isEmpty()) {
-                model.addAttribute("studentSet", studentService.findAll());
+                model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
             } else {
-                model.addAttribute("studentSet", studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
+                model.addAttribute("studentSet",
+                        sortStudentSetByLastName(studentService.findAllByLastNameContainingIgnoreCase(StudentLastName)));
             }
             model.addAttribute("guardian", guardianUserService.findById(Long.valueOf(guardianId)));
             return "/SRM/guardians/studentSet";
@@ -197,8 +199,30 @@ public class GuardianController {
         GuardianUser saved = guardianUserService.save(guardianUserOnFile);
 
         model.addAttribute("guardian", saved);
-        model.addAttribute("students", saved.getStudents());
+        model.addAttribute("students", sortStudentSetByLastName(saved.getStudents()));
         model.addAttribute("newGuardian", "Registered students updated");
         return "/SRM/guardians/guardianDetails";
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by student's lastName
+     * */
+    @TeacherRead
+    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
+        List<Student> listByLastName = new ArrayList<>(studentSet);
+        //see Student's model string comparison method, compareTo()
+        Collections.sort(listByLastName);
+        return listByLastName;
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by guardian's lastName
+     * */
+    @TeacherRead
+    private List<GuardianUser> sortGuardianSetByLastName(Set<GuardianUser> guardianUserSet) {
+        List<GuardianUser> listByLastName = new ArrayList<>(guardianUserSet);
+        //see Guardian's model string comparison method, compareTo()
+        Collections.sort(listByLastName);
+        return listByLastName;
     }
 }

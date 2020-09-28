@@ -22,7 +22,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "Guardians")
-public class GuardianUser extends BaseEntity {
+public class GuardianUser extends BaseEntity implements Comparable<GuardianUser>{
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
     @Size(min = 1, max = 255)
@@ -49,4 +49,12 @@ public class GuardianUser extends BaseEntity {
 
     @OneToOne
     private ContactDetail contactDetail;
+
+    //custom comparator (list guardians by lastName and then firstName)
+    @Override
+    public int compareTo(GuardianUser input) {
+        String bothNames = this.lastName + ' ' + this.firstName;
+        String inputBothNames = input.lastName + ' ' + input.firstName;
+        return bothNames.compareTo(inputBothNames);
+    }
 }

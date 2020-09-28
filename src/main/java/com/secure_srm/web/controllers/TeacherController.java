@@ -2,6 +2,8 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.people.Student;
+import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
@@ -19,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,9 +43,10 @@ public class TeacherController {
     @GetMapping({"", "/", "/index"})
     public String listTeachers(Model model, String lastName) {
         if(lastName == null || lastName.isEmpty()){
-            model.addAttribute("teachers", teacherUserService.findAll());
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
-            model.addAttribute("teachers", teacherUserService.findAllByLastNameContainingIgnoreCase(lastName));
+            model.addAttribute("teachers",
+                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(lastName)));
         }
         return "/SRM/teachers/teacherIndex";
     }
@@ -175,5 +176,27 @@ public class TeacherController {
         model.addAttribute("subjectsTaught", saved.getSubjects());
         model.addAttribute("newTeacher", "Teacher subject details updated");
         return "/SRM/teachers/teacherDetails";
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by teachers's lastName
+     * */
+    @TeacherRead
+    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
+        List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
+        //see TeacherUser's model string comparison method, compareTo()
+        Collections.sort(listByLastName);
+        return listByLastName;
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by student's lastName
+     * */
+    @TeacherRead
+    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
+        List<Student> listByLastName = new ArrayList<>(studentSet);
+        //see Student's model string comparison method, compareTo()
+        Collections.sort(listByLastName);
+        return listByLastName;
     }
 }

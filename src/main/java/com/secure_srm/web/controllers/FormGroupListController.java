@@ -47,8 +47,7 @@ public class FormGroupListController {
         } else {
             FormGroupList found = formGroupListService.findById(Long.valueOf(groupID));
             //build a list by lastName, then sort
-            List<Student> listByLastName = new ArrayList<>(found.getStudentList());
-            Collections.sort(listByLastName);
+            List<Student> listByLastName = sortSetByLastName(found.getStudentList());
             model.addAttribute("formGroup", found);
             model.addAttribute("studentList", listByLastName);
             return "/SRM/classLists/form";
@@ -64,8 +63,7 @@ public class FormGroupListController {
         } else {
             model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
             //build a list by lastName, then sort
-            List<Student> listByLastName = new ArrayList<>(studentService.findAll());
-            Collections.sort(listByLastName);
+            List<Student> listByLastName = sortSetByLastName(studentService.findAll());
             model.addAttribute("studentSet", listByLastName);
             return "/SRM/classLists/studentsOnFile";
         }
@@ -80,8 +78,7 @@ public class FormGroupListController {
         } else {
             model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
             //build a list by lastName, then sort
-            List<Student> listByLastName = new ArrayList<>(studentService.findAllByLastNameLike(StudentLastName));
-            Collections.sort(listByLastName);
+            List<Student> listByLastName = sortSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
             model.addAttribute("studentSet", listByLastName);
             return "/SRM/classLists/studentsOnFile";
         }
@@ -120,5 +117,16 @@ public class FormGroupListController {
         model.addAttribute("studentList", saved.getStudentList());
         model.addAttribute("newList", "Form group updated");
         return "/SRM/classLists/form";
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by student's lastName
+     * */
+    @TeacherRead
+    private List<Student> sortSetByLastName(Set<Student> studentSet) {
+        List<Student> listByLastName = new ArrayList<>(studentSet);
+        //see Student's model string comparison method, compareTo()
+        Collections.sort(listByLastName);
+        return listByLastName;
     }
 }

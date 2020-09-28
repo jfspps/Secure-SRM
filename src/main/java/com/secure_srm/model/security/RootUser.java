@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "SRM_root_users")
-public class RootUser extends BaseEntity {
+public class RootUser extends BaseEntity implements Comparable<RootUser>{
 
     //Hibernate uses snake case by default so the name argument is somewhat redundant here
     @Size(min = 1, max = 255)
@@ -29,4 +29,12 @@ public class RootUser extends BaseEntity {
 
     @OneToOne
     private ContactDetail contactDetail;
+
+    //custom comparator (list rootUsers by lastName and then firstName)
+    @Override
+    public int compareTo(RootUser input) {
+        String bothNames = this.lastName + ' ' + this.firstName;
+        String inputBothNames = input.lastName + ' ' + input.firstName;
+        return bothNames.compareTo(inputBothNames);
+    }
 }

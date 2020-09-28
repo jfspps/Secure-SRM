@@ -14,10 +14,8 @@
         <ul class="navbar-nav mr-auto" sec:authorize="hasAuthority('guardian.read')" >
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="webLoginDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Navigation</a>
+                   aria-haspopup="true" aria-expanded="false">Personnel</a>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
-                    <div class="dropdown-header"><i class="fas fa-chalkboard-teacher"></i> SRM navigation</div>
-                    <a class="dropdown-item" href="/">SRM home page</a>
                     <span sec:authorize="hasAuthority('admin.create')">
                         <div class="dropdown-header">New...</div>
                         <a class="dropdown-item" th:href="@{/students/new}">Student</a>
@@ -36,7 +34,17 @@
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="testRecordDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Test record demo</a>
+                   aria-haspopup="true" aria-expanded="false">Academic</a>
+                <div class="dropdown-menu" aria-labelledby="dbDropdown">
+                    <span>
+                        <div class="dropdown-header">New...</div>
+                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
+                        <a sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/assignments/new}">Assignment</a>
+                    </span>
+                    <div class="dropdown-header">Show...</div>
+                    <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
+                    <a class="dropdown-item" th:href="@{/assignments/index}">Assignment summary</a>
+                </div>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header">Test records</div>
                     <a class="dropdown-item" th:href="@{/testRecord}"><i class="far fa-newspaper"></i> View/edit test records</a>

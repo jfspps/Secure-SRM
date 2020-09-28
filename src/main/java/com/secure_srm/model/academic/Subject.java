@@ -2,6 +2,7 @@ package com.secure_srm.model.academic;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.secure_srm.model.BaseEntity;
+import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.*;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "subjects")
-public class Subject extends BaseEntity {
+public class Subject extends BaseEntity implements Comparable<Subject>{
 
     @Size(min = 2, max = 255)
     @Column(name = "subject_name")
@@ -33,4 +34,12 @@ public class Subject extends BaseEntity {
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
     @JsonIgnore
     private Set<TeacherUser> teachers = new HashSet<>();
+
+    //custom comparator (list by subject name)
+    @Override
+    public int compareTo(Subject input) {
+        String bothNames = this.subjectName;
+        String inputBothNames = input.subjectName;
+        return bothNames.compareTo(inputBothNames);
+    }
 }
