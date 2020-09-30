@@ -52,6 +52,10 @@
                     </ul>
                 </span>
             </div>
+            <!--/*@thymesVar id="newSubjectFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${newSubjectFeedback != null}">
+                    <p class="alert alert-info" th:text="${newSubjectFeedback}"></p>
+                </span>
         </div>
         <br />
 

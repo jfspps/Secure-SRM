@@ -2,7 +2,6 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
-import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.securityServices.TeacherUserService;
@@ -78,7 +77,16 @@ public class SubjectController {
             log.debug("Problems with subject details submitted");
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("subject", subjectSubmitted);
-            model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            return "/SRM/academicRecords/newSubject";
+        }
+
+        //check the subject title is not already on file
+        if (subjectService.findBySubjectName(subjectSubmitted.getSubjectName()) != null){
+            log.debug("Subject with given title already exists");
+            model.addAttribute("newSubjectFeedback", "Subject already exists with given title");
+            model.addAttribute("subject", subjectSubmitted);
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/academicRecords/newSubject";
         }
 
@@ -93,7 +101,7 @@ public class SubjectController {
         log.debug("New subject saved");
         model.addAttribute("subjectTeachersFeedback", "New subject \"" + saved.getSubjectName() + "\"" + " saved");
         model.addAttribute("subject", saved);
-        model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         return "/SRM/academicRecords/updateSubject";
     }
 
@@ -106,7 +114,7 @@ public class SubjectController {
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
-        model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("subject", subjectOnFile);
         return "/SRM/academicRecords/updateSubject";
     }
@@ -121,7 +129,7 @@ public class SubjectController {
         }
 
         if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
         }
@@ -142,7 +150,7 @@ public class SubjectController {
             subjectSubmitted.setSubjectName(onFile.getSubjectName());
             subjectSubmitted.setTeachers(onFile.getTeachers());
             model.addAttribute("subject", subjectSubmitted);
-            model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/academicRecords/updateSubject";
         }
 
@@ -172,7 +180,7 @@ public class SubjectController {
         log.debug("Subject updated");
         model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
-        model.addAttribute("teachers", sortSetBySubjectName(subjectService.findAll()));
+        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         return "/SRM/academicRecords/updateSubject";
     }
 

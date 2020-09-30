@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>New form group</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+<div class="container" sec:authorize="hasAuthority('teacher.read')">
+    <div class="row">
+        <div class="col">
+            <h2>New form group</h2>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/formGroupList/new/teachers/search}"
+          class="form-horizontal" id="refine-teachers-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Teacher search</label>
+            </div>
+            <div class="col-sm-8">
+                <p>Perform searches before filling in fields. Submitting a search will reset all data on this form.</p>
+                <input class="form-control mr-sm-2" type="text" name="TeacherLastName" placeholder="Teacher last name"
+                       aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine Teacher list</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
+    <!--/*@thymesVar id="formGroup" type="com.secure_srm.model.people.FormGroupList"*/-->
+    <form th:object="${formGroup}" method="post" th:action="@{/formGroupList/new}"
+          class="form-horizontal" id="change-teacherSet-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Form group tutor'}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Teacher name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="tutor" type="com.secure_srm.model.security.TeacherUser"*/-->
+                    <tr th:each="tutor: ${teachers}">
+                        <td>
+                            <input type="radio" th:field="*{teacher}" th:value="${tutor.id}" />
+                            <label><a th:text="${tutor.firstName + ' ' + tutor.lastName}"
+                                      th:href="@{/teachers/{teacherId}(teacherId=${tutor.id})}"></a></label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+                <p>Errors with form data listed below</p>
+            </div>
+
+            <div class="col-sm-2">
+                <label class="control-label">Form group name</label>
+            </div>
+            <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="Form group name" th:field="*{groupName}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('groupName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('groupName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+            <!--/*@thymesVar id="newSubjectFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${groupNameFeedback != null}">
+                    <p class="alert alert-info" th:text="${groupNameFeedback}"></p>
+                </span>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Students on record'}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Student name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
+                    <tr th:each="student: ${studentSet}">
+                        <td>
+                            <input sec:authorize="hasAuthority('admin.update')" type="checkbox" th:field="*{studentList}" th:value="${student.id}"/>
+                            <label><a th:text="${student.firstName + ' ' + student.lastName}"
+                                      th:href="@{/students/{studentId}(studentId=${student.id})}"></a> </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <br />
+        <div class="row align-items-start" sec:authorize="hasAuthority('admin.update')" >
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Submit changes</button>
+            </div>
+        </div>
+    </form>
+    <br />
+    <div class="row align-items-start">
+        <div class="col-sm-5">
+            <a class="btn btn-outline-primary" th:href="@{/formGroupList/index}"
+               role="button">Return to form group list</a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

@@ -18,20 +18,18 @@
             <th class="px-3">Number of teachers</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody th:object="${subjects}">
         <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
-        <tr th:each="subject: ${subjects}">
-            <span th:if="${subject == null}">
-                <th class="px-3"></th>
-                <td class="px-3">(No subjects on record)</td>
-                <td class="px-3"></td>
-            </span>
-            <span th:unless="${subject == null}">
-                <th class="px-3"><a role="button" class="btn btn-sm btn-outline-info"
-                                    th:href="@{/subjects/{id}(id=${subject.id})}" th:text="${subject.id}"></a></th>
-                <td class="px-3" th:text="${subject.subjectName}"></td>
-                <td class="px-3" th:text="${subject.getTeachers().size()}"></td>
-            </span>
+        <tr th:if="${subjects.isEmpty()}">
+            <th class="px-3"></th>
+            <td class="px-3">(No subjects on record)</td>
+            <td class="px-3"></td>
+        </tr>
+        <tr th:each="subject: ${subjects}" th:unless="${subjects.isEmpty()}">
+            <th class="px-3"><a role="button" class="btn btn-sm btn-outline-info"
+                                th:href="@{/subjects/{id}(id=${subject.id})}" th:text="${subject.id}"></a></th>
+            <td class="px-3" th:text="${subject.subjectName}"></td>
+            <td class="px-3" th:text="${subject.getTeachers().size()}"></td>
         </tr>
         </tbody>
     </table>
