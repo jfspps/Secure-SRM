@@ -7,6 +7,7 @@ import lombok.*;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,8 +17,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-public class FormGroupList extends BaseEntity {
+public class FormGroupList extends BaseEntity implements Comparable<FormGroupList> {
 
+    @Size(min = 1, max = 255)
     private String groupName;
 
     @OneToMany(mappedBy = "formGroupList")
@@ -25,4 +27,10 @@ public class FormGroupList extends BaseEntity {
 
     @OneToOne
     private TeacherUser teacher;
+
+    //custom comparator (list forms by groupName)
+    @Override
+    public int compareTo(FormGroupList input) {
+        return this.getGroupName().compareTo(input.groupName);
+    }
 }
