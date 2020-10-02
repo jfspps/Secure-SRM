@@ -1,8 +1,10 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.services.academicServices.AssignmentTypeService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
+import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,5 +60,40 @@ public class AssignmentTypeController {
         log.debug("New assignment type with ID: " + saved.getId() + " saved");
         model.addAttribute("assignmentTypeFeedback", "New assignment type saved");
         return "/SRM/assignmentType/newAssignmentType";
+    }
+
+    @AdminUpdate
+    @GetMapping("/{id}/edit")
+    public String getNewAssignmentType(Model model, @PathVariable("id") String id){
+        if (assignmentTypeService.findById(Long.valueOf(id)) == null){
+            log.debug("Assignment type not found");
+            throw new NotFoundException("Assignment type not found");
+        }
+
+        AssignmentType found = assignmentTypeService.findById(Long.valueOf(id));
+        model.addAttribute("assignmentType", found);
+        return "/SRM/assignmentType/updateAssignmentType";
+    }
+
+    @AdminUpdate
+    @PostMapping("/{id}/edit")
+    public String postNewAssignmentType(Model model, @PathVariable("id") String id,
+                                        @ModelAttribute("assignmentType") AssignmentType assignmentType){
+        AssignmentType found = assignmentTypeService.findById(Long.valueOf(id));
+
+        if (assignmentTypeService.findByDescription(assignmentType.getDescription()) != null){
+            log.debug("Assignment type with given description already exists");
+            model.addAttribute("assignmentType", found);
+            model.addAttribute("assignmentTypeFeedback", "Assignment type with given description already exists");
+            return "/SRM/assignmentType/updateAssignmentType";
+        }
+
+        found.setDescription(assignmentType.getDescription());
+        AssignmentType saved = assignmentTypeService.save(found);
+        model.addAttribute("assignmentType", saved);
+        log.debug("Assignment type updated");
+        model.addAttribute("assignmentTypeFeedback", "Assignment type updated");
+
+        return "/SRM/assignmentType/updateAssignmentType";
     }
 }

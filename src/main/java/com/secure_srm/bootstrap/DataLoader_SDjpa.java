@@ -1,5 +1,6 @@
 package com.secure_srm.bootstrap;
 
+import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.people.Address;
 import com.secure_srm.model.people.ContactDetail;
@@ -7,6 +8,7 @@ import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.*;
 import com.secure_srm.services.TestRecordService;
+import com.secure_srm.services.academicServices.AssignmentTypeService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.AddressService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
@@ -44,6 +46,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
     private final AddressService addressService;
     private final ContactDetailService contactDetailService;
     private final FormGroupListService formGroupListService;
+    private final AssignmentTypeService assignmentTypeService;
 
     @Override
     public void run(String... args) {
@@ -330,6 +333,13 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         studentService.save(student2);
         studentService.save(student3);
         log.debug("Students loaded to DB");
+
+        assignmentTypeService.save(AssignmentType.builder().description("Mock exam").build());
+        assignmentTypeService.save(AssignmentType.builder().description("Coursework").build());
+        assignmentTypeService.save(AssignmentType.builder().description("Quiz").build());
+        assignmentTypeService.save(AssignmentType.builder().description("Interview").build());
+        assignmentTypeService.save(AssignmentType.builder().description("Service").build());
+        log.debug("Assignment types loaded to DB");
 
         log.debug("================ Finished uploading SRM data to DB ============");
     }

@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.services.academicServices.AssignmentTypeService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
@@ -31,6 +32,9 @@ public abstract class SecurityCredentialsTest {
 
     @Autowired
     FormGroupListService formGroupListService;
+
+    @Autowired
+    AssignmentTypeService assignmentTypeService;
 
     protected MockMvc mockMvc;
 

@@ -27,7 +27,7 @@
         </tr>
         <tr th:unless="${assignmentTypeSet.isEmpty()}" th:each="assignmentType: ${assignmentTypeSet}">
             <th class="px-3" sec:authorize="hasAuthority('admin.update')"><a role="button"
-                     class="btn btn-sm btn-outline-info" th:href="@{/assignmentType/{id}(id=${assignmentType.id})}"
+                     class="btn btn-sm btn-outline-info" th:href="@{/assignmentTypes/{id}/edit(id=${assignmentType.id})}"
                                                          th:text="${assignmentType.id}"></a></th>
             <td class="px-3" th:text="${assignmentType.description}"></td>
             <td class="px-3" th:text="${assignmentType.getStudentResults().size()}"></td>
