@@ -8,11 +8,14 @@ import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 // AssignmentType stores the description of the type of assignment (exam, quiz, test, coursework, performance etc.)
@@ -48,7 +51,15 @@ public class AssignmentTypeController {
 
     @AdminCreate
     @PostMapping("/new")
-    public String postNewAssignmentType(@ModelAttribute("assignmentType") AssignmentType assignmentType, Model model){
+    public String postNewAssignmentType(@Valid @ModelAttribute("assignmentType") AssignmentType assignmentType,
+                                        BindingResult result, Model model){
+        if (result.hasErrors()){
+            log.debug("Problems with description submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("assignmentType", assignmentType);
+            return "/SRM/assignmentType/newAssignmentType";
+        }
+
         if (assignmentTypeService.findByDescription(assignmentType.getDescription()) != null){
             log.debug("Assignment type with given description already exists");
             model.addAttribute("assignmentType", assignmentType);
@@ -78,7 +89,15 @@ public class AssignmentTypeController {
     @AdminUpdate
     @PostMapping("/{id}/edit")
     public String postNewAssignmentType(Model model, @PathVariable("id") String id,
-                                        @ModelAttribute("assignmentType") AssignmentType assignmentType){
+                                        @Valid @ModelAttribute("assignmentType") AssignmentType assignmentType,
+                                        BindingResult result){
+        if (result.hasErrors()){
+            log.debug("Problems with description submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("assignmentType", assignmentType);
+            return "/SRM/assignmentType/updateAssignmentType";
+        }
+
         AssignmentType found = assignmentTypeService.findById(Long.valueOf(id));
 
         if (assignmentTypeService.findByDescription(assignmentType.getDescription()) != null){
