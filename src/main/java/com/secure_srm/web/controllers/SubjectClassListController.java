@@ -7,21 +7,17 @@ import com.secure_srm.model.people.SubjectClassList;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.peopleServices.SubjectClassListService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.web.permissionAnnot.AdminRead;
+import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -47,7 +43,7 @@ public class SubjectClassListController {
 
     @TeacherRead
     @GetMapping("/{groupId}")
-    public String getShowFormGroup(@PathVariable("groupId") String groupID, Model model){
+    public String getShowSubjectClass(@PathVariable("groupId") String groupID, Model model){
         if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
             log.debug("Subject class not found");
             throw new NotFoundException("Subject class not found");
@@ -59,6 +55,69 @@ public class SubjectClassListController {
             model.addAttribute("studentList", listByLastName);
             return "/SRM/classLists/subjectClass";
         }
+    }
+
+    @AdminUpdate
+    @GetMapping("/{groupId}/edit")
+    public String getUpdateSubjectClass(@PathVariable("groupId") String groupID,  Model model){
+        if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
+            log.debug("Subject class not found");
+            throw new NotFoundException("Subject class not found");
+        } else {
+            model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
+            //build a list by lastName, then sort
+            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
+            model.addAttribute("studentSet", listByLastName);
+            return "/SRM/classLists/studentsOnFile_subject";
+        }
+    }
+
+    @AdminRead
+    @GetMapping("/{groupId}/search")
+    public String getUpdateClassListSearch(@PathVariable("groupId") String groupID, Model model, String StudentLastName){
+        if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
+            log.debug("Subject class not found");
+            throw new NotFoundException("Subject class not found");
+        } else {
+            model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
+            //build a list by lastName, then sort
+            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
+            model.addAttribute("studentSet", listByLastName);
+            return "/SRM/classLists/studentsOnFile_subject";
+        }
+    }
+
+    @AdminUpdate
+    @PostMapping("/{groupId}/edit")
+    public String postUpdateClassList(@PathVariable("groupId") String groupID,  Model model,
+                                      @ModelAttribute("formGroup") SubjectClassList subjectClassList){
+
+        SubjectClassList listOnFile = subjectClassListService.findById(Long.valueOf(groupID));
+
+        //copy listOnFile student set and remove those from subjectClassList
+        Set<Student> removed = new HashSet<>(listOnFile.getStudentList());
+        removed.removeIf(subjectClassList.getStudentList()::contains);
+
+        //clear removed students' subjectClassList property and update the subjectClassList on file
+        removed.forEach(student -> {
+            student.getSubjectClassLists().remove(listOnFile);
+            listOnFile.getStudentList().remove(student);
+            studentService.save(student);
+        });
+
+        //update each added student
+        subjectClassList.getStudentList().forEach(student -> {
+            student.getSubjectClassLists().add(listOnFile);
+            studentService.save(student);
+        });
+
+        listOnFile.setStudentList(subjectClassList.getStudentList());
+        SubjectClassList saved = subjectClassListService.save(listOnFile);
+
+        model.addAttribute("subjectClass", saved);
+        model.addAttribute("studentList", saved.getStudentList());
+        model.addAttribute("newList", "Subject class updated");
+        return "/SRM/classLists/subjectClass";
     }
 
     /**

@@ -7,8 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
@@ -32,5 +34,38 @@ public class SubjectClassListController_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/classLists/subjectClass"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("subjectClass"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void getUpdateClassList(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjectClassList/1/edit").with(httpBasic(username, pwd)))
+                .andExpect(view().name("/SRM/classLists/studentsOnFile_subject"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("subjectClass"))
+                .andExpect(model().attributeExists("studentSet"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void getUpdateSubjectClassSearch(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjectClassList/1/search").with(httpBasic(username, pwd))
+                .param("StudentLastName", ""))
+                .andExpect(view().name("/SRM/classLists/studentsOnFile_subject"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("subjectClass"))
+                .andExpect(model().attributeExists("studentSet"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postUpdateClassList(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/subjectClassList/1/edit").with(httpBasic(username, pwd)).with(csrf())
+                .flashAttr("subjectClass", subjectClassListService.findById(1L)))
+                .andExpect(view().name("/SRM/classLists/subjectClass"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("subjectClass"))
+                .andExpect(model().attributeExists("studentList"))
+                .andExpect(model().attributeExists("newList"));
     }
 }

@@ -4,10 +4,12 @@ import com.secure_srm.services.academicServices.AssignmentTypeService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
+import com.secure_srm.services.peopleServices.SubjectClassListService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,6 +34,9 @@ public abstract class SecurityCredentialsTest {
 
     @Autowired
     FormGroupListService formGroupListService;
+
+    @Autowired
+    SubjectClassListService subjectClassListService;
 
     @Autowired
     AssignmentTypeService assignmentTypeService;
