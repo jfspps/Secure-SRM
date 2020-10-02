@@ -61,10 +61,12 @@
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">Student summary</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">Create new student record</a></p>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/}">View form groups</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/new}">New form groups</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/new}">New form group</a></p>
                     <h5 class="card-title">Teachers</h5>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/teachers/index}">Teacher summary</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">Create new teacher record</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/}">View subject classes</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/new}">New subject class</a></p>
                     <h5 class="card-title">Guardians</h5>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/index}">Guardian summary</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/new}">Create new guardian record</a></p>

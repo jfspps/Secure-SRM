@@ -18,6 +18,7 @@ import java.util.Set;
 @Builder
 @Entity
 public class FormGroupList extends BaseEntity implements Comparable<FormGroupList> {
+    //this model provides pastoral group related properties (groupName must be unique)
 
     @Size(min = 1, max = 255)
     private String groupName;

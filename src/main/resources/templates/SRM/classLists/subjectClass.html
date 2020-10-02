@@ -3,17 +3,17 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Form group</title>
+    <title>Subject class</title>
 </head>
 <body>
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-<!--/*@thymesVar id="formGroup" type="com.secure_srm.model.people.FormGroupList"*/-->
+<!--/*@thymesVar id="subjectClass" type="com.secure_srm.model.people.SubjectClassList"*/-->
 <div class="container" sec:authorize="hasAuthority('teacher.read')">
     <div class="row">
         <div class="col">
-            <h2 th:text="${'Form group: ' + formGroup.groupName}">Title</h2>
+            <h2 th:text="${'Subject class: ' + subjectClass.groupName}">Title</h2>
         </div>
     </div>
     <!--/*@thymesVar id="newList" type="java.lang.String"*/-->
@@ -23,10 +23,10 @@
     <br />
     <div class="row align-items-start">
         <div class="col-sm-2">
-            <label><b>Personal Tutor</b></label>
+            <label><b>Subject teacher</b></label>
         </div>
         <div class="col-sm-8">
-            <label th:text="${formGroup.teacher.firstName + ' ' + formGroup.teacher.lastName}"></label>
+            <label th:text="${subjectClass.teacher.firstName + ' ' + subjectClass.teacher.lastName}"></label>
         </div>
     </div>
     <br />
@@ -61,14 +61,14 @@
     </div>
     <div class="row align-items-start">
         <div class="col-sm-4">
-            <a class="btn btn-outline-warning" th:href="@{/formGroupList/{formId}/edit(formId=${formGroup.id})}"
+            <a class="btn btn-outline-warning" th:href="@{/subjectClassList/{classId}/edit(classId=${subjectClass.id})}"
                role="button" sec:authorize="hasAuthority('admin.update')">Add/remove students</a>
         </div>
     </div>
     <br />
     <div class="row align-items-start">
         <div class="col-sm-4">
-            <a class="btn btn-outline-info" href="/formGroupList/" role="button">Form group list</a>
+            <a class="btn btn-outline-info" href="/subjectClassList/" role="button">Subject class list</a>
         </div>
     </div>
 
