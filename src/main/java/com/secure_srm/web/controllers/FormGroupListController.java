@@ -164,7 +164,17 @@ public class FormGroupListController {
     @AdminUpdate
     @PostMapping("/{groupId}/edit")
     public String postUpdateFormGroup(@PathVariable("groupId") String groupID,  Model model,
-                                      @ModelAttribute("formGroup") FormGroupList formGroupList){
+                                      @Valid @ModelAttribute("formGroup") FormGroupList formGroupList,
+                                      BindingResult result){
+
+        if (result.hasErrors()){
+            log.debug("Problems with form group details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("formGroup", formGroupList);
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            return "/SRM/classLists/studentsOnFile";
+        }
 
         FormGroupList listOnFile = formGroupListService.findById(Long.valueOf(groupID));
 

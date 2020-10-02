@@ -8,6 +8,7 @@ import lombok.*;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 public class SubjectClassList extends BaseEntity implements Comparable<SubjectClassList> {
     //this model provides academic class/group related properties (groupName must be unique)
 
+    @Size(min = 1, max = 255)
     private String groupName;
 
     @ManyToMany(mappedBy = "subjectClassLists")
