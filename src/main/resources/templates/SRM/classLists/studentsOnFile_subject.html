@@ -18,14 +18,14 @@
     </div>
     <br/>
 
-    <form method="get" th:action="@{/formGroupList/{formGroupId}/search(formGroupId=${formGroup.id})}"
+    <form method="get" th:action="@{/subjectClassList/{classId}/search(classId=${subjectClass.id})}"
           class="form-horizontal" id="remove-tutor-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label>Student search</label>
             </div>
             <div class="col-sm-8">
-                <p>Students not listed below will be removed from current form group (to be fixed).</p>
+                <p>Students not listed below will be removed from current class list (to be fixed).</p>
                 <input class="form-control mr-sm-2" type="text" name="StudentLastName" placeholder="Student last name" aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine student list</button>
             </div>
@@ -33,13 +33,13 @@
     </form>
 
     <br />
-    <!--/*@thymesVar id="formGroup" type="com.secure_srm.model.people.FormGroupList"*/-->
-    <form th:object="${formGroup}" method="post" th:action="@{/formGroupList/{formId}/edit(formId=${formGroup.id})}"
+    <!--/*@thymesVar id="subjectClass" type="com.secure_srm.model.people.SubjectClassList"*/-->
+    <form th:object="${subjectClass}" method="post" th:action="@{/subjectClassList/{classId}/edit(classId=${subjectClass.id})}"
           class="form-horizontal" id="change-studentSet-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" th:text="${'Students registered to: ' +
-                 formGroup.groupName}"></label>
+                 subjectClass.groupName}"></label>
             </div>
             <div class="col-sm-8">
                 <table class="table table-hover table-sm table-striped">

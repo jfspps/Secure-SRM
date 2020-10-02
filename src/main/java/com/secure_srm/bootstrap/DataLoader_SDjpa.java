@@ -2,18 +2,12 @@ package com.secure_srm.bootstrap;
 
 import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.model.academic.Subject;
-import com.secure_srm.model.people.Address;
-import com.secure_srm.model.people.ContactDetail;
-import com.secure_srm.model.people.FormGroupList;
-import com.secure_srm.model.people.Student;
+import com.secure_srm.model.people.*;
 import com.secure_srm.model.security.*;
 import com.secure_srm.services.TestRecordService;
 import com.secure_srm.services.academicServices.AssignmentTypeService;
 import com.secure_srm.services.academicServices.SubjectService;
-import com.secure_srm.services.peopleServices.AddressService;
-import com.secure_srm.services.peopleServices.ContactDetailService;
-import com.secure_srm.services.peopleServices.FormGroupListService;
-import com.secure_srm.services.peopleServices.StudentService;
+import com.secure_srm.services.peopleServices.*;
 import com.secure_srm.services.securityServices.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +41,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
     private final ContactDetailService contactDetailService;
     private final FormGroupListService formGroupListService;
     private final AssignmentTypeService assignmentTypeService;
+    private final SubjectClassListService subjectClassListService;
 
     @Override
     public void run(String... args) {
@@ -247,24 +242,24 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         teacher2.setContactDetail(teacher2Contact);
 
         //academic details
-        Subject subject1 = Subject.builder().subjectName("Mathematics").build();
+        Subject mathematics = Subject.builder().subjectName("Mathematics").build();
         Set<TeacherUser> teachers1 = new HashSet<>();
         teachers1.add(teacher1);
-        subject1.setTeachers(teachers1);
+        mathematics.setTeachers(teachers1);
         Set<Subject> teacher1subjects = new HashSet<>();
-        teacher1subjects.add(subject1);
+        teacher1subjects.add(mathematics);
         teacher1.setSubjects(teacher1subjects);
 
-        Subject subject2 = Subject.builder().subjectName("English").build();
+        Subject english = Subject.builder().subjectName("English").build();
         Set<TeacherUser> teachers2 = new HashSet<>();
         teachers2.add(teacher2);
-        subject2.setTeachers(teachers2);
+        english.setTeachers(teachers2);
         Set<Subject> teacher2subjects = new HashSet<>();
-        teacher2subjects.add(subject2);
+        teacher2subjects.add(english);
         teacher2.setSubjects(teacher2subjects);
 
-        subjectService.save(subject1);
-        subjectService.save(subject2);
+        subjectService.save(mathematics);
+        subjectService.save(english);
         log.debug("Subjects loaded to DB");
 
         teacherUserService.save(teacher1);
@@ -328,6 +323,13 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         formGroupListService.save(formGroupList1);
         formGroupListService.save(formGroupList2);
         log.debug("FormGroupList loaded to DB");
+
+        //Subject class lists
+        SubjectClassList subjectClassList_Math = SubjectClassList.builder().subject(mathematics).teacher(teacher1).groupName("Math_101").build();
+        SubjectClassList subjectClassList_Eng = SubjectClassList.builder().subject(english).teacher(teacher2).groupName("English_101").build();
+        subjectClassListService.save(subjectClassList_Eng);
+        subjectClassListService.save(subjectClassList_Math);
+        log.debug("SubjectClassList loaded to DB");
 
         studentService.save(student1);
         studentService.save(student2);

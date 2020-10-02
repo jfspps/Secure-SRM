@@ -8,6 +8,8 @@ import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
+import com.secure_srm.web.permissionAnnot.AdminRead;
+import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -129,7 +131,7 @@ public class FormGroupListController {
         }
     }
 
-    @TeacherRead
+    @AdminUpdate
     @GetMapping("/{groupId}/edit")
     public String getUpdateFormGroup(@PathVariable("groupId") String groupID,  Model model){
         if (formGroupListService.findById(Long.valueOf(groupID)) == null){
@@ -144,7 +146,7 @@ public class FormGroupListController {
         }
     }
 
-    @TeacherRead
+    @AdminRead
     @GetMapping("/{groupId}/search")
     public String getUpdateFormGroupSearch(@PathVariable("groupId") String groupID,  Model model, String StudentLastName){
         if (formGroupListService.findById(Long.valueOf(groupID)) == null){
@@ -159,10 +161,20 @@ public class FormGroupListController {
         }
     }
 
-    @TeacherRead
+    @AdminUpdate
     @PostMapping("/{groupId}/edit")
     public String postUpdateFormGroup(@PathVariable("groupId") String groupID,  Model model,
-                                      @ModelAttribute("formGroup") FormGroupList formGroupList){
+                                      @Valid @ModelAttribute("formGroup") FormGroupList formGroupList,
+                                      BindingResult result){
+
+        if (result.hasErrors()){
+            log.debug("Problems with form group details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("formGroup", formGroupList);
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            return "/SRM/classLists/studentsOnFile";
+        }
 
         FormGroupList listOnFile = formGroupListService.findById(Long.valueOf(groupID));
 
