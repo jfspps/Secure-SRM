@@ -1,7 +1,5 @@
 package com.secure_srm.web.controllers;
 
-import com.secure_srm.model.academic.Subject;
-import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.SubjectClassList;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -58,27 +53,15 @@ public class SubjectClassListController_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
-    void getNewSubjectClass_findTeachers(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/subjectClassList/new").with(httpBasic(username, pwd))
-                .param("TeacherLastName", "Jones"))
+    void getNewSubjectClass_search(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjectClassList/new/search").with(httpBasic(username, pwd)).with(csrf())
+                .param("TeacherLastName", "Jones")
+                .param("SubjectTitle", ""))
                 .andExpect(view().name("/SRM/classLists/newSubjectClass"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("subjectClass"))
                 .andExpect(model().attribute("subjects", hasSize(2)))
                 .andExpect(model().attribute("teachers", hasSize(1)))
-                .andExpect(model().attributeExists("studentSet"));
-    }
-
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
-    @ParameterizedTest
-    void getNewSubjectClass_findSubjects(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/subjectClassList/new").with(httpBasic(username, pwd))
-                .param("SubjectTitle", "Mathematics"))
-                .andExpect(view().name("/SRM/classLists/newSubjectClass"))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("subjectClass"))
-                .andExpect(model().attribute("subjects", hasSize(1)))
-                .andExpect(model().attribute("teachers", hasSize(2)))
                 .andExpect(model().attributeExists("studentSet"));
     }
 
@@ -111,7 +94,7 @@ public class SubjectClassListController_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
-    void getUpdateSubjectClassSearch(String username, String pwd) throws Exception {
+    void getUpdateSubjectClass_search(String username, String pwd) throws Exception {
         mockMvc.perform(get("/subjectClassList/1/search").with(httpBasic(username, pwd))
                 .param("StudentLastName", ""))
                 .andExpect(view().name("/SRM/classLists/studentsOnFile_subject"))

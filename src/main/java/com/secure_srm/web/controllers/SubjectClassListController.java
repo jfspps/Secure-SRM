@@ -42,43 +42,29 @@ public class SubjectClassListController {
 
     @TeacherRead
     @GetMapping({"/", "/index"})
-    public String getFormGroupList(Model model){
+    public String getFormGroupList(Model model) {
         model.addAttribute("subjectClasses", sortSubjectClassSetByGroupName(subjectClassListService.findAll()));
         return "/SRM/classLists/subjectClasses";
     }
 
     @TeacherRead
     @GetMapping("/{groupId}")
-    public String getShowSubjectClass(@PathVariable("groupId") String groupID, Model model){
-        if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Subject class not found");
-            throw new NotFoundException("Subject class not found");
-        } else {
-            SubjectClassList found = subjectClassListService.findById(Long.valueOf(groupID));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(found.getStudentList());
-            model.addAttribute("subjectClass", found);
-            model.addAttribute("studentList", listByLastName);
-            return "/SRM/classLists/subjectClass";
-        }
+    public String getShowSubjectClass(@PathVariable("groupId") String groupID, Model model) {
+        checkSubjectExists(groupID);
+
+        SubjectClassList found = subjectClassListService.findById(Long.valueOf(groupID));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(found.getStudentList());
+        model.addAttribute("subjectClass", found);
+        model.addAttribute("studentList", listByLastName);
+        return "/SRM/classLists/subjectClass";
+
     }
 
     @AdminCreate
     @GetMapping("/new")
-    public String getNewSubjectClass(Model model, String TeacherLastName, String SubjectTitle){
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        } else {
-            model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
-        }
-
-        if (SubjectTitle == null || SubjectTitle.isEmpty()){
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
-        } else {
-            model.addAttribute("subjects",
-                    sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(SubjectTitle)));
-        }
+    public String getNewSubjectClass(Model model, String TeacherLastName, String SubjectTitle) {
+        refineTeacherAndSubjectLists(model, TeacherLastName, SubjectTitle);
 
         model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("subjectClass", SubjectClassList.builder().build());
@@ -86,45 +72,10 @@ public class SubjectClassListController {
     }
 
     @AdminCreate
-    @GetMapping("/new/teachers/search")
-    public String getNewSubjectClass_findTeachers(Model model, @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
-                                                  String TeacherLastName, String SubjectTitle){
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        } else {
-            model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
-        }
-
-        if (SubjectTitle == null || SubjectTitle.isEmpty()){
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
-        } else {
-            model.addAttribute("subjects",
-                    sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(SubjectTitle)));
-        }
-
-        model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
-        model.addAttribute("subjectClass", subjectClassList);
-        return "/SRM/classLists/newSubjectClass";
-    }
-
-    @AdminCreate
-    @GetMapping("/new/subjects/search")
-    public String getNewSubjectClass_findSubjects(Model model, @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
-                                                  String TeacherLastName, String SubjectTitle){
-        if (SubjectTitle == null || SubjectTitle.isEmpty()){
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
-        } else {
-            model.addAttribute("subjects",
-                    sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(SubjectTitle)));
-        }
-
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        } else {
-            model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
-        }
+    @GetMapping("/new/search")
+    public String getNewSubjectClass_Search(Model model, @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
+                                            String TeacherLastName, String SubjectTitle) {
+        refineTeacherAndSubjectLists(model, TeacherLastName, SubjectTitle);
 
         model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("subjectClass", subjectClassList);
@@ -134,16 +85,8 @@ public class SubjectClassListController {
     @AdminCreate
     @PostMapping("/new")
     public String postNewSubjectClass(Model model, @Valid @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
-                                   BindingResult result){
-        if (result.hasErrors()){
-            log.debug("Problems with subject class details submitted");
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
-            model.addAttribute("subjectClass", subjectClassList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
-            return "/SRM/classLists/newSubjectClass";
-        }
+                                      BindingResult result) {
+        if (SubjectClass_formHasErrors(model, subjectClassList, result)) return "/SRM/classLists/newSubjectClass";
 
         //check if the groupName already exists
         if (subjectClassListService.findByGroupName(subjectClassList.getGroupName()) != null) {
@@ -173,49 +116,37 @@ public class SubjectClassListController {
 
     @AdminUpdate
     @GetMapping("/{groupId}/edit")
-    public String getUpdateSubjectClass(@PathVariable("groupId") String groupID,  Model model){
-        if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Subject class not found");
-            throw new NotFoundException("Subject class not found");
-        } else {
-            model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
-            model.addAttribute("studentSet", listByLastName);
-            return "/SRM/classLists/studentsOnFile_subject";
-        }
+    public String getUpdateSubjectClass(@PathVariable("groupId") String groupID, Model model) {
+        checkSubjectExists(groupID);
+
+        model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
+        model.addAttribute("studentSet", listByLastName);
+        return "/SRM/classLists/studentsOnFile_subject";
+
     }
 
     @AdminRead
     @GetMapping("/{groupId}/search")
-    public String getUpdateClassListSearch(@PathVariable("groupId") String groupID, Model model, String StudentLastName){
-        if (subjectClassListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Subject class not found");
-            throw new NotFoundException("Subject class not found");
-        } else {
-            model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
-            model.addAttribute("studentSet", listByLastName);
-            return "/SRM/classLists/studentsOnFile_subject";
-        }
+    public String getUpdateClassListSearch(@PathVariable("groupId") String groupID, Model model, String StudentLastName) {
+        checkSubjectExists(groupID);
+
+        model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
+        model.addAttribute("studentSet", listByLastName);
+        return "/SRM/classLists/studentsOnFile_subject";
+
     }
 
     @AdminUpdate
     @PostMapping("/{groupId}/edit")
-    public String postUpdateClassList(@PathVariable("groupId") String groupID,  Model model,
-                                      @Valid @ModelAttribute("formGroup") SubjectClassList subjectClassList,
-                                      BindingResult result){
-
-        if (result.hasErrors()){
-            log.debug("Problems with subject class details submitted");
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
-            model.addAttribute("subjectClass", subjectClassList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
+    public String postUpdateClassList(@PathVariable("groupId") String groupID, Model model,
+                                      @Valid @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
+                                      BindingResult result) {
+        if (SubjectClass_formHasErrors(model, subjectClassList, result))
             return "/SRM/classLists/studentsOnFile_subject";
-        }
 
         SubjectClassList listOnFile = subjectClassListService.findById(Long.valueOf(groupID));
 
@@ -245,9 +176,49 @@ public class SubjectClassListController {
         return "/SRM/classLists/subjectClass";
     }
 
+
+    @AdminUpdate
+    private void checkSubjectExists(String groupID) {
+        if (subjectClassListService.findById(Long.valueOf(groupID)) == null) {
+            log.debug("Subject class not found");
+            throw new NotFoundException("Subject class not found");
+        }
+    }
+
+    @AdminRead
+    private void refineTeacherAndSubjectLists(Model model, String TeacherLastName, String SubjectTitle) {
+        if (TeacherLastName == null || TeacherLastName.isEmpty()) {
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        } else {
+            model.addAttribute("teachers",
+                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+        }
+
+        if (SubjectTitle == null || SubjectTitle.isEmpty()) {
+            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
+        } else {
+            model.addAttribute("subjects",
+                    sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(SubjectTitle)));
+        }
+    }
+
+    @AdminUpdate
+    private boolean SubjectClass_formHasErrors(Model model, SubjectClassList subjectClassList, BindingResult result) {
+        if (result.hasErrors()) {
+            log.debug("Problems with subject class details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("subjectClass", subjectClassList);
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Returns an ArrayList of items, sorted by Teachers's lastName
-     * */
+     */
     @TeacherRead
     private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
         List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
@@ -258,7 +229,7 @@ public class SubjectClassListController {
 
     /**
      * Returns an ArrayList of items, sorted by Groupname
-     * */
+     */
     @TeacherRead
     private List<SubjectClassList> sortSubjectClassSetByGroupName(Set<SubjectClassList> subjectClassListSet) {
         List<SubjectClassList> listByGroupName = new ArrayList<>(subjectClassListSet);
@@ -269,7 +240,7 @@ public class SubjectClassListController {
 
     /**
      * Returns an ArrayList of items, sorted by student's lastName
-     * */
+     */
     @TeacherRead
     private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
         List<Student> listByLastName = new ArrayList<>(studentSet);
@@ -280,7 +251,7 @@ public class SubjectClassListController {
 
     /**
      * Returns an ArrayList of items, sorted by subject title
-     * */
+     */
     @TeacherRead
     private List<Subject> sortSetBySubjectName(Set<Subject> subjectSet) {
         List<Subject> listBySubjectName = new ArrayList<>(subjectSet);

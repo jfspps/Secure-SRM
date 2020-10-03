@@ -13,7 +13,6 @@ import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,21 +39,15 @@ public class FormGroupListController {
 
     @TeacherRead
     @GetMapping({"/", "/index"})
-    public String getFormGroupList(Model model){
+    public String getFormGroupList(Model model) {
         model.addAttribute("formGroups", sortFormGroupSetByGroupName(formGroupListService.findAll()));
         return "/SRM/classLists/formGroups";
     }
 
     @AdminCreate
     @GetMapping("/new")
-    public String getNewFormGroup(Model model, String TeacherLastName){
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        } else {
-            model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
-        }
-
+    public String getNewFormGroup(Model model, String TeacherLastName) {
+        updateTutorList(model, TeacherLastName);
         model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("formGroup", FormGroupList.builder().build());
         return "/SRM/classLists/newFormGroup";
@@ -63,14 +56,8 @@ public class FormGroupListController {
     @AdminCreate
     @GetMapping("/new/teachers/search")
     public String getNewFormGroup_findTeachers(Model model, @ModelAttribute("formGroup") FormGroupList formGroupList,
-                                               String TeacherLastName){
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        } else {
-            model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
-        }
-
+                                               String TeacherLastName) {
+        updateTutorList(model, TeacherLastName);
         model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("formGroup", formGroupList);
         return "/SRM/classLists/newFormGroup";
@@ -79,15 +66,8 @@ public class FormGroupListController {
     @AdminCreate
     @PostMapping("/new")
     public String postNewFormGroup(Model model, @Valid @ModelAttribute("formGroup") FormGroupList formGroupList,
-                                   BindingResult result){
-        if (result.hasErrors()){
-            log.debug("Problems with form group details submitted");
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
-            model.addAttribute("formGroup", formGroupList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            return "/SRM/classLists/newFormGroup";
-        }
+                                   BindingResult result) {
+        if (FormGroup_FormHasErrors(model, formGroupList, result)) return "/SRM/classLists/newFormGroup";
 
         //check if the groupName already exists
         if (formGroupListService.findByGroupName(formGroupList.getGroupName()) != null) {
@@ -117,64 +97,48 @@ public class FormGroupListController {
 
     @TeacherRead
     @GetMapping("/{groupId}")
-    public String getShowFormGroup(@PathVariable("groupId") String groupID,  Model model){
-        if (formGroupListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Form group not found");
-            throw new NotFoundException("Form group not found");
-        } else {
-            FormGroupList found = formGroupListService.findById(Long.valueOf(groupID));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(found.getStudentList());
-            model.addAttribute("formGroup", found);
-            model.addAttribute("studentList", listByLastName);
-            return "/SRM/classLists/form";
-        }
+    public String getShowFormGroup(@PathVariable("groupId") String groupID, Model model) {
+        checkFormGroupExists(groupID);
+
+        FormGroupList found = formGroupListService.findById(Long.valueOf(groupID));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(found.getStudentList());
+        model.addAttribute("formGroup", found);
+        model.addAttribute("studentList", listByLastName);
+        return "/SRM/classLists/form";
+
     }
 
     @AdminUpdate
     @GetMapping("/{groupId}/edit")
-    public String getUpdateFormGroup(@PathVariable("groupId") String groupID,  Model model){
-        if (formGroupListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Form group not found");
-            throw new NotFoundException("Form group not found");
-        } else {
-            model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
-            model.addAttribute("studentSet", listByLastName);
-            return "/SRM/classLists/studentsOnFile";
-        }
+    public String getUpdateFormGroup(@PathVariable("groupId") String groupID, Model model) {
+        checkFormGroupExists(groupID);
+
+        model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
+        model.addAttribute("studentSet", listByLastName);
+        return "/SRM/classLists/studentsOnFile";
     }
 
     @AdminRead
     @GetMapping("/{groupId}/search")
-    public String getUpdateFormGroupSearch(@PathVariable("groupId") String groupID,  Model model, String StudentLastName){
-        if (formGroupListService.findById(Long.valueOf(groupID)) == null){
-            log.debug("Form group not found");
-            throw new NotFoundException("Form group not found");
-        } else {
-            model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
-            //build a list by lastName, then sort
-            List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
-            model.addAttribute("studentSet", listByLastName);
-            return "/SRM/classLists/studentsOnFile";
-        }
+    public String getUpdateFormGroupSearch(@PathVariable("groupId") String groupID, Model model, String StudentLastName) {
+        checkFormGroupExists(groupID);
+
+        model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
+        //build a list by lastName, then sort
+        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
+        model.addAttribute("studentSet", listByLastName);
+        return "/SRM/classLists/studentsOnFile";
     }
 
     @AdminUpdate
     @PostMapping("/{groupId}/edit")
-    public String postUpdateFormGroup(@PathVariable("groupId") String groupID,  Model model,
+    public String postUpdateFormGroup(@PathVariable("groupId") String groupID, Model model,
                                       @Valid @ModelAttribute("formGroup") FormGroupList formGroupList,
-                                      BindingResult result){
-
-        if (result.hasErrors()){
-            log.debug("Problems with form group details submitted");
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
-            model.addAttribute("formGroup", formGroupList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            return "/SRM/classLists/studentsOnFile";
-        }
+                                      BindingResult result) {
+        if (FormGroup_FormHasErrors(model, formGroupList, result)) return "/SRM/classLists/studentsOnFile";
 
         FormGroupList listOnFile = formGroupListService.findById(Long.valueOf(groupID));
 
@@ -206,9 +170,40 @@ public class FormGroupListController {
         return "/SRM/classLists/form";
     }
 
+    @AdminUpdate
+    private boolean FormGroup_FormHasErrors(Model model, FormGroupList formGroupList, BindingResult result) {
+        if (result.hasErrors()) {
+            log.debug("Problems with form group details submitted");
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("formGroup", formGroupList);
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            return true;
+        }
+        return false;
+    }
+
+    @AdminUpdate
+    private void checkFormGroupExists(String groupID) {
+        if (formGroupListService.findById(Long.valueOf(groupID)) == null) {
+            log.debug("Form group not found");
+            throw new NotFoundException("Form group not found");
+        }
+    }
+
+    @AdminRead
+    private void updateTutorList(Model model, String TeacherLastName) {
+        if (TeacherLastName == null || TeacherLastName.isEmpty()) {
+            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        } else {
+            model.addAttribute("teachers",
+                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+        }
+    }
+
     /**
      * Returns an ArrayList of items, sorted by student's lastName
-     * */
+     */
     @TeacherRead
     private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
         List<Student> listByLastName = new ArrayList<>(studentSet);
@@ -219,7 +214,7 @@ public class FormGroupListController {
 
     /**
      * Returns an ArrayList of items, sorted by Teachers's lastName
-     * */
+     */
     @TeacherRead
     private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
         List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
@@ -230,7 +225,7 @@ public class FormGroupListController {
 
     /**
      * Returns an ArrayList of items, sorted by Groupname
-     * */
+     */
     @TeacherRead
     private List<FormGroupList> sortFormGroupSetByGroupName(Set<FormGroupList> formGroupListSet) {
         List<FormGroupList> listByLastName = new ArrayList<>(formGroupListSet);
