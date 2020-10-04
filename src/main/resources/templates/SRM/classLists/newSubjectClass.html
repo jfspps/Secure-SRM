@@ -17,33 +17,34 @@
         </div>
     </div>
 
-    <form method="get" th:action="@{/subjectClassList/new/teachers/search}"
+    <form method="get" th:action="@{/subjectClassList/new/search}"
           class="form-horizontal" id="refine-teachers-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label>Teacher search</label>
             </div>
             <div class="col-sm-8">
-                <p>Perform searches before filling in fields. Submitting a search will reset all data on this form.</p>
                 <input class="form-control mr-sm-2" type="text" name="TeacherLastName" placeholder="Teacher last name"
                        aria-label="Search" maxlength="50">
-                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine Teacher list</button>
             </div>
         </div>
-    </form>
-    <br />
 
-    <form method="get" th:action="@{/subjectClassList/new/subjects/search}"
-          class="form-horizontal" id="refine-subjects-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label>Subject search</label>
             </div>
             <div class="col-sm-8">
-                <p>Perform searches before filling in fields. Submitting a search will reset all data on this form.</p>
                 <input class="form-control mr-sm-2" type="text" name="SubjectTitle" placeholder="Subject title"
                        aria-label="Search" maxlength="50">
-                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine subject list</button>
+            </div>
+        </div>
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-8">
+                <p>Conducting a teacher or subject search will reset any changes entered. Perform any searches needed
+                    before making selections and submitting changes.</p>
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine lists</button>
             </div>
         </div>
     </form>
