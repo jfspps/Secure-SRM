@@ -99,6 +99,7 @@ public class SubjectClassListController_IT extends SecurityCredentialsTest {
                 .param("StudentLastName", ""))
                 .andExpect(view().name("/SRM/classLists/studentsOnFile_subject"))
                 .andExpect(status().isOk())
+                .andExpect(model().attributeExists("searchQuery"))
                 .andExpect(model().attributeExists("subjectClass"))
                 .andExpect(model().attributeExists("studentSet"));
     }

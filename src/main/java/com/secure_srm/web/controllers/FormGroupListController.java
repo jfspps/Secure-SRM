@@ -127,9 +127,15 @@ public class FormGroupListController {
         checkFormGroupExists(groupID);
 
         model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
-        //build a list by lastName, then sort
-        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
-        model.addAttribute("studentSet", listByLastName);
+        Set<Student> found = studentService.findAllByLastNameContainingIgnoreCase(StudentLastName);
+
+        //add students who are already registered to the class along with search results
+        Set<Student> registered = formGroupListService.findById(Long.valueOf(groupID)).getStudentList();
+        found.addAll(registered);
+
+        List<Student> sorted = sortStudentSetByLastName(found);
+        model.addAttribute("searchQuery", StudentLastName);
+        model.addAttribute("studentSet", sorted);
         return "/SRM/classLists/studentsOnFile";
     }
 
