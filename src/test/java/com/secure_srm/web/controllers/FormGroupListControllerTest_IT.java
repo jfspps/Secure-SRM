@@ -110,6 +110,7 @@ class FormGroupListControllerTest_IT extends SecurityCredentialsTest {
                 .param("StudentLastName", ""))
                 .andExpect(view().name("/SRM/classLists/studentsOnFile"))
                 .andExpect(status().isOk())
+                .andExpect(model().attributeExists("searchQuery"))
                 .andExpect(model().attributeExists("formGroup"))
                 .andExpect(model().attributeExists("studentSet"));
     }

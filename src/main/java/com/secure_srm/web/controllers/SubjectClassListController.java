@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -124,7 +125,6 @@ public class SubjectClassListController {
         List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
         model.addAttribute("studentSet", listByLastName);
         return "/SRM/classLists/studentsOnFile_subject";
-
     }
 
     @AdminRead
@@ -133,41 +133,50 @@ public class SubjectClassListController {
         checkSubjectExists(groupID);
 
         model.addAttribute("subjectClass", subjectClassListService.findById(Long.valueOf(groupID)));
-        //build a list by lastName, then sort
-        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAllByLastNameLike(StudentLastName));
-        model.addAttribute("studentSet", listByLastName);
-        return "/SRM/classLists/studentsOnFile_subject";
+        Set<Student> found = studentService.findAllByLastNameContainingIgnoreCase(StudentLastName);
 
+        //add students who are already registered to the class along with search results
+        Set<Student> registered = subjectClassListService.findById(Long.valueOf(groupID)).getStudentList();
+        found.addAll(registered);
+
+        List<Student> sorted = sortStudentSetByLastName(found);
+
+        model.addAttribute("studentSet", sorted);
+        //send back the search string (used for update)
+        model.addAttribute("searchQuery", StudentLastName);
+        return "/SRM/classLists/studentsOnFile_subject";
     }
 
     @AdminUpdate
     @PostMapping("/{groupId}/edit")
     public String postUpdateClassList(@PathVariable("groupId") String groupID, Model model,
-                                      @Valid @ModelAttribute("subjectClass") SubjectClassList subjectClassList,
+                                      @Valid @ModelAttribute("subjectClass") SubjectClassList classListSubmitted,
                                       BindingResult result) {
-        if (SubjectClass_formHasErrors(model, subjectClassList, result))
+        if (SubjectClass_formHasErrors(model, classListSubmitted, result))
             return "/SRM/classLists/studentsOnFile_subject";
 
         SubjectClassList listOnFile = subjectClassListService.findById(Long.valueOf(groupID));
 
-        //copy listOnFile student set and remove those from subjectClassList
-        Set<Student> removed = new HashSet<>(listOnFile.getStudentList());
-        removed.removeIf(subjectClassList.getStudentList()::contains);
+        //students listed on the form with checkbox checked stored in classListSubmitted
+        //all other students on the DB are not stored
 
-        //clear removed students' subjectClassList property and update the subjectClassList on file
-        removed.forEach(student -> {
+        //remove listOnFile from removed students and update the subjectClassList on file
+        Set<Student> allOthers = new HashSet<>(studentService.findAll());
+        allOthers.removeIf(classListSubmitted.getStudentList()::contains);
+
+        allOthers.forEach(student -> {
             student.getSubjectClassLists().remove(listOnFile);
             listOnFile.getStudentList().remove(student);
             studentService.save(student);
         });
 
         //update each added student
-        subjectClassList.getStudentList().forEach(student -> {
+        classListSubmitted.getStudentList().forEach(student -> {
             student.getSubjectClassLists().add(listOnFile);
             studentService.save(student);
+            listOnFile.getStudentList().add(student);
         });
 
-        listOnFile.setStudentList(subjectClassList.getStudentList());
         SubjectClassList saved = subjectClassListService.save(listOnFile);
 
         model.addAttribute("subjectClass", saved);

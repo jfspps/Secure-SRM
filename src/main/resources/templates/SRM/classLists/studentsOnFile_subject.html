@@ -6,7 +6,7 @@
     <title>Add/remove students</title>
 </head>
 <body>
-<nav th:replace="fragments/navGuardianSearch :: nav"></nav>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
 <div class="container" sec:authorize="hasAuthority('admin.update')">
@@ -22,11 +22,11 @@
           class="form-horizontal" id="remove-tutor-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label>Student search</label>
+                <label>Search by student's last name</label>
             </div>
             <div class="col-sm-8">
-                <p>Students not listed below will be removed from current class list (to be fixed).</p>
-                <input class="form-control mr-sm-2" type="text" name="StudentLastName" placeholder="Student last name" aria-label="Search" maxlength="50">
+                <p>Please perform any search before committing updates. Search query also returns registered students.</p>
+                <input class="form-control mr-sm-2" type="text" name="StudentLastName" aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine student list</button>
             </div>
         </div>
@@ -42,6 +42,8 @@
                  subjectClass.groupName}"></label>
             </div>
             <div class="col-sm-8">
+                <!--/*@thymesVar id="searchQuery" type="java.lang.String"*/-->
+                <p th:if="${searchQuery != null}" th:text="${'Searching for last name: ' + searchQuery}"></p>
                 <table class="table table-hover table-sm table-striped">
                     <thead class="thead-light">
                         <tr>

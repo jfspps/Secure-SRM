@@ -42,7 +42,7 @@ public class SubjectController {
         } else {
             model.addAttribute("subjects", sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(subjectTitle)));
         }
-        return "/SRM/academicRecords/subjectIndex";
+        return "/SRM/subjects/subjectIndex";
     }
 
     @AdminCreate
@@ -51,7 +51,7 @@ public class SubjectController {
         Subject newSubject = Subject.builder().subjectName("").build();
         model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("subject", newSubject);
-        return "/SRM/academicRecords/newSubject";
+        return "/SRM/subjects/newSubject";
     }
 
     @TeacherRead
@@ -66,7 +66,7 @@ public class SubjectController {
 
         //note that subjectSubmitted is not saved to the DB, and is composed of a new Subject with a blank subject title
         model.addAttribute("subject", subjectSubmitted);
-        return "/SRM/academicRecords/newSubject";
+        return "/SRM/subjects/newSubject";
     }
 
     @AdminCreate
@@ -78,7 +78,7 @@ public class SubjectController {
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("subject", subjectSubmitted);
             model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            return "/SRM/academicRecords/newSubject";
+            return "/SRM/subjects/newSubject";
         }
 
         //check the subject title is not already on file
@@ -87,7 +87,7 @@ public class SubjectController {
             model.addAttribute("newSubjectFeedback", "Subject already exists with given title");
             model.addAttribute("subject", subjectSubmitted);
             model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            return "/SRM/academicRecords/newSubject";
+            return "/SRM/subjects/newSubject";
         }
 
         Subject saved = subjectService.save(subjectSubmitted);
@@ -102,7 +102,7 @@ public class SubjectController {
         model.addAttribute("subjectTeachersFeedback", "New subject \"" + saved.getSubjectName() + "\"" + " saved");
         model.addAttribute("subject", saved);
         model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        return "/SRM/academicRecords/updateSubject";
+        return "/SRM/subjects/updateSubject";
     }
 
     @TeacherRead
@@ -116,7 +116,7 @@ public class SubjectController {
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
         model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("subject", subjectOnFile);
-        return "/SRM/academicRecords/updateSubject";
+        return "/SRM/subjects/updateSubject";
     }
 
     @TeacherRead
@@ -135,7 +135,7 @@ public class SubjectController {
         }
 
         model.addAttribute("subject", subjectService.findById(Long.valueOf(subjectId)));
-        return "/SRM/academicRecords/updateSubject";
+        return "/SRM/subjects/updateSubject";
     }
 
     @AdminUpdate
@@ -151,7 +151,7 @@ public class SubjectController {
             subjectSubmitted.setTeachers(onFile.getTeachers());
             model.addAttribute("subject", subjectSubmitted);
             model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-            return "/SRM/academicRecords/updateSubject";
+            return "/SRM/subjects/updateSubject";
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
@@ -181,7 +181,7 @@ public class SubjectController {
         model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
         model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
-        return "/SRM/academicRecords/updateSubject";
+        return "/SRM/subjects/updateSubject";
     }
 
     /**

@@ -155,7 +155,7 @@ public class TeacherController {
         } else {
             model.addAttribute("subjectSet", subjectService.findAll());
             model.addAttribute("teacher", teacherUserService.findById(Long.valueOf(teacherId)));
-            return "/SRM/academicRecords/subjectSet";
+            return "/SRM/subjects/subjectSet";
         }
     }
 
