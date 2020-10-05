@@ -25,7 +25,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(get("/subjects").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectIndex"))
+                .andExpect(view().name("/SRM/subjects/subjectIndex"))
                 .andExpect(model().attribute("subjects", hasSize(2)));
     }
 
@@ -36,7 +36,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("subjectTitle", "english"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectIndex"))
+                .andExpect(view().name("/SRM/subjects/subjectIndex"))
                 .andExpect(model().attribute("subjects", hasSize(1)));
     }
 
@@ -47,7 +47,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("subjectTitle", "math"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/subjectIndex"))
+                .andExpect(view().name("/SRM/subjects/subjectIndex"))
                 .andExpect(model().attribute("subjects", hasSize(1)));
     }
 
@@ -57,7 +57,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(get("/subjects/new").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/newSubject"))
+                .andExpect(view().name("/SRM/subjects/newSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
     }
@@ -69,7 +69,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("TeacherLastName", "jones"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/newSubject"))
+                .andExpect(view().name("/SRM/subjects/newSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(1)));
     }
@@ -82,7 +82,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .flashAttr("teachers", teacherUserService.findAll()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attributeExists("subjectTeachersFeedback"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
@@ -95,7 +95,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(get("/subjects/1").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
     }
@@ -107,7 +107,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("TeacherLastName", "manning"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(1)));
     }
@@ -120,7 +120,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("TeacherLastName", ""))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subjectTeachersFeedback"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
@@ -134,7 +134,7 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .param("TeacherLastName", ""))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/academicRecords/updateSubject"))
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
                 .andExpect(model().attribute("teachers", hasSize(2)));
     }

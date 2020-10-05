@@ -33,21 +33,21 @@
                     Academic data
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Subjects and assignments</h5>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects}">View subjects</a></p>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/templates/SRM/assignmentType}">View assignments</a></p>
+                    <h5 class="card-title">Subjects</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/index}">View subjects</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/new}">New subject</a></p>
                     <h5 class="card-title">Students' scores</h5>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by form group</a></p>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject class</a></p>
                     <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject</a></p>
                     <h5 class="card-title">Assignments</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/index}">Assignment types</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignments by teacher</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignments by subject</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary">Assignment thresholds and awards/grades</a></p>
+                    <p sec:authorize="hasAuthority('admin.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/index}">View assignment types</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/new}">New assignment type</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignments/index}">View assignments</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignments/new}">New assignment</a></p>
                     <h5 class="card-title">Student reports</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Student reports/comments by assignment</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary">Reports to parents</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/index}">View student reports</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/new}">New student reports</a></p>
                 </div>
             </div>
         </div>
@@ -58,18 +58,20 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Students</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">Student summary</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">Create new student record</a></p>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/}">View form groups</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/new}">New form group</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">View student records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">New student record</a></p>
                     <h5 class="card-title">Teachers</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/teachers/index}">Teacher summary</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">Create new teacher record</a></p>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/}">View subject classes</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/new}">New subject class</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/index}">View teacher records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">New teacher record</a></p>
                     <h5 class="card-title">Guardians</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/index}">Guardian summary</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/guardians/new}">Create new guardian record</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/index}">View guardian records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/new}">New guardian record</a></p>
+                    <h5 class="card-title">Form groups</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/index}">View form groups</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/new}">New form group</a></p>
+                    <h5 class="card-title">Subject classes</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/index}">View subject classes</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/new}">New subject class</a></p>
                 </div>
             </div>
         </div>

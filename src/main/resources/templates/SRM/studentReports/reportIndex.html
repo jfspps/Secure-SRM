@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Student reports</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
+    <table class="table table-hover table-sm table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th class="px-3" sec:authorize="hasAuthority('admin.update')">ID</th>
+            <th class="px-3">Student</th>
+            <th class="px-3">Teacher</th>
+            <th class="px-3">Subject</th>
+            <th class="px-3">Report length</th>
+        </tr>
+        </thead>
+        <tbody th:object="${reports}">
+        <!--/*@thymesVar id="report" type="com.secure_srm.model.academic.Report"*/-->
+        <tr th:if="${reports.isEmpty()}">
+            <th class="px-3" sec:authorize="hasAuthority('admin.update')"></th>
+            <td class="px-3">(No student reports on record)</td>
+            <td class="px-3"></td>
+            <td class="px-3"></td>
+            <td class="px-3"></td>
+        </tr>
+        <tr th:unless="${reports.isEmpty()}" th:each="report: ${reports}">
+            <th class="px-3" sec:authorize="hasAuthority('admin.update')"><a role="button"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentReports/{id}/edit(id=${report.id})}"
+                                                                             th:text="${report.id}"></a></th>
+            <td class="px-3" th:text="${report.student.firstName + ' ' + report.student.lastName}"></td>
+            <td class="px-3" th:text="${report.teacher.firstName + ' ' + report.teacher.lastName}"></td>
+            <td class="px-3" th:text="${report.subject.subjectName}"></td>
+            <td class="px-3" th:text="${report.comments.length()}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

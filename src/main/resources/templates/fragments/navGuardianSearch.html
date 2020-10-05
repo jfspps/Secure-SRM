@@ -16,20 +16,30 @@
                 <a class="nav-link dropdown-toggle" id="webLoginDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">Personnel</a>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
+
                     <span sec:authorize="hasAuthority('admin.create')">
                         <div class="dropdown-header">New...</div>
                         <a class="dropdown-item" th:href="@{/students/new}">Student</a>
                         <a class="dropdown-item" th:href="@{/teachers/new}">Teacher</a>
                         <a class="dropdown-item" th:href="@{/guardians/new}">Guardian</a>
+                        <a class="dropdown-item" th:href="@{/formGroupList/new}">Form group</a>
+                        <a class="dropdown-item" th:href="@{/subjectClassList/new}">Subject class</a>
                     </span>
-                    <div class="dropdown-header">Show...</div>
-                    <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
-                    <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>
-                    <a class="dropdown-item" th:href="@{/guardians/index}">Guardian summary</a>
+
+                    <span sec:authorize="hasAuthority('teacher.read')">
+                        <div class="dropdown-header">Show...</div>
+                        <a class="dropdown-item" th:href="@{/students/index}">Student summary</a>
+                        <a class="dropdown-item" th:href="@{/teachers/index}">Teacher summary</a>
+                        <a class="dropdown-item" th:href="@{/guardians/index}">Guardian summary</a>
+                        <a class="dropdown-item" th:href="@{/formGroupList/index}">Form group summary</a>
+                        <a class="dropdown-item" th:href="@{/subjectClassList/index}">Subject class summary</a>
+                    </span>
                     <div class="dropdown-divider"></div>
-                    <div class="dropdown-header"><i class="fas fa-user-edit"></i> Weblogin accounts</div>
-                    <a class="dropdown-item" href="/userPage">View DB user records</a>
-                    <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" href="/adminPage">Edit DB user records</a>
+                    <span sec:authorize="hasAuthority('admin.create')">
+                        <div class="dropdown-header"><i class="fas fa-user-edit"></i> Weblogin accounts</div>
+                        <a class="dropdown-item" href="/userPage">View DB user records</a>
+                        <a class="dropdown-item" href="/adminPage">Edit DB user records</a>
+                    </span>
                 </div>
             </li>
             <li class="nav-item dropdown">
@@ -39,11 +49,15 @@
                     <span>
                         <div class="dropdown-header">New...</div>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
+                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
                         <a sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/assignments/new}">Assignment</a>
+                        <a sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
                     </span>
                     <div class="dropdown-header">Show...</div>
                     <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
+                    <a class="dropdown-item" th:href="@{/assignmentTypes/index}">Assignment type summary</a>
                     <a class="dropdown-item" th:href="@{/assignments/index}">Assignment summary</a>
+                    <a class="dropdown-item" th:href="@{/studentReports/index}">Student report summary</a>
                 </div>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header">Test records</div>
