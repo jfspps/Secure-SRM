@@ -13,4 +13,6 @@ public interface ReportService extends BaseService<Report, Long> {
     Report findByTeacherFirstAndLastName(String firstName, String lastName);
 
     Report findBySubject(String subjectName);
+
+    Report findByUniqueIdentifier(String uniqueIdentifier);
 }

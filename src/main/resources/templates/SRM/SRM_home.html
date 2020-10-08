@@ -47,7 +47,7 @@
                     <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignments/new}">New assignment</a></p>
                     <h5 class="card-title">Student reports</h5>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/index}">View student reports</a></p>
-                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/new}">New student reports</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/new}">New student report</a></p>
                 </div>
             </div>
         </div>

@@ -31,7 +31,7 @@
         </tr>
         <tr th:unless="${reports.isEmpty()}" th:each="report: ${reports}">
             <th class="px-3" sec:authorize="hasAuthority('admin.update')"><a role="button"
-                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentReports/{id}/edit(id=${report.id})}"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentReports/{id}(id=${report.id})}"
                                                                              th:text="${report.id}"></a></th>
             <td class="px-3" th:text="${report.student.firstName + ' ' + report.student.lastName}"></td>
             <td class="px-3" th:text="${report.teacher.firstName + ' ' + report.teacher.lastName}"></td>
