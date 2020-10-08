@@ -10,6 +10,8 @@ import org.springframework.security.test.context.support.WithUserDetails;
 
 import javax.transaction.Transactional;
 
+import java.awt.image.ImagingOpException;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -76,21 +78,59 @@ public class StudentReportControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("report"));
     }
 
-    @WithUserDetails("keithjones")
-    @Test
-    void viewReport() throws Exception {
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void viewReport(String username, String pwd) throws Exception {
         Report tempReport = Report.builder()
                 .student(studentService.findById(1L))
                 .subject(subjectService.findById(1L))
                 .teacher(teacherUserService.findById(1L))
                 .comments("Bla")
                 .uniqueIdentifier("something").build();
-        reportService.save(tempReport);
+        Report saved = reportService.save(tempReport);
 
-        mockMvc.perform(get("/studentReports/1"))
+        mockMvc.perform(get("/studentReports/" + saved.getId()).with(httpBasic(username, pwd)))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/studentReports/viewReport"))
                 .andExpect(model().attributeExists("report"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void getUpdateReport(String username, String pwd) throws Exception {
+        Report tempReport = Report.builder()
+                .student(studentService.findById(1L))
+                .subject(subjectService.findById(1L))
+                .teacher(teacherUserService.findById(1L))
+                .comments("Bla")
+                .uniqueIdentifier("something").build();
+        Report saved = reportService.save(tempReport);
+
+        mockMvc.perform(get("/studentReports/" + saved.getId() + "/edit").with(httpBasic(username, pwd)))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentReports/updateReport"))
+                .andExpect(model().attributeExists("report"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void postUpdateReport(String username, String pwd) throws Exception {
+        Report tempReport = Report.builder()
+                .student(studentService.findById(1L))
+                .subject(subjectService.findById(1L))
+                .teacher(teacherUserService.findById(1L))
+                .comments("Bla")
+                .uniqueIdentifier("something").build();
+        Report saved = reportService.save(tempReport);
+
+        mockMvc.perform(post("/studentReports/" + saved.getId() + "/edit").with(httpBasic(username, pwd)).with(csrf())
+                .flashAttr("report", saved))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentReports/viewReport"))
+                .andExpect(model().attributeExists("report"))
+                .andExpect(model().attributeExists("reportFeedback"));
     }
 }

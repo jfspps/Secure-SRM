@@ -10,7 +10,7 @@
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
 <!--/*@thymesVar id="report" type="com.secure_srm.model.academic.Report"*/-->
-<div class="container" sec:authorize="hasAuthority('teacher.create')">
+<div class="container" sec:authorize="hasAuthority('teacher.read')" th:object="${report}">
     <div class="row">
         <div class="col">
             <h2>Student report</h2>

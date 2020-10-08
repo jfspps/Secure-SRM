@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>New student report</title>
+    <title>Update student report</title>
 </head>
 <body>
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
@@ -13,7 +13,7 @@
 <div class="container" sec:authorize="hasAuthority('teacher.create')">
     <div class="row">
         <div class="col">
-            <h2>New student report</h2>
+            <h2>Update student report</h2>
             <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting changes.</p>
         </div>
     </div>
@@ -57,7 +57,7 @@
     <br />
 
     <!--/*@thymesVar id="report" type="com.secure_srm.model.academic.Report"*/-->
-    <form th:object="${report}" method="post" th:action="@{/studentReports/new}"
+    <form th:object="${report}" method="post" th:action="@{/studentReports/{id}/edit(id=${report.id})}"
           class="form-horizontal" id="change-teacherSet-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -161,18 +161,14 @@
                 <label class="control-label">Unique identifier</label>
             </div>
             <div class="col-sm-8">
-                <input size="50" placeholder="Unique identifier" th:field="*{uniqueIdentifier}"/>
-                <!--/*@thymesVar id="uniqueId" type="java.lang.String"*/-->
-                <span class="help-block" th:if="${uniqueId != null}">
-                    <p class="alert alert-info" th:text="${uniqueId}"></p>
-                </span>
+                <label size="50" th:text="${report.uniqueIdentifier}"/>
             </div>
         </div>
 
         <br />
         <div class="row align-items-start" sec:authorize="hasAuthority('admin.update')" >
             <div class="col-sm-2">
-                <button class="btn btn-info" type="submit">Submit changes</button>
+                <button class="btn btn-info" type="submit">Submit updates</button>
             </div>
         </div>
     </form>

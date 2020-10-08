@@ -2,18 +2,25 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Report;
+import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.people.Student;
+import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.ReportService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
+import com.secure_srm.web.permissionAnnot.TeacherUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,19 +65,25 @@ public class StudentReportController {
         if (TeacherLastName == null || TeacherLastName.isEmpty()){
             model.addAttribute("teachers", teacherUserService.findAll());
         } else {
-            model.addAttribute("teachers", teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName));
+            Set<TeacherUser> teacherUsers = new HashSet<>(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName));
+            teacherUsers.add(report.getTeacher());
+            model.addAttribute("teachers", teacherUsers);
         }
 
         if (StudentLastName == null || StudentLastName.isEmpty()){
             model.addAttribute("students", studentService.findAll());
         } else {
-            model.addAttribute("students", studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
+            Set<Student> students = new HashSet<>(studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
+            students.add(report.getStudent());
+            model.addAttribute("students", students);
         }
 
         if (SubjectName == null || SubjectName.isEmpty()){
             model.addAttribute("subjects", subjectService.findAll());
         } else {
-            model.addAttribute("subjects", subjectService.findBySubjectNameContainingIgnoreCase(SubjectName));
+            Set<Subject> subjects = new HashSet<>(subjectService.findBySubjectNameContainingIgnoreCase(SubjectName));
+            subjects.add(report.getSubject());
+            model.addAttribute("subjects", subjects);
         }
 
         return "/SRM/studentReports/newReport";
@@ -122,6 +135,39 @@ public class StudentReportController {
         }
 
         model.addAttribute("report", reportService.findById(Long.valueOf(reportID)));
+        return "/SRM/studentReports/viewReport";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{reportID}/edit")
+    public String getUpdateReport(Model model, @PathVariable("reportID") String reportID){
+        if (reportService.findById(Long.valueOf(reportID)) == null){
+            log.debug("Student report not found");
+            throw new NotFoundException("Report not found");
+        }
+
+        model.addAttribute("teachers", teacherUserService.findAll());
+        model.addAttribute("students", studentService.findAll());
+        model.addAttribute("subjects", subjectService.findAll());
+        model.addAttribute("report", reportService.findById(Long.valueOf(reportID)));
+        return "/SRM/studentReports/updateReport";
+    }
+
+    @TeacherUpdate
+    @PostMapping("/{reportID}/edit")
+    public String postUpdateReport(Model model, @ModelAttribute("report") Report report,
+                                   @PathVariable("reportID") String reportID){
+        Report onFile = reportService.findById(Long.valueOf(reportID));
+        onFile.setComments(report.getComments());
+        onFile.setStudent(report.getStudent());
+        onFile.setSubject(report.getSubject());
+        onFile.setTeacher(report.getTeacher());
+
+        Report saved = reportService.save(onFile);
+        log.debug("Student report updated");
+        model.addAttribute("reportFeedback", "Student report updated");
+        model.addAttribute("report", saved);
+
         return "/SRM/studentReports/viewReport";
     }
 }
