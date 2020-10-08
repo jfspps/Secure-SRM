@@ -47,6 +47,11 @@ public class ReportSDjpaService implements ReportService {
     }
 
     @Override
+    public Report findByUniqueIdentifier(String uniqueIdentifier) {
+        return reportRepository.findByUniqueIdentifier(uniqueIdentifier).orElse(null);
+    }
+
+    @Override
     public Report save(Report object) {
         return reportRepository.save(object);
     }

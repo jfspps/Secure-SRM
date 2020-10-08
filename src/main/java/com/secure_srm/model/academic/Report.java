@@ -26,4 +26,6 @@ public class Report extends BaseEntity {
     private Subject subject;
 
     private String comments;
+
+    private String uniqueIdentifier;
 }
