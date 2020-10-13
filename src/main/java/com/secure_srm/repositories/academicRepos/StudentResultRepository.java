@@ -19,7 +19,7 @@ public interface StudentResultRepository extends JpaRepository<StudentResult, Lo
 
     Optional<StudentResult> findByTeacher_FirstNameAndTeacher_LastName(String firstName, String lastName);
 
-    Optional<StudentResult> findByStudentWork_Title(String assignmentTitle);
+    Optional<StudentResult> findByStudentTask_Title(String taskTitle);
 
     Optional<StudentResult> findByScore(String score);
 }

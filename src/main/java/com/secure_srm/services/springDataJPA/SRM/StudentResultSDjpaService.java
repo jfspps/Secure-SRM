@@ -43,7 +43,7 @@ public class StudentResultSDjpaService implements StudentResultService {
 
     @Override
     public StudentResult findByStudentWorkTitle(String assignmentTitle) {
-        return studentResultRepository.findByStudentWork_Title(assignmentTitle).orElse(null);
+        return studentResultRepository.findByStudentTask_Title(assignmentTitle).orElse(null);
     }
 
     @Override
