@@ -17,12 +17,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-//POJO for HW, coursework, exams, quizzes, projects etc...
+//POJO for the framework to a piece of HW, coursework, exams, quizzes, projects etc...
+//student specific results are handled by StudentResult
 public class StudentWork extends BaseEntity {
 
     private String title;
     private Integer maxScore;        //boxed Integer can be null; allows for letter grades or no score at all
-    private boolean contributor;     //purpose is to state whether this contributes to an overall end-of-term/...score
+    private boolean contributor = true;     //purpose is to state whether this contributes to an overall end-of-term/...score
 
     @OneToOne
     private TeacherUser teacherUploader;
