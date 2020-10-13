@@ -119,6 +119,18 @@ public class StudentTaskController {
         return "/SRM/studentTask/taskDetails";
     }
 
+    @TeacherRead
+    @GetMapping("/{taskId}")
+    public String postNewTask(@PathVariable("taskId") String taskID, Model model) {
+        if (studentTaskService.findById(Long.valueOf(taskID)) == null){
+            log.debug("Student task not found");
+            throw new NotFoundException("Student task not found");
+        }
+
+        model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
+        return "/SRM/studentTask/taskDetails";
+    }
+
     @TeacherCreate
     private String getUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

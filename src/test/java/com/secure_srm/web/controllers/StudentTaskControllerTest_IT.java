@@ -63,4 +63,24 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("task"))
                 .andExpect(model().attributeExists("taskFeedback"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getStudentTaskDetails(String username, String pwd) throws Exception {
+        StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore(120)
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findById(1L))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(temp);
+
+        mockMvc.perform(get("/studentTask/" + temp.getId()).with(httpBasic(username, pwd)))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentTask/taskDetails"))
+                .andExpect(model().attributeExists("task"));
+    }
 }
