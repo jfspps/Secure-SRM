@@ -1,8 +1,6 @@
 package com.secure_srm.web.controllers;
 
-import com.secure_srm.services.academicServices.AssignmentTypeService;
-import com.secure_srm.services.academicServices.ReportService;
-import com.secure_srm.services.academicServices.SubjectService;
+import com.secure_srm.services.academicServices.*;
 import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.peopleServices.SubjectClassListService;
@@ -10,7 +8,6 @@ import com.secure_srm.services.securityServices.TeacherUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,6 +42,12 @@ public abstract class SecurityCredentialsTest {
     @Autowired
     ReportService reportService;
 
+    @Autowired
+    StudentResultService studentResultService;
+
+    @Autowired
+    StudentTaskService studentTaskService;
+
     protected MockMvc mockMvc;
 
     private final static String JOHNSMITH_ADMINPWD = "johnsmith123";
@@ -69,6 +72,11 @@ public abstract class SecurityCredentialsTest {
                 Arguments.of("marymanning", MARYMANNING_TEACHERPWD),
                 Arguments.of("johnsmith", JOHNSMITH_ADMINPWD),
                 Arguments.of("amysmith", AMYSMITH_ADMINPWD));
+    }
+
+    public static Stream<Arguments> streamSchoolTeachers(){
+        return Stream.of(Arguments.of("keithjones", KEITHJONES_TEACHERPWD),
+                Arguments.of("marymanning", MARYMANNING_TEACHERPWD));
     }
 
     // provides non-Admin users to perform a given test

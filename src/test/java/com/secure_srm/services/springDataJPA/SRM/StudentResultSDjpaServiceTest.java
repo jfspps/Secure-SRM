@@ -1,7 +1,7 @@
 package com.secure_srm.services.springDataJPA.SRM;
 
 import com.secure_srm.model.academic.StudentResult;
-import com.secure_srm.model.academic.StudentWork;
+import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
@@ -34,7 +34,7 @@ class StudentResultSDjpaServiceTest {
     Subject subject = Subject.builder().subjectName(subjectName).build();
 
     final String assignmentTitle = "The merits of testing";
-    StudentWork exam = StudentWork.builder().teacherUploader(setter).subject(subject).title(assignmentTitle).build();
+    StudentTask exam = StudentTask.builder().teacherUploader(setter).subject(subject).title(assignmentTitle).build();
     final String score = "MERIT";
     final String comments = "A very pleasing start";
 
@@ -51,7 +51,7 @@ class StudentResultSDjpaServiceTest {
         studentResult = StudentResult.builder()
                 .student(student)
                 .teacher(marker)
-                .studentWork(exam)
+                .studentTask(exam)
                 .score(score)
                 .comments(comments).build();
     }
@@ -96,11 +96,11 @@ class StudentResultSDjpaServiceTest {
 
     @Test
     void findByStudentWorkTitle() {
-        when(studentResultRepository.findByStudentWork_Title(any())).thenReturn(Optional.of(studentResult));
+        when(studentResultRepository.findByStudentTask_Title(any())).thenReturn(Optional.of(studentResult));
 
         StudentResult found = studentResultSDjpaService.findByStudentWorkTitle("The British People");
-        verify(studentResultRepository, times(1)).findByStudentWork_Title(any());
-        assertEquals(assignmentTitle, found.getStudentWork().getTitle());
+        verify(studentResultRepository, times(1)).findByStudentTask_Title(any());
+        assertEquals(assignmentTitle, found.getStudentTask().getTitle());
     }
 
     @Test

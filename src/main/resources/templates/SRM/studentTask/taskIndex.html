@@ -20,10 +20,11 @@
             <th class="px-3">Task owner</th>
             <th class="px-3">Subject</th>
             <th class="px-3">Task type</th>
+            <th class="px-3">No. of student records</th>
         </tr>
         </thead>
         <tbody th:object="${tasks}">
-        <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentWork"*/-->
+        <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
         <tr th:if="${tasks.isEmpty()}">
             <th class="px-3" sec:authorize="hasAuthority('teacher.update')"></th>
             <td class="px-3">(No student tasks on record)</td>
@@ -35,8 +36,8 @@
             <td class="px-3"></td>
         </tr>
         <tr th:unless="${tasks.isEmpty()}" th:each="task: ${tasks}">
-            <th class="px-3" sec:authorize="hasAuthority('admin.update')"><a role="button"
-                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentWork/{id}(id=${task.id})}"
+            <th class="px-3" sec:authorize="hasAuthority('teacher.read')"><a role="button"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentTask/{id}(id=${task.id})}"
                                                                              th:text="${task.id}"></a></th>
             <td class="px-3" th:text="${task.title}"></td>
             <td class="px-3" th:text="${task.maxScore}"></td>
@@ -44,6 +45,7 @@
             <td class="px-3" th:text="${task.teacherUploader.firstName + ' ' + task.teacherUploader.lastName}"></td>
             <td class="px-3" th:text="${task.subject.subjectName}"></td>
             <td class="px-3" th:text="${task.assignmentType.description}"></td>
+            <td class="px-3" th:text="${task.studentResults.size()}"></td>
         </tr>
         </tbody>
     </table>

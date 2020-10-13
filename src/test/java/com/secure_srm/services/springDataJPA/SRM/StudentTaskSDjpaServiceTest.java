@@ -1,10 +1,10 @@
 package com.secure_srm.services.springDataJPA.SRM;
 
 import com.secure_srm.model.academic.AssignmentType;
-import com.secure_srm.model.academic.StudentWork;
+import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.security.TeacherUser;
-import com.secure_srm.repositories.academicRepos.StudentWorkRepository;
+import com.secure_srm.repositories.academicRepos.StudentTaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 //see StudentSDjpaServiceTest for commentary
 @ExtendWith(MockitoExtension.class)
-class StudentWorkSDjpaServiceTest {
+class StudentTaskSDjpaServiceTest {
 
     final String teacherLastName = "Jones";
     final String teacherFirstName = "Tom";
@@ -33,17 +33,17 @@ class StudentWorkSDjpaServiceTest {
     AssignmentType assignmentType = AssignmentType.builder().description(description).build();
     final String assignmentTitle = "The merits of testing";
 
-    StudentWork exam;
+    StudentTask exam;
 
     @Mock
-    StudentWorkRepository studentWorkRepository;
+    StudentTaskRepository studentTaskRepository;
 
     @InjectMocks
-    StudentWorkSDjpaService studentWorkSDjpaService;
+    StudentTaskSDjpaService studentTaskSDjpaService;
 
     @BeforeEach
     void setUp() {
-        exam = StudentWork.builder()
+        exam = StudentTask.builder()
                 .teacherUploader(setter)
                 .subject(subject)
                 .maxScore(maxScore)
@@ -54,29 +54,29 @@ class StudentWorkSDjpaServiceTest {
 
     @Test
     void findByTitle() {
-        when(studentWorkRepository.findByTitle(anyString())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findByTitle(anyString())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByTitle("The horrors of youth");
-        verify(studentWorkRepository, times(1)).findByTitle(anyString());
+        StudentTask found = studentTaskSDjpaService.findByTitle("The horrors of youth");
+        verify(studentTaskRepository, times(1)).findByTitle(anyString());
         assertEquals(assignmentTitle, found.getTitle());
     }
 
     @Test
     void findByTeacherLastName() {
-        when(studentWorkRepository.findByTeacherUploader_LastName(anyString())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findByTeacherUploader_LastName(anyString())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByTeacherLastName("Smith");
-        verify(studentWorkRepository, times(1)).findByTeacherUploader_LastName(anyString());
+        StudentTask found = studentTaskSDjpaService.findByTeacherLastName("Smith");
+        verify(studentTaskRepository, times(1)).findByTeacherUploader_LastName(anyString());
         assertEquals(teacherLastName, found.getTeacherUploader().getLastName());
     }
 
     @Test
     void findByTeacherFirstAndLastName() {
-        when(studentWorkRepository.findByTeacherUploader_FirstNameAndTeacherUploader_LastName(anyString(), anyString()))
+        when(studentTaskRepository.findByTeacherUploader_FirstNameAndTeacherUploader_LastName(anyString(), anyString()))
                 .thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByTeacherFirstAndLastName("John", "Smith");
-        verify(studentWorkRepository, times(1))
+        StudentTask found = studentTaskSDjpaService.findByTeacherFirstAndLastName("John", "Smith");
+        verify(studentTaskRepository, times(1))
                 .findByTeacherUploader_FirstNameAndTeacherUploader_LastName(anyString(), anyString());
         assertEquals(teacherLastName, found.getTeacherUploader().getLastName());
         assertEquals(teacherFirstName, found.getTeacherUploader().getFirstName());
@@ -84,29 +84,29 @@ class StudentWorkSDjpaServiceTest {
 
     @Test
     void findBySubject() {
-        when(studentWorkRepository.findBySubject_SubjectName(anyString())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findBySubject_SubjectName(anyString())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findBySubject("Noodles");
-        verify(studentWorkRepository, times(1)).findBySubject_SubjectName(anyString());
+        StudentTask found = studentTaskSDjpaService.findBySubject("Noodles");
+        verify(studentTaskRepository, times(1)).findBySubject_SubjectName(anyString());
         assertEquals(subjectName, found.getSubject().getSubjectName());
     }
 
     @Test
     void findByDescription() {
-        when(studentWorkRepository.findByAssignmentType_Description(anyString())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findByAssignmentType_Description(anyString())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByDescription("Homework");
-        verify(studentWorkRepository, times(1)).findByAssignmentType_Description(anyString());
+        StudentTask found = studentTaskSDjpaService.findByDescription("Homework");
+        verify(studentTaskRepository, times(1)).findByAssignmentType_Description(anyString());
         assertEquals(description, found.getAssignmentType().getDescription());
     }
 
     //default is true
     @Test
     void findByContribution() {
-        when(studentWorkRepository.findByContributor(anyBoolean())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findByContributor(anyBoolean())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByContribution(true);
-        verify(studentWorkRepository, times(1)).findByContributor(anyBoolean());
+        StudentTask found = studentTaskSDjpaService.findByContribution(true);
+        verify(studentTaskRepository, times(1)).findByContributor(anyBoolean());
         assertNotNull(found);
         assertTrue(found.isContributor());
     }
@@ -114,10 +114,10 @@ class StudentWorkSDjpaServiceTest {
     @Test
     void findByContributionFalse() {
         exam.setContributor(false);     //reported assignment not part of any overall score
-        when(studentWorkRepository.findByContributor(anyBoolean())).thenReturn(Optional.of(exam));
+        when(studentTaskRepository.findByContributor(anyBoolean())).thenReturn(Optional.of(exam));
 
-        StudentWork found = studentWorkSDjpaService.findByContribution(true);
-        verify(studentWorkRepository, times(1)).findByContributor(anyBoolean());
+        StudentTask found = studentTaskSDjpaService.findByContribution(true);
+        verify(studentTaskRepository, times(1)).findByContributor(anyBoolean());
         assertNotNull(found);
         assertFalse(found.isContributor());
     }

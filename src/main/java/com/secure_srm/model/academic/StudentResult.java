@@ -25,7 +25,7 @@ public class StudentResult extends BaseEntity {
     // allow for different teachers to share the same assignment
 
     @ManyToOne
-    private StudentWork studentWork;
+    private StudentTask studentTask;
 
     private String score;           //allow for numerical or letter based results
     private String comments;

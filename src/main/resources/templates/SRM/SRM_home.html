@@ -43,8 +43,8 @@
                     <h5 class="card-title">Assignments</h5>
                     <p sec:authorize="hasAuthority('admin.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/index}">View assignment types</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/new}">New assignment type</a></p>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignments/index}">View assignments</a></p>
-                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignments/new}">New assignment</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/studentTask/index}">View student tasks</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/studentTask/new}">New student task</a></p>
                     <h5 class="card-title">Student reports</h5>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/index}">View student reports</a></p>
                     <p sec:authorize="hasAuthority('teacher.create')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/new}">New student report</a></p>
@@ -58,13 +58,13 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Students</h5>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">View student records</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">View student records</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">New student record</a></p>
                     <h5 class="card-title">Teachers</h5>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/index}">View teacher records</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/index}">View teacher records</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">New teacher record</a></p>
                     <h5 class="card-title">Guardians</h5>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/index}">View guardian records</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/index}">View guardian records</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/new}">New guardian record</a></p>
                     <h5 class="card-title">Form groups</h5>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/index}">View form groups</a></p>

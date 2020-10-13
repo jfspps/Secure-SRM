@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Student task details</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container" sec:authorize="hasAuthority('teacher.read')">
+    <div class="row">
+        <div class="col">
+            <h2>Student task details</h2>
+        </div>
+    </div>
+    <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
+    <form th:object="${task}" method="get">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Task title</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{title}"></label>
+                <!--/*@thymesVar id="taskFeedback" type="java.lang.String"*/-->
+                <span class="help-block" th:if="${taskFeedback != null}">
+                <p class="alert alert-info" th:text="${taskFeedback}"></p>
+            </span>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Subject</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{subject.subjectName}"></label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Assignment type</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{assignmentType.description}"></label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Contributor</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:if="${task.isContributor()}">Yes</label>
+                <label size="50" th:unless="${task.isContributor()}">No</label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Max. numerical score</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:if="${task.maxScore == null}">(None on record)</label>
+                <label size="50" th:unless="${task.maxScore == null}" th:text="*{maxScore}"></label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-10">
+                <a class="btn btn-outline-info" href="/studentTask/index" role="button">Student task index</a>
+                <a class="btn btn-outline-warning" th:href="@{/studentTask/{Id}/edit(Id=${task.id})}"
+                   role="button" sec:authorize="hasAuthority('teaacher.update')">Edit record</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>
