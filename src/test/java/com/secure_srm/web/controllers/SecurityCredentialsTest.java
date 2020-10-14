@@ -5,6 +5,7 @@ import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.peopleServices.SubjectClassListService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public abstract class SecurityCredentialsTest {
 
     @Autowired
     StudentTaskService studentTaskService;
+
+    @Autowired
+    UserService userService;
 
     protected MockMvc mockMvc;
 
