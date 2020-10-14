@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Update student task</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+<div class="container" sec:authorize="hasAuthority('teacher.create')">
+    <div class="row">
+        <div class="col">
+            <h2>Update student task</h2>
+        </div>
+    </div>
+
+    <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
+    <form th:object="${task}" method="post" th:action="@{/studentTask/{taskID}/edit(taskID=${task.id})}"
+          class="form-horizontal" id="change-teacherSet-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Subject</label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Subject title</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="subjectFound" type="com.secure_srm.model.academic.Subject"*/-->
+                    <tr th:each="subjectFound: ${subjects}">
+                        <td>
+                            <input type="radio" th:field="*{subject}" th:value="${subjectFound.id}" />
+                            <label><a th:text="${subjectFound.subjectName}"
+                                      th:href="@{/subjects/{subjectId}(subjectId=${subjectFound.id})}"></a></label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Assignment type</label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Assignment type description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="assignmentTypeFound" type="com.secure_srm.model.academic.AssignmentType"*/-->
+                    <tr th:each="assignmentTypeFound: ${assignmentTypes}">
+                        <td>
+                            <input type="radio" th:field="*{assignmentType}" th:value="${assignmentTypeFound.id}"/>
+                            <label><a th:text="${assignmentTypeFound.description}"
+                                      th:href="@{/assignmentTypes/{Id}(Id=${assignmentTypeFound.id})}"></a> </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Contributor</label>
+            </div>
+            <div class="col-sm-8">
+                <input type="checkbox" th:field="*{contributor}"/>
+                <label th:text="${'Check (tick) box to set to true'}"></label>
+            </div>
+        </div>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Max. numerical score (optional)</label>
+            </div>
+            <div class="col-sm-8">
+                <input size="50" placeholder="Maximum numerical score" th:field="*{maxScore}"/>
+            </div>
+        </div>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Task title</label>
+            </div>
+            <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                <input size="50" placeholder="Task title" th:field="*{title}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('title')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('title')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+            <!--/*@thymesVar id="newTaskFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${newTaskFeedback != null}">
+                    <p class="alert alert-info" th:text="${newTaskFeedback}"></p>
+                </span>
+        </div>
+
+        <br />
+        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.create')" >
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Submit changes</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
+    <div class="row align-items-start">
+        <div class="col-sm-5">
+            <a class="btn btn-outline-primary" th:href="@{/studentTask/index}"
+               role="button">Return to task index</a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

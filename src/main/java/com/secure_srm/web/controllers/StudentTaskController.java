@@ -16,6 +16,7 @@ import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminRead;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
+import com.secure_srm.web.permissionAnnot.TeacherUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -128,6 +129,78 @@ public class StudentTaskController {
         }
 
         model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
+        return "/SRM/studentTask/taskDetails";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{taskId}/edit")
+    public String getUpdateTask(@PathVariable("taskId") String taskID, Model model) {
+        if (userService.findAllByUsername(getUsername()) == null){
+            log.debug("Current username not recognised");
+            throw new NotFoundException("Username not recognised");
+        }
+
+        if (studentTaskService.findById(Long.valueOf(taskID)) == null){
+            log.debug("Student task not found");
+            throw new NotFoundException("Student task not found");
+        }
+
+        StudentTask onFile = studentTaskService.findById(Long.valueOf(taskID));
+        //make sure teacher records match
+        if (!onFile.getTeacherUploader().equals(userService.findByUsername(getUsername()).getTeacherUser())){
+            log.debug("Current teacher is not allowed to edit this resource");
+            model.addAttribute("taskFeedback", "You are not permitted to edit this task");
+            model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
+            return "/SRM/studentTask/taskDetails";
+        }
+
+        Set<Subject> subjectsTaught = userService.findByUsername(getUsername()).getTeacherUser().getSubjects();
+
+        model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+        model.addAttribute("subjects", subjectsTaught);
+        model.addAttribute("task", onFile);
+        return "/SRM/studentTask/updateTask";
+    }
+
+    @TeacherUpdate
+    @PostMapping("/{taskId}/edit")
+    public String postUpdateTask(@PathVariable("taskId") String taskID, Model model,
+                                @Valid @ModelAttribute("task") StudentTask studentTask,
+                                BindingResult result) {
+        if (userService.findAllByUsername(getUsername()) == null){
+            log.debug("Current username not recognised");
+            throw new NotFoundException("Username not recognised");
+        }
+
+        StudentTask onFile = studentTaskService.findById(Long.valueOf(taskID));
+        //make sure teacher records match
+        if (!onFile.getTeacherUploader().equals(userService.findByUsername(getUsername()).getTeacherUser())){
+            log.debug("Current teacher is not allowed to edit this resource");
+            model.addAttribute("taskFeedback", "You are not permitted to edit this task");
+            model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
+            return "/SRM/studentTask/updateTask";
+        }
+
+        if (result.hasErrors()){
+            result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+            Set<Subject> subjectsTaught = currentTeacher.getSubjects();
+
+            model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+            model.addAttribute("subjects", subjectsTaught);
+            model.addAttribute("task", studentTask);
+            return "/SRM/studentTask/updateTask";
+        }
+
+        onFile.setAssignmentType(studentTask.getAssignmentType());
+        onFile.setContributor(studentTask.isContributor());
+        onFile.setMaxScore(studentTask.getMaxScore());
+        onFile.setTitle(studentTask.getTitle());
+
+        StudentTask saved = studentTaskService.save(onFile);
+        log.debug("Student task updated");
+        model.addAttribute("taskFeedback", "Student task updated");
+        model.addAttribute("task", saved);
         return "/SRM/studentTask/taskDetails";
     }
 
