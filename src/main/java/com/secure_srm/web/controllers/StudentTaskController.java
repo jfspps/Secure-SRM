@@ -37,17 +37,21 @@ import java.util.*;
 @RequestMapping({"/studentTask"})
 public class StudentTaskController {
 
-    private final TeacherUserService teacherUserService;
-    private final SubjectService subjectService;
     private final AssignmentTypeService assignmentTypeService;
-    private final StudentResultService studentResultService;
     private final StudentTaskService studentTaskService;
     private final UserService userService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder){
         dataBinder.setDisallowedFields("id");
+    }
+
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
     }
 
     @TeacherRead
@@ -61,12 +65,12 @@ public class StudentTaskController {
     @GetMapping("/new")
     public String getNewTask(Model model) {
         //retrieve this teacher details and tie to studentTask
-        if (userService.findAllByUsername(getUsername()) == null){
+        if (userService.findAllByUsername(auxiliaryController.getUsername()) == null){
             log.debug("Current username not recognised");
             throw new NotFoundException("Username not recognised");
         }
 
-        TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
         if (currentTeacher == null){
             log.debug("TeacherUser not recognised");
             throw new ForbiddenException("TeacherUser not recognised");
@@ -79,7 +83,7 @@ public class StudentTaskController {
                 .studentResults(new HashSet<>()).subject(subjectsTaught.stream().findAny().get())
                 .assignmentType(assignmentTypeSet.stream().findAny().get()).build();
 
-        model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeSet));
+        model.addAttribute("assignmentTypes", auxiliaryController.sortAssignmentTypeSetByDescription(assignmentTypeSet));
         model.addAttribute("subjects", subjectsTaught);
         model.addAttribute("task", studentTask);
         return "/SRM/studentTask/newTask";
@@ -91,7 +95,7 @@ public class StudentTaskController {
                               Model model) {
         if (result.hasErrors()){
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+            TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
             if (currentTeacher == null){
                 log.debug("TeacherUser not recognised");
                 throw new ForbiddenException("TeacherUser not recognised");
@@ -99,19 +103,19 @@ public class StudentTaskController {
 
             Set<Subject> subjectsTaught = currentTeacher.getSubjects();
 
-            model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+            model.addAttribute("assignmentTypes", auxiliaryController.sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
             model.addAttribute("subjects", subjectsTaught);
             model.addAttribute("task", studentTask);
             return "/SRM/studentTask/newTask";
         }
 
         //check teacher hasn't already uploaded record with same title
-        if (studentTaskService.findByTitleAndTeacherUploaderId(studentTask.getTitle(), Long.valueOf(getUserId())) != null){
+        if (studentTaskService.findByTitleAndTeacherUploaderId(studentTask.getTitle(), Long.valueOf(auxiliaryController.getUserId())) != null){
             log.debug("Task with given title already exits");
-            TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+            TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
             Set<Subject> subjectsTaught = currentTeacher.getSubjects();
 
-            model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+            model.addAttribute("assignmentTypes", auxiliaryController.sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
             model.addAttribute("subjects", subjectsTaught);
             model.addAttribute("task", studentTask);
             model.addAttribute("newTaskFeedback", "Task with given title already exists");
@@ -119,7 +123,7 @@ public class StudentTaskController {
         }
 
         //set current teacherUser
-        TeacherUser currentTeacher = userService.findById(Long.valueOf(getUserId())).getTeacherUser();
+        TeacherUser currentTeacher = userService.findById(Long.valueOf(auxiliaryController.getUserId())).getTeacherUser();
         studentTask.setTeacherUploader(currentTeacher);
 
         StudentTask saved = studentTaskService.save(studentTask);
@@ -144,7 +148,7 @@ public class StudentTaskController {
     @TeacherUpdate
     @GetMapping("/{taskId}/edit")
     public String getUpdateTask(@PathVariable("taskId") String taskID, Model model) {
-        if (userService.findAllByUsername(getUsername()) == null){
+        if (userService.findAllByUsername(auxiliaryController.getUsername()) == null){
             log.debug("Current username not recognised");
             throw new NotFoundException("Username not recognised");
         }
@@ -156,16 +160,16 @@ public class StudentTaskController {
 
         StudentTask onFile = studentTaskService.findById(Long.valueOf(taskID));
         //make sure teacher records match
-        if (!onFile.getTeacherUploader().equals(userService.findByUsername(getUsername()).getTeacherUser())){
+        if (!onFile.getTeacherUploader().equals(userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser())){
             log.debug("Current teacher is not allowed to edit this resource");
             model.addAttribute("taskFeedback", "You are not permitted to edit this task");
             model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
             return "/SRM/studentTask/taskDetails";
         }
 
-        Set<Subject> subjectsTaught = userService.findByUsername(getUsername()).getTeacherUser().getSubjects();
+        Set<Subject> subjectsTaught = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser().getSubjects();
 
-        model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+        model.addAttribute("assignmentTypes", auxiliaryController.sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
         model.addAttribute("subjects", subjectsTaught);
         model.addAttribute("task", onFile);
         return "/SRM/studentTask/updateTask";
@@ -176,14 +180,14 @@ public class StudentTaskController {
     public String postUpdateTask(@PathVariable("taskId") String taskID, Model model,
                                 @Valid @ModelAttribute("task") StudentTask studentTask,
                                 BindingResult result) {
-        if (userService.findAllByUsername(getUsername()) == null){
+        if (userService.findAllByUsername(auxiliaryController.getUsername()) == null){
             log.debug("Current username not recognised");
             throw new NotFoundException("Username not recognised");
         }
 
         StudentTask onFile = studentTaskService.findById(Long.valueOf(taskID));
         //make sure teacher records match
-        if (!onFile.getTeacherUploader().equals(userService.findByUsername(getUsername()).getTeacherUser())){
+        if (!onFile.getTeacherUploader().equals(userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser())){
             log.debug("Current teacher is not allowed to edit this resource");
             model.addAttribute("taskFeedback", "You are not permitted to edit this task");
             model.addAttribute("task", studentTaskService.findById(Long.valueOf(taskID)));
@@ -192,10 +196,10 @@ public class StudentTaskController {
 
         if (result.hasErrors()){
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+            TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
             Set<Subject> subjectsTaught = currentTeacher.getSubjects();
 
-            model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
+            model.addAttribute("assignmentTypes", auxiliaryController.sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
             model.addAttribute("subjects", subjectsTaught);
             model.addAttribute("task", studentTask);
             return "/SRM/studentTask/updateTask";
@@ -211,37 +215,5 @@ public class StudentTaskController {
         model.addAttribute("taskFeedback", "Student task updated");
         model.addAttribute("task", saved);
         return "/SRM/studentTask/taskDetails";
-    }
-
-    @TeacherCreate
-    private String getUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
-        }
-    }
-
-    @TeacherCreate
-    private String getUserId() {
-        User found = userService.findByUsername(getUsername());
-        if (found != null) {
-            return found.getId().toString();
-        } else {
-            log.debug("User with given ID not found");
-            throw new NotFoundException("User with given ID not found");
-        }
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by assignmentType's description
-     * */
-    @TeacherRead
-    private List<AssignmentType> sortAssignmentTypeSetByDescription(Set<AssignmentType> assignmentTypeSet) {
-        List<AssignmentType> listByDescription = new ArrayList<>(assignmentTypeSet);
-        //see StudentTasks's model string comparison method, compareTo()
-        Collections.sort(listByDescription);
-        return listByDescription;
     }
 }

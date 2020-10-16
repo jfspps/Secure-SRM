@@ -33,13 +33,9 @@
                     Academic data
                 </div>
                 <div class="card-body" th:object="${hasSubject}">
-                    <h5 class="card-title">Subjects</h5>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/index}">View subjects</a></p>
-                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/new}">New subject</a></p>
-                    <h5 class="card-title">Students' scores</h5>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by form group</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject class</a></p>
-                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info">Scores by subject</a></p>
+                    <h5 class="card-title">Student results</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentResult/index}">View student results</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentResult/new}">New student result</a></p>
                     <h5 class="card-title">Assignments</h5>
                     <p sec:authorize="hasAuthority('admin.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/index}">View assignment types</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/new}">New assignment type</a></p>
@@ -48,6 +44,9 @@
                     <h5 class="card-title">Student reports</h5>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/index}">View student reports</a></p>
                     <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentReports/new}">New student report</a></p>
+                    <h5 class="card-title">Subjects</h5>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/index}">View subjects</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjects/new}">New subject</a></p>
                 </div>
             </div>
         </div>

@@ -49,16 +49,18 @@
                     <!--/*@thymesVar id="hasSubject" type="java.lang.Boolean"*/-->
                     <span th:object="${hasSubject}">
                         <div class="dropdown-header">New...</div>
-                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
-                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentResult/new}">Student result</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentTask/new}">Student task</a>
+                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
+                        <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
                     </span>
                     <div class="dropdown-header">Show...</div>
-                    <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
-                    <a class="dropdown-item" th:href="@{/assignmentTypes/index}">Assignment type summary</a>
+                    <a class="dropdown-item" th:href="@{/studentResult/index}">Student result summary</a>
                     <a class="dropdown-item" th:href="@{/studentTask/index}">Student task summary</a>
+                    <a class="dropdown-item" th:href="@{/assignmentTypes/index}">Assignment type summary</a>
                     <a class="dropdown-item" th:href="@{/studentReports/index}">Student report summary</a>
+                    <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
                 </div>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
                     <div class="dropdown-header">Test records</div>
@@ -80,10 +82,8 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-user"></i> User account</a>
+                    <i class="fa fa-user"></i> <span sec:authentication="name"></span></a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dbDropdown">
-                    <div class="dropdown-header" sec:authorize="hasAuthority('guardian.read')">Username: <span
-                            sec:authentication="name"></span></div>
                     <a class="dropdown-header" href="/authenticated" sec:authorize="hasAuthority('guardian.update')"><i class="fas fa-user-cog"></i> Account settings</a>
                     <form class="dropdown-item" th:action="@{/login}" method="get" sec:authorize="!isAuthenticated()">
                         <button type="submit" class="btn btn-group-sm btn-outline-info"><i class="fas fa-sign-in-alt"></i> LOGIN</button>

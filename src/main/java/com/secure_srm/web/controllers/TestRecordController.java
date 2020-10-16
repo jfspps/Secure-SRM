@@ -9,6 +9,7 @@ import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +33,13 @@ public class TestRecordController {
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
         dataBinder.setDisallowedFields("id");
+    }
+
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
+        return auxiliaryController.teachesASubject();
     }
 
     @ModelAttribute("testRecordSet")

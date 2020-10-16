@@ -3,8 +3,10 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
@@ -27,6 +29,7 @@ public class SubjectController {
 
     private final SubjectService subjectService;
     private final TeacherUserService teacherUserService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -34,13 +37,19 @@ public class SubjectController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
+    }
+
     @TeacherRead
     @GetMapping({"", "/", "/index"})
     public String listSubjects(Model model, String subjectTitle) {
         if(subjectTitle == null || subjectTitle.isEmpty()){
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findAll()));
+            model.addAttribute("subjects", auxiliaryController.sortSetBySubjectName(subjectService.findAll()));
         } else {
-            model.addAttribute("subjects", sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(subjectTitle)));
+            model.addAttribute("subjects", auxiliaryController.sortSetBySubjectName(subjectService.findBySubjectNameContainingIgnoreCase(subjectTitle)));
         }
         return "/SRM/subjects/subjectIndex";
     }
@@ -49,7 +58,7 @@ public class SubjectController {
     @GetMapping("/new")
     public String getNewSubject(Model model) {
         Subject newSubject = Subject.builder().subjectName("").build();
-        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("subject", newSubject);
         return "/SRM/subjects/newSubject";
     }
@@ -59,9 +68,9 @@ public class SubjectController {
     public String getNewSubject_SearchTeachers(Model model, @ModelAttribute("subject") Subject subjectSubmitted,
                                                String TeacherLastName) {
         if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
         }
 
         //note that subjectSubmitted is not saved to the DB, and is composed of a new Subject with a blank subject title
@@ -77,7 +86,7 @@ public class SubjectController {
             log.debug("Problems with subject details submitted");
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("subject", subjectSubmitted);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/subjects/newSubject";
         }
 
@@ -86,7 +95,7 @@ public class SubjectController {
             log.debug("Subject with given title already exists");
             model.addAttribute("newSubjectFeedback", "Subject already exists with given title");
             model.addAttribute("subject", subjectSubmitted);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/subjects/newSubject";
         }
 
@@ -101,7 +110,7 @@ public class SubjectController {
         log.debug("New subject saved");
         model.addAttribute("subjectTeachersFeedback", "New subject \"" + saved.getSubjectName() + "\"" + " saved");
         model.addAttribute("subject", saved);
-        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         return "/SRM/subjects/updateSubject";
     }
 
@@ -114,7 +123,7 @@ public class SubjectController {
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
-        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("subject", subjectOnFile);
         return "/SRM/subjects/updateSubject";
     }
@@ -129,9 +138,9 @@ public class SubjectController {
         }
 
         if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
         }
 
         model.addAttribute("subject", subjectService.findById(Long.valueOf(subjectId)));
@@ -150,7 +159,7 @@ public class SubjectController {
             subjectSubmitted.setSubjectName(onFile.getSubjectName());
             subjectSubmitted.setTeachers(onFile.getTeachers());
             model.addAttribute("subject", subjectSubmitted);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/subjects/updateSubject";
         }
 
@@ -180,29 +189,7 @@ public class SubjectController {
         log.debug("Subject updated");
         model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
         model.addAttribute("subject", saved);
-        model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         return "/SRM/subjects/updateSubject";
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by subject title
-     * */
-    @TeacherRead
-    private List<Subject> sortSetBySubjectName(Set<Subject> subjectSet) {
-        List<Subject> listBySubjectName = new ArrayList<>(subjectSet);
-        //see Student's model string comparison method, compareTo()
-        Collections.sort(listBySubjectName);
-        return listBySubjectName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by teacher's last name
-     * */
-    @TeacherRead
-    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
-        List<TeacherUser> listByLstName = new ArrayList<>(teacherUserSet);
-        //see Teacher's model string comparison method, compareTo()
-        Collections.sort(listByLstName);
-        return listByLstName;
     }
 }

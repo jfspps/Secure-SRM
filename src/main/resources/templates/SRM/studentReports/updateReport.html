@@ -100,7 +100,7 @@
                     <!--/*@thymesVar id="studentFound" type="com.secure_srm.model.people.Student"*/-->
                     <tr th:each="studentFound: ${students}">
                         <td>
-                            <input sec:authorize="hasAuthority('admin.update')" type="radio" th:field="*{student}" th:value="${studentFound.id}"/>
+                            <input sec:authorize="hasAuthority('teacher.update')" type="radio" th:field="*{student}" th:value="${studentFound.id}"/>
                             <label><a th:text="${studentFound.firstName + ' ' + studentFound.lastName}"
                                       th:href="@{/students/{studentId}(studentId=${studentFound.id})}"></a> </label>
                         </td>
@@ -126,7 +126,7 @@
                     <!--/*@thymesVar id="subjectFound" type="com.secure_srm.model.academic.Subject"*/-->
                     <tr th:each="subjectFound: ${subjects}">
                         <td>
-                            <input sec:authorize="hasAuthority('admin.update')" type="radio" th:field="*{subject}" th:value="${subjectFound.id}"/>
+                            <input sec:authorize="hasAuthority('teacher.update')" type="radio" th:field="*{subject}" th:value="${subjectFound.id}"/>
                             <label><a th:text="${subjectFound.subjectName}"
                                       th:href="@{/subjects/{subjectId}(subjectId=${subjectFound.id})}"></a> </label>
                         </td>

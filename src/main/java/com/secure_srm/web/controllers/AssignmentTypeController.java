@@ -2,7 +2,9 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.AssignmentType;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.AssignmentTypeService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
@@ -28,10 +30,17 @@ import java.util.Set;
 public class AssignmentTypeController {
 
     private final AssignmentTypeService assignmentTypeService;
+    private final AuxiliaryController auxiliaryController;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
         dataBinder.setDisallowedFields("id");
+    }
+
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
     }
 
     @TeacherRead

@@ -5,10 +5,12 @@ import com.secure_srm.model.academic.Report;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.ReportService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import com.secure_srm.web.permissionAnnot.TeacherUpdate;
@@ -32,11 +34,18 @@ public class StudentReportController {
     private final StudentService studentService;
     private final TeacherUserService teacherUserService;
     private final SubjectService subjectService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder){
         dataBinder.setDisallowedFields("id");
+    }
+
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
     }
 
     @TeacherRead

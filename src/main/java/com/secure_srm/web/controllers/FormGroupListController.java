@@ -4,9 +4,11 @@ import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminRead;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
@@ -31,16 +33,23 @@ public class FormGroupListController {
     private final FormGroupListService formGroupListService;
     private final StudentService studentService;
     private final TeacherUserService teacherUserService;
+    private final AuxiliaryController auxiliaryController;
 
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
         dataBinder.setDisallowedFields("id");
     }
 
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
+    }
+
     @TeacherRead
     @GetMapping({"/", "/index"})
     public String getFormGroupList(Model model) {
-        model.addAttribute("formGroups", sortFormGroupSetByGroupName(formGroupListService.findAll()));
+        model.addAttribute("formGroups", auxiliaryController.sortFormGroupSetByGroupName(formGroupListService.findAll()));
         return "/SRM/classLists/formGroups";
     }
 
@@ -48,7 +57,7 @@ public class FormGroupListController {
     @GetMapping("/new")
     public String getNewFormGroup(Model model, String TeacherLastName) {
         updateTutorList(model, TeacherLastName);
-        model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+        model.addAttribute("studentSet", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("formGroup", FormGroupList.builder().build());
         return "/SRM/classLists/newFormGroup";
     }
@@ -58,7 +67,7 @@ public class FormGroupListController {
     public String getNewFormGroup_findTeachers(Model model, @ModelAttribute("formGroup") FormGroupList formGroupList,
                                                String TeacherLastName) {
         updateTutorList(model, TeacherLastName);
-        model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+        model.addAttribute("studentSet", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
         model.addAttribute("formGroup", formGroupList);
         return "/SRM/classLists/newFormGroup";
     }
@@ -73,9 +82,9 @@ public class FormGroupListController {
         if (formGroupListService.findByGroupName(formGroupList.getGroupName()) != null) {
             log.debug("Form group name submitted already exists");
             model.addAttribute("groupNameFeedback", "Form group name submitted already exists");
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("studentSet", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
             model.addAttribute("formGroup", formGroupList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
             return "/SRM/classLists/newFormGroup";
         }
 
@@ -90,7 +99,7 @@ public class FormGroupListController {
         log.debug("New form group saved");
 
         model.addAttribute("formGroup", saved);
-        model.addAttribute("studentList", sortStudentSetByLastName(saved.getStudentList()));
+        model.addAttribute("studentList", auxiliaryController.sortStudentSetByLastName(saved.getStudentList()));
         model.addAttribute("newList", "New form group \"" + saved.getGroupName() + "\" saved");
         return "/SRM/classLists/form";
     }
@@ -102,7 +111,7 @@ public class FormGroupListController {
 
         FormGroupList found = formGroupListService.findById(Long.valueOf(groupID));
         //build a list by lastName, then sort
-        List<Student> listByLastName = sortStudentSetByLastName(found.getStudentList());
+        List<Student> listByLastName = auxiliaryController.sortStudentSetByLastName(found.getStudentList());
         model.addAttribute("formGroup", found);
         model.addAttribute("studentList", listByLastName);
         return "/SRM/classLists/form";
@@ -116,7 +125,7 @@ public class FormGroupListController {
 
         model.addAttribute("formGroup", formGroupListService.findById(Long.valueOf(groupID)));
         //build a list by lastName, then sort
-        List<Student> listByLastName = sortStudentSetByLastName(studentService.findAll());
+        List<Student> listByLastName = auxiliaryController.sortStudentSetByLastName(studentService.findAll());
         model.addAttribute("studentSet", listByLastName);
         return "/SRM/classLists/studentsOnFile";
     }
@@ -133,7 +142,7 @@ public class FormGroupListController {
         Set<Student> registered = formGroupListService.findById(Long.valueOf(groupID)).getStudentList();
         found.addAll(registered);
 
-        List<Student> sorted = sortStudentSetByLastName(found);
+        List<Student> sorted = auxiliaryController.sortStudentSetByLastName(found);
         model.addAttribute("searchQuery", StudentLastName);
         model.addAttribute("studentSet", sorted);
         return "/SRM/classLists/studentsOnFile";
@@ -181,9 +190,9 @@ public class FormGroupListController {
         if (result.hasErrors()) {
             log.debug("Problems with form group details submitted");
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            model.addAttribute("studentSet", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("studentSet", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
             model.addAttribute("formGroup", formGroupList);
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
             return true;
         }
         return false;
@@ -200,43 +209,10 @@ public class FormGroupListController {
     @AdminRead
     private void updateTutorList(Model model, String TeacherLastName) {
         if (TeacherLastName == null || TeacherLastName.isEmpty()) {
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+                    auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
         }
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by student's lastName
-     */
-    @TeacherRead
-    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
-        List<Student> listByLastName = new ArrayList<>(studentSet);
-        //see Student's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by Teachers's lastName
-     */
-    @TeacherRead
-    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
-        List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
-        //see Teacher's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by Groupname
-     */
-    @TeacherRead
-    private List<FormGroupList> sortFormGroupSetByGroupName(Set<FormGroupList> formGroupListSet) {
-        List<FormGroupList> listByLastName = new ArrayList<>(formGroupListSet);
-        //see FormGroupList's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
     }
 }

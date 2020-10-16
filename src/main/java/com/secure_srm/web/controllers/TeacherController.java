@@ -5,9 +5,11 @@ import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
@@ -32,6 +34,7 @@ public class TeacherController {
     private final TeacherUserService teacherUserService;
     private final ContactDetailService contactDetailService;
     private final SubjectService subjectService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -39,14 +42,20 @@ public class TeacherController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        return auxiliaryController.teachesASubject();
+    }
+
     @TeacherRead
     @GetMapping({"", "/", "/index"})
     public String listTeachers(Model model, String lastName) {
         if(lastName == null || lastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(lastName)));
+                    auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(lastName)));
         }
         return "/SRM/teachers/teacherIndex";
     }
@@ -176,27 +185,5 @@ public class TeacherController {
         model.addAttribute("subjectsTaught", saved.getSubjects());
         model.addAttribute("newTeacher", "Teacher subject details updated");
         return "/SRM/teachers/teacherDetails";
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by teachers's lastName
-     * */
-    @TeacherRead
-    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
-        List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
-        //see TeacherUser's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by student's lastName
-     * */
-    @TeacherRead
-    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
-        List<Student> listByLastName = new ArrayList<>(studentSet);
-        //see Student's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
     }
 }
