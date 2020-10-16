@@ -51,7 +51,18 @@ public class UserController {
     }
 
     @GetMapping({"/", "/welcome"})
-    public String welcomePage() {
+    public String welcomePage(Model model) {
+        //if TeacherUser and subjectsSet is not empty then show "New student task"
+        if (userService.findByUsername(getUsername()) != null){
+            User currentUser = userService.findByUsername(getUsername());
+            if (currentUser.getTeacherUser() != null && !currentUser.getTeacherUser().getSubjects().isEmpty()){
+                model.addAttribute("hasSubject", true);
+            } else {
+                model.addAttribute("hasSubject", false);
+            }
+        } else {
+            model.addAttribute("hasSubject", false);
+        }
         return "/SRM/SRM_home";
     }
 

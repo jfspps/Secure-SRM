@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.exceptions.ForbiddenException;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.model.academic.StudentTask;
@@ -65,9 +66,12 @@ public class StudentTaskController {
             throw new NotFoundException("Username not recognised");
         }
 
-        //todo: check if teacher is assigned at least one subject
-
         TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+        if (currentTeacher == null){
+            log.debug("TeacherUser not recognised");
+            throw new ForbiddenException("TeacherUser not recognised");
+        }
+
         Set<Subject> subjectsTaught = currentTeacher.getSubjects();
         Set<AssignmentType> assignmentTypeSet = assignmentTypeService.findAll();
 
@@ -88,6 +92,11 @@ public class StudentTaskController {
         if (result.hasErrors()){
             result.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             TeacherUser currentTeacher = userService.findByUsername(getUsername()).getTeacherUser();
+            if (currentTeacher == null){
+                log.debug("TeacherUser not recognised");
+                throw new ForbiddenException("TeacherUser not recognised");
+            }
+
             Set<Subject> subjectsTaught = currentTeacher.getSubjects();
 
             model.addAttribute("assignmentTypes", sortAssignmentTypeSetByDescription(assignmentTypeService.findAll()));
