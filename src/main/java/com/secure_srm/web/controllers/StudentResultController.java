@@ -26,7 +26,7 @@ public class StudentResultController {
     private final StudentService studentService;
     private final TeacherUserService teacherUserService;
     private final StudentTaskService studentTaskService;
-    private final UserService userService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -37,7 +37,6 @@ public class StudentResultController {
     @ModelAttribute("hasSubject")
     public Boolean teachesSubjects(){
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
-        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
         return auxiliaryController.teachesASubject();
     }
 

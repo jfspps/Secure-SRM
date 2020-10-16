@@ -34,7 +34,7 @@ public class StudentController {
     private final GuardianUserService guardianUserService;
     private final TeacherUserService teacherUserService;
     private final ContactDetailService contactDetailService;
-    private final UserService userService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -45,7 +45,6 @@ public class StudentController {
     @ModelAttribute("hasSubject")
     public Boolean teachesSubjects(){
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
-        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
         return auxiliaryController.teachesASubject();
     }
 
@@ -53,10 +52,10 @@ public class StudentController {
     @GetMapping({"", "/", "/index"})
     public String listStudents(Model model, String lastName) {
         if(lastName == null || lastName.isEmpty()){
-            model.addAttribute("students", sortStudentSetByLastName(studentService.findAll()));
+            model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
         } else {
             model.addAttribute("students",
-                    sortStudentSetByLastName(studentService.findAllByLastNameContainingIgnoreCase(lastName)));
+                    auxiliaryController.sortStudentSetByLastName(studentService.findAllByLastNameContainingIgnoreCase(lastName)));
         }
         return "/SRM/students/studentIndex";
     }
@@ -148,7 +147,7 @@ public class StudentController {
     public String getStudent_guardianSet(Model model, @PathVariable String studentId){
         checkStudentID(studentId);
 
-        model.addAttribute("guardianSet", sortGuardianSetByLastName(guardianUserService.findAll()));
+        model.addAttribute("guardianSet", auxiliaryController.sortGuardianSetByLastName(guardianUserService.findAll()));
         model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
         return "/SRM/students/guardianSet";
     }
@@ -160,10 +159,10 @@ public class StudentController {
         checkStudentID(studentId);
 
         if (GuardianLastName == null || GuardianLastName.isEmpty()) {
-            model.addAttribute("guardianSet", sortGuardianSetByLastName(guardianUserService.findAll()));
+            model.addAttribute("guardianSet", auxiliaryController.sortGuardianSetByLastName(guardianUserService.findAll()));
         } else {
             model.addAttribute("guardianSet",
-                    sortGuardianSetByLastName(guardianUserService.findAllByLastNameContainingIgnoreCase(GuardianLastName)));
+                    auxiliaryController.sortGuardianSetByLastName(guardianUserService.findAllByLastNameContainingIgnoreCase(GuardianLastName)));
         }
 
         model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
@@ -208,7 +207,7 @@ public class StudentController {
     public String getChangeTutor(Model model, @PathVariable String studentId){
         checkStudentID(studentId);
 
-        model.addAttribute("teacherSet", sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teacherSet", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
         return "/SRM/students/personalTutor";
     }
@@ -220,10 +219,10 @@ public class StudentController {
         checkStudentID(studentId);
 
         if (TutorLastName == null || TutorLastName.isEmpty()) {
-            model.addAttribute("teacherSet", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teacherSet", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teacherSet",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TutorLastName)));
+                    auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TutorLastName)));
         }
 
         model.addAttribute("student", studentService.findById(Long.valueOf(studentId)));
@@ -280,38 +279,5 @@ public class StudentController {
         model.addAttribute("teacher", found.getTeacher());
         model.addAttribute("formGroupList", found.getFormGroupList());
         model.addAttribute("subjectClassLists", found.getSubjectClassLists());
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by student's lastName
-     * */
-    @TeacherRead
-    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
-        List<Student> listByLastName = new ArrayList<>(studentSet);
-        //see Student's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by guardian's lastName
-     * */
-    @TeacherRead
-    private List<GuardianUser> sortGuardianSetByLastName(Set<GuardianUser> guardianUserSet) {
-        List<GuardianUser> listByLastName = new ArrayList<>(guardianUserSet);
-        //see Guardian's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by teachers's lastName
-     * */
-    @TeacherRead
-    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
-        List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
-        //see TeacherUser's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
     }
 }

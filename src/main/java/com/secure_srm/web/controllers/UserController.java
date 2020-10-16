@@ -2,7 +2,6 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.people.ContactDetail;
-import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.*;
 import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.securityServices.*;
@@ -23,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +38,7 @@ public class UserController {
     private final AdminUserService adminUserService;
     private final PasswordEncoder passwordEncoder;
     private final ContactDetailService contactDetailService;
+    private final AuxiliaryController auxiliaryController;
 
     private final String INVALID_USERNAME = "User's username length must be >= 8 characters";
     private final String INVALID_ADMIN_NAME = "AdminUser's name length must be >= 8 characters";
@@ -53,7 +54,7 @@ public class UserController {
     @ModelAttribute("hasSubject")
     public Boolean teachesSubjects(){
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
-        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
+//        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
         return auxiliaryController.teachesASubject();
     }
 
@@ -78,9 +79,9 @@ public class UserController {
     @GuardianRead
     @GetMapping("/authenticated")
     public String userLogin(Model model) {
-        User user = userService.findByUsername(getUsername());
+        User user = userService.findByUsername(auxiliaryController.getUsername());
         model.addAttribute("userID", user.getId());
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         if (user.getAdminUser() != null){
             model.addAttribute("contactDetails", user.getAdminUser().getContactDetail());
         } else if (user.getTeacherUser() != null){
@@ -132,9 +133,9 @@ public class UserController {
     @GuardianRead
     @GetMapping("/userPage")
     public String userPage(Model model) {
-        User user = userService.findByUsername(getUsername());
+        User user = userService.findByUsername(auxiliaryController.getUsername());
         model.addAttribute("userID", user.getId());
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         return "userPage";
     }
 
@@ -157,9 +158,9 @@ public class UserController {
         model.addAttribute("GuardianUsersFound", GuardianUsers);
 
         //current authenticated user details
-        User user = userService.findByUsername(getUsername());
+        User user = userService.findByUsername(auxiliaryController.getUsername());
         model.addAttribute("userID", user.getId());
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         return "adminPage";
     }
 
@@ -180,7 +181,7 @@ public class UserController {
         //userSet is never null if user has one of the above roles
         Set<User> userSet = new HashSet<>(userService.findAll());
         model.addAttribute("usersFound", userSet);
-        User currentUser = userService.findByUsername(getUsername());
+        User currentUser = userService.findByUsername(auxiliaryController.getUsername());
         model.addAttribute("userID", currentUser.getId());
         return "userPage";
     }
@@ -193,7 +194,7 @@ public class UserController {
             currentUser.setPassword(passwordEncoder.encode(currentUser.getUsername() + "123"));
             userService.save(currentUser);
             log.debug("Password was reset");
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("confirmReset", "Password has been reset");
             if (currentUser.getAdminUser() != null){
@@ -234,7 +235,7 @@ public class UserController {
     public String postDeleteUser(@PathVariable String userID, Model model) {
         if (userService.findById(Long.valueOf(userID)) != null) {
             User currentUser = userService.findById(Long.valueOf(userID));
-            if (Long.valueOf(userID).equals(userService.findByUsername(getUsername()).getId())) {
+            if (Long.valueOf(userID).equals(userService.findByUsername(auxiliaryController.getUsername()).getId())) {
                 log.debug("Cannot delete yourself");
                 model.addAttribute("deniedDelete", "You are not permitted to delete your own account");
                 model.addAttribute("returnURL", userTypeUpdatePage(currentUser) + "/" + userID);
@@ -265,7 +266,7 @@ public class UserController {
     public String getNewAdmin(Model model) {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         AdminUser adminUser = AdminUser.builder().build();
         model.addAttribute("newAdmin", adminUser);
         return "adminCreate";
@@ -331,7 +332,7 @@ public class UserController {
             return "redirect:/adminPage";
         } else {
             AdminUser adminUser = user.getAdminUser();
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", user);
             model.addAttribute("currentAdminUser", adminUser);
             return "adminUpdate";
@@ -374,7 +375,7 @@ public class UserController {
             userToBeUpdated.setUsername(currentUser.getUsername());
             userToBeUpdated.getAdminUser().setFirstName(currentAdminUser.getFirstName());
             userToBeUpdated.getAdminUser().setLastName(currentAdminUser.getLastName());
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentAdminUser", userToBeUpdated.getAdminUser());
             return "adminUpdate";
@@ -400,7 +401,7 @@ public class UserController {
     public String getNewTeacher(Model model) {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         TeacherUser teacherUser = TeacherUser.builder().build();
         model.addAttribute("newTeacher", teacherUser);
         return "teacherCreate";
@@ -452,7 +453,7 @@ public class UserController {
             return "redirect:/adminPage";
         } else {
             TeacherUser teacherUser = user.getTeacherUser();
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", user);
             model.addAttribute("currentTeacherUser", teacherUser);
             return "teacherUpdate";
@@ -499,7 +500,7 @@ public class UserController {
             userToBeUpdated.setUsername(currentUser.getUsername());
             userToBeUpdated.getTeacherUser().setFirstName(currentTeacherUser.getFirstName());
             userToBeUpdated.getTeacherUser().setLastName(currentTeacherUser.getLastName());
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentAdminUser", userToBeUpdated.getTeacherUser());
             return "teacherUpdate";
@@ -524,7 +525,7 @@ public class UserController {
     public String getNewGuardian(Model model) {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
-        model.addAttribute("user", getUsername());
+        model.addAttribute("user", auxiliaryController.getUsername());
         GuardianUser guardianUser = GuardianUser.builder().build();
         model.addAttribute("newGuardian", guardianUser);
         return "guardianCreate";
@@ -577,7 +578,7 @@ public class UserController {
             return "redirect:/adminPage";
         } else {
             GuardianUser guardianUser = user.getGuardianUser();
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", user);
             model.addAttribute("currentGuardianUser", guardianUser);
             return "guardianUpdate";
@@ -619,7 +620,7 @@ public class UserController {
             userToBeUpdated.setUsername(currentUser.getUsername());
             userToBeUpdated.getGuardianUser().setFirstName(currentGuardianUser.getFirstName());
             userToBeUpdated.getGuardianUser().setLastName(currentGuardianUser.getLastName());
-            model.addAttribute("user", getUsername());
+            model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", userToBeUpdated);
             model.addAttribute("currentGuardianUser", userToBeUpdated.getGuardianUser());
             return "guardianUpdate";
@@ -708,15 +709,6 @@ public class UserController {
             return false;
         } else
             return true;
-    }
-
-    private String getUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
-        }
     }
 
     @AdminUpdate

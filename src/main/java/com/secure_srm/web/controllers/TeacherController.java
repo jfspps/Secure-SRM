@@ -34,7 +34,7 @@ public class TeacherController {
     private final TeacherUserService teacherUserService;
     private final ContactDetailService contactDetailService;
     private final SubjectService subjectService;
-    private final UserService userService;
+    private final AuxiliaryController auxiliaryController;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -45,7 +45,6 @@ public class TeacherController {
     @ModelAttribute("hasSubject")
     public Boolean teachesSubjects(){
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
-        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
         return auxiliaryController.teachesASubject();
     }
 
@@ -53,10 +52,10 @@ public class TeacherController {
     @GetMapping({"", "/", "/index"})
     public String listTeachers(Model model, String lastName) {
         if(lastName == null || lastName.isEmpty()){
-            model.addAttribute("teachers", sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teachers",
-                    sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(lastName)));
+                    auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(lastName)));
         }
         return "/SRM/teachers/teacherIndex";
     }
@@ -186,27 +185,5 @@ public class TeacherController {
         model.addAttribute("subjectsTaught", saved.getSubjects());
         model.addAttribute("newTeacher", "Teacher subject details updated");
         return "/SRM/teachers/teacherDetails";
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by teachers's lastName
-     * */
-    @TeacherRead
-    private List<TeacherUser> sortTeacherSetByLastName(Set<TeacherUser> teacherUserSet) {
-        List<TeacherUser> listByLastName = new ArrayList<>(teacherUserSet);
-        //see TeacherUser's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
-    }
-
-    /**
-     * Returns an ArrayList of items, sorted by student's lastName
-     * */
-    @TeacherRead
-    private List<Student> sortStudentSetByLastName(Set<Student> studentSet) {
-        List<Student> listByLastName = new ArrayList<>(studentSet);
-        //see Student's model string comparison method, compareTo()
-        Collections.sort(listByLastName);
-        return listByLastName;
     }
 }
