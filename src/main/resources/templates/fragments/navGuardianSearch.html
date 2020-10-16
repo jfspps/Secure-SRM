@@ -46,12 +46,13 @@
                 <a class="nav-link dropdown-toggle" id="testRecordDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">Academic</a>
                 <div class="dropdown-menu" aria-labelledby="dbDropdown">
-                    <span>
+                    <!--/*@thymesVar id="hasSubject" type="java.lang.Boolean"*/-->
+                    <span th:object="${hasSubject}">
                         <div class="dropdown-header">New...</div>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
-                        <a sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentTask/new}">Student task</a>
-                        <a sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentTask/new}">Student task</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
                     </span>
                     <div class="dropdown-header">Show...</div>
                     <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
