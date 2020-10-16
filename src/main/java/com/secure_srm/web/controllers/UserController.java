@@ -50,19 +50,15 @@ public class UserController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
+        return auxiliaryController.teachesASubject();
+    }
+
     @GetMapping({"/", "/welcome"})
     public String welcomePage(Model model) {
-        //if TeacherUser and subjectsSet is not empty then show "New student task"
-        if (userService.findByUsername(getUsername()) != null){
-            User currentUser = userService.findByUsername(getUsername());
-            if (currentUser.getTeacherUser() != null && !currentUser.getTeacherUser().getSubjects().isEmpty()){
-                model.addAttribute("hasSubject", true);
-            } else {
-                model.addAttribute("hasSubject", false);
-            }
-        } else {
-            model.addAttribute("hasSubject", false);
-        }
         return "/SRM/SRM_home";
     }
 
@@ -714,7 +710,6 @@ public class UserController {
             return true;
     }
 
-    @AdminRead
     private String getUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {

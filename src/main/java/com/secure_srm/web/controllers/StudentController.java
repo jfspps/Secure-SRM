@@ -4,11 +4,13 @@ import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.peopleServices.StudentService;
 import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.services.securityServices.TeacherUserService;
+import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +34,19 @@ public class StudentController {
     private final GuardianUserService guardianUserService;
     private final TeacherUserService teacherUserService;
     private final ContactDetailService contactDetailService;
+    private final UserService userService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder){
         dataBinder.setDisallowedFields("id");
+    }
+
+    @ModelAttribute("hasSubject")
+    public Boolean teachesSubjects(){
+        //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
+        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
+        return auxiliaryController.teachesASubject();
     }
 
     @TeacherRead
