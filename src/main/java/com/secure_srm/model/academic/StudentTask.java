@@ -27,7 +27,7 @@ public class StudentTask extends BaseEntity {
     @Size(min = 1, max = 255)
     private String title;
 
-    private Integer maxScore;        //boxed Integer can be null; allows for letter grades or no score at all
+    private String maxScore;        //boxed Integer can be null; allows for letter grades or no score at all
 
     private boolean contributor;     //purpose is to state whether this contributes to an overall end-of-term/...score
 

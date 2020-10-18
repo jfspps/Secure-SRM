@@ -1,6 +1,7 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.ForbiddenException;
+import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.StudentResult;
 import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Subject;
@@ -13,6 +14,7 @@ import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
+import com.secure_srm.web.permissionAnnot.TeacherUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
@@ -136,7 +138,7 @@ public class StudentResultController {
             bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
 
             Set<Subject> subjectsTaught = currentTeacher.getSubjects();
-            model.addAttribute("newResult", studentResult);
+            model.addAttribute("result", studentResult);
             model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
 
             //list tasks relevant to current teacher's subject(s)
@@ -159,7 +161,165 @@ public class StudentResultController {
 
         StudentResult savedResult = studentResultService.save(studentResult);
         log.debug("Result from task, " + savedResult.getStudentTask().getTitle() + ", saved");
-        model.addAttribute("resultFeedback", "New result saved");
+
+        try {
+            if (Long.parseLong(studentResult.getScore()) > Long.parseLong(studentResult.getStudentTask().getMaxScore())){
+                log.debug("Submitted score is greater than the maximum score");
+                model.addAttribute("resultFeedback", "Note: submitted score is greater than the maximum score. Result saved.");
+            } else {
+                model.addAttribute("resultFeedback", "New result saved");
+            }
+        } catch (NumberFormatException exception){
+            log.debug("Could not parse maxscore or score");
+            model.addAttribute("resultFeedback", "New result saved");
+        }
+
+        model.addAttribute("result", savedResult);
+        return "/SRM/studentResults/viewResult";
+    }
+
+    @TeacherRead
+    @GetMapping("/{resultId}")
+    public String getViewResult(Model model, @PathVariable("resultId") String resultID){
+        if (studentResultService.findById(Long.valueOf(resultID)) == null){
+            log.debug("Student result not found");
+            throw new NotFoundException("Student result not found");
+        }
+
+        StudentResult found = studentResultService.findById(Long.valueOf(resultID));
+        model.addAttribute("result", found);
+        return "/SRM/studentResults/viewResult";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{resultId}/edit")
+    public String getUpdateResult(Model model, @PathVariable("resultId") String resultID){
+        if (studentResultService.findById(Long.valueOf(resultID)) == null){
+            log.debug("Student result not found");
+            throw new NotFoundException("Student result not found");
+        }
+        StudentResult found = studentResultService.findById(Long.valueOf(resultID));
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+
+        //check that the current teacher is the result's marker
+        if (found.getTeacher() != currentTeacher){
+            log.debug("Current teacher cannot edit results of other teachers");
+            throw new ForbiddenException("Current teacher cannot edit results of other teachers");
+        }
+
+        Set<Subject> subjectsTaught = currentTeacher.getSubjects();
+        model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
+
+        //list tasks relevant to current teacher's subject(s)
+        Set<StudentTask> tasks = new HashSet<>();
+        for (Subject subject: subjectsTaught) {
+            tasks.addAll(studentTaskService.findAllBySubject(subject.getSubjectName()));
+        }
+        model.addAttribute("studentTasks", tasks);
+        model.addAttribute("result", found);
+        return "/SRM/studentResults/updateResult";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{resultId}/edit/search")
+    public String getUpdateResult_search(Model model, @PathVariable("resultId") String resultID, String StudentLastName,
+                                         String TaskTitle, @ModelAttribute("result") StudentResult studentResult){
+        if (studentResultService.findById(Long.valueOf(resultID)) == null){
+            log.debug("Student result not found");
+            throw new NotFoundException("Student result not found");
+        }
+        StudentResult found = studentResultService.findById(Long.valueOf(resultID));
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        Set<Subject> subjectsTaught = currentTeacher.getSubjects();
+
+        if (StudentLastName == null || StudentLastName.isEmpty()){
+            model.addAttribute("students", studentService.findAll());
+        } else {
+            model.addAttribute("students",
+                    studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
+        }
+
+        Set<StudentTask> tasks = new HashSet<>();
+        for (Subject subject: subjectsTaught) {
+            tasks.addAll(studentTaskService.findAllBySubject(subject.getSubjectName()));
+        }
+
+        if (TaskTitle != null && !TaskTitle.isBlank()){
+            tasks = studentTaskService.findAllByTitleIgnoreCase(TaskTitle);
+        }
+
+        model.addAttribute("studentTasks", tasks);
+        model.addAttribute("result", found);
+        return "/SRM/studentResults/updateResult";
+    }
+
+    @TeacherUpdate
+    @PostMapping("{resultId}/edit")
+    public String postUpdateResult(@Valid @ModelAttribute("result") StudentResult studentResult, BindingResult bindingResult,
+                                   Model model, @PathVariable("resultId") String resultID){
+        if (studentResultService.findById(Long.valueOf(resultID)) == null){
+            log.debug("Student result not found");
+            throw new NotFoundException("Student result not found");
+        }
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        StudentResult resultOnFile = studentResultService.findById(Long.valueOf(resultID));
+
+        //check that the current teacher is the result's marker
+        if (resultOnFile.getTeacher() != currentTeacher){
+            log.debug("Current teacher cannot edit results of other teachers");
+            throw new ForbiddenException("Current teacher cannot edit results of other teachers");
+        }
+
+        if (bindingResult.hasErrors()){
+            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+
+            Set<Subject> subjectsTaught = currentTeacher.getSubjects();
+            model.addAttribute("result", studentResult);
+            model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
+
+            //list tasks relevant to current teacher's subject(s)
+            Set<StudentTask> tasks = new HashSet<>();
+            for (Subject subject: subjectsTaught) {
+                tasks.addAll(studentTaskService.findAllBySubject(subject.getSubjectName()));
+            }
+            model.addAttribute("studentTasks", tasks);
+            return "/SRM/studentResults/newResult";
+        }
+
+        StudentTask taskOnFile = resultOnFile.getStudentTask();
+
+        StudentTask taskSubmitted = studentResult.getStudentTask();
+
+        //update StudentTasks tally
+        taskOnFile.getStudentResults().remove(resultOnFile);
+        StudentTask onFileSaved = studentTaskService.save(taskOnFile);
+        taskSubmitted.getStudentResults().add(resultOnFile);
+        StudentTask submittedSaved = studentTaskService.save(taskSubmitted);
+
+        log.debug("Result removed from " + onFileSaved.getTitle());
+        log.debug("Result saved to " + submittedSaved.getTitle());
+
+        //update resultOnFile (no need to change teacher)
+        resultOnFile.setStudent(studentResult.getStudent());
+        resultOnFile.setStudentTask(studentResult.getStudentTask());
+        resultOnFile.setComments(studentResult.getComments());
+        resultOnFile.setScore(studentResult.getScore());
+
+        StudentResult savedResult = studentResultService.save(resultOnFile);
+        log.debug("Result from task, " + savedResult.getStudentTask().getTitle() + ", saved");
+
+        try {
+            if (Long.parseLong(studentResult.getScore()) > Long.parseLong(studentResult.getStudentTask().getMaxScore())){
+                log.debug("Submitted score is greater than the maximum score");
+                model.addAttribute("resultFeedback", "Note: submitted score is greater than the maximum score. Result updated.");
+            } else {
+                model.addAttribute("resultFeedback", "Result updated");
+            }
+        } catch (NumberFormatException exception){
+            log.debug("Could not parse maxscore or score");
+            model.addAttribute("resultFeedback", "Result updated");
+        }
+
         model.addAttribute("result", savedResult);
         return "/SRM/studentResults/viewResult";
     }

@@ -50,7 +50,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void postNewStudentTask(String username, String pwd) throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -71,7 +71,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void getStudentTaskDetails(String username, String pwd) throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -91,7 +91,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void getUpdateStudentTask() throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
@@ -113,7 +113,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void getUpdateStudentTask_Denied() throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
@@ -134,7 +134,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void postUpdateStudentTask() throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
@@ -156,7 +156,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
     void postUpdateStudentTask_denied() throws Exception {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())

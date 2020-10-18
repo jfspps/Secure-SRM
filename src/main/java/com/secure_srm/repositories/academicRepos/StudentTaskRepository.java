@@ -14,6 +14,8 @@ public interface StudentTaskRepository extends JpaRepository<StudentTask, Long> 
 
     Optional<StudentTask> findByTitle(String title);
 
+    Set<StudentTask> findAllByTitleContainingIgnoreCase(String title);
+
     Optional<StudentTask> findByTitleAndTeacherUploader_Id(String title, Long id);
 
     Optional<StudentTask> findByTeacherUploader_LastName(String uploaderLastName);

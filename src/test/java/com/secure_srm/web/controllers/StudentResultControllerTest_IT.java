@@ -4,9 +4,11 @@ import com.secure_srm.model.academic.StudentResult;
 import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 import javax.transaction.Transactional;
 
@@ -41,7 +43,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -66,7 +68,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -103,7 +105,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("distinction")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -126,5 +128,192 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("resultFeedback"));
     }
 
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getViewStudentResult(String username, String pwd) throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername(username).getTeacherUser();
 
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("120")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(tempTask)
+                .teacher(teacherUserService.findById(1L)).build();
+        StudentResult saved = studentResultService.save(tempResult);
+
+        mockMvc.perform(get("/studentResult/" + saved.getId()).with(httpBasic(username, pwd))
+                .flashAttr("result", tempResult))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentResults/viewResult"))
+                .andExpect(model().attributeExists("result"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getUpdateStudentResult_permitted() throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername("keithjones").getTeacherUser();
+
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("120")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(tempTask)
+                .teacher(userService.findByUsername("keithjones").getTeacherUser()).build();
+        StudentResult saved = studentResultService.save(tempResult);
+
+        mockMvc.perform(get("/studentResult/" + saved.getId() + "/edit")
+                .flashAttr("result", tempResult))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentResults/updateResult"))
+                .andExpect(model().attributeExists("result"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attributeExists("studentTasks"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getUpdateStudentResult_denied() throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername("keithjones").getTeacherUser();
+
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("120")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(tempTask)
+                .teacher(userService.findByUsername("marymanning").getTeacherUser()).build();
+        StudentResult saved = studentResultService.save(tempResult);
+
+        mockMvc.perform(get("/studentResult/" + saved.getId() + "/edit")
+                .flashAttr("result", tempResult))
+                .andExpect(status().is(403))
+                .andExpect(status().isForbidden());
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void postUpdateStudentResult_permitted() throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername("keithjones").getTeacherUser();
+
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("distinction")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(tempTask)
+                .teacher(tempTeacher).build();
+        StudentResult tempSaved = studentResultService.save(tempResult);
+
+        mockMvc.perform(post("/studentResult/" + tempSaved.getId() + "/edit").with(csrf())
+                .flashAttr("result", tempSaved))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentResults/viewResult"))
+                .andExpect(model().attributeExists("result"))
+                .andExpect(model().attributeExists("resultFeedback"));
+    }
+
+    @WithUserDetails("marymanning")
+    @Test
+    void postUpdateStudentResult_denied() throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername("keithjones").getTeacherUser();
+
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("distinction")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(tempTask)
+                .teacher(tempTeacher).build();
+        StudentResult tempSaved = studentResultService.save(tempResult);
+
+        mockMvc.perform(post("/studentResult/" + tempSaved.getId() + "/edit").with(csrf())
+                .flashAttr("result", tempSaved))
+                .andExpect(status().is(403))
+                .andExpect(status().isForbidden());
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void postUpdateStudentResult_search() throws Exception {
+        TeacherUser tempTeacher = userService.findByUsername("keithjones").getTeacherUser();
+
+        StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("distinction")
+                .studentResults(new HashSet<>())
+                .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
+                .teacherUploader(teacherUserService.findById(1L))
+                .title("new student task")
+                .build();
+        StudentTask savedTempTask = studentTaskService.save(tempTask);
+
+        StudentResult tempResult = StudentResult.builder()
+                .comments("did OK")
+                .score("merit")
+                .student(studentService.findById(1L))
+                .studentTask(savedTempTask)
+                .teacher(tempTeacher).build();
+        StudentResult tempSaved = studentResultService.save(tempResult);
+
+        mockMvc.perform(get("/studentResult/" + tempSaved.getId() + "/edit/search").with(csrf())
+                .flashAttr("result", tempSaved)
+                .param("StudentLastName", "Smith")
+                .param("TaskTitle", "new student task"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentResults/updateResult"))
+                .andExpect(model().attributeExists("result"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attributeExists("studentTasks"));
+    }
 }

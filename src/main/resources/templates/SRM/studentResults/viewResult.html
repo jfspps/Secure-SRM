@@ -21,6 +21,15 @@
     <span class="help-block" th:if="${resultFeedback != null}">
         <p class="alert alert-info" th:text="${resultFeedback}"></p>
     </span>
+    <div class="row align-items-start">
+        <div class="col-sm-2">
+            <label>Task title</label>
+        </div>
+        <div class="col-sm-8">
+            <label size="50" th:text="${result.studentTask.title}"></label>
+        </div>
+    </div>
+    <br/>
 
     <div class="row align-items-start">
         <div class="col-sm-2">
@@ -31,6 +40,33 @@
         </div>
     </div>
     <br/>
+
+    <div class="row align-items-start">
+        <div class="col-sm-2">
+            <label>Score/grade</label>
+        </div>
+        <div class="col-sm-8">
+            <label size="50" th:text="${result.score}"></label>
+        </div>
+    </div>
+
+    <div class="row align-items-start">
+        <div class="col-sm-2">
+            <label>Maximum score/grade</label>
+        </div>
+        <div class="col-sm-8">
+            <label size="50" th:text="${result.studentTask.maxScore}"></label>
+        </div>
+    </div>
+
+    <div class="row align-items-start">
+        <div class="col-sm-2">
+            <label>Comments</label>
+        </div>
+        <div class="col-sm-8">
+            <textarea size="50" th:text="${result.comments}"></textarea>
+        </div>
+    </div>
 
     <div class="row align-items-start">
         <div class="col-sm-2">
@@ -60,24 +96,7 @@
             <label size="50" th:text="${result.studentTask.subject.subjectName}"></label>
         </div>
     </div>
-
-    <div class="row align-items-start">
-        <div class="col-sm-2">
-            <label>Score/grade</label>
-        </div>
-        <div class="col-sm-8">
-            <textarea size="50" th:text="${result.score}"></textarea>
-        </div>
-    </div>
-
-    <div class="row align-items-start">
-        <div class="col-sm-2">
-            <label>Comments</label>
-        </div>
-        <div class="col-sm-8">
-            <textarea size="50" th:text="${result.comments}"></textarea>
-        </div>
-    </div>
+    <br />
 
     <br/>
     <div class="row align-items-start">
