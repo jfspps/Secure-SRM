@@ -27,6 +27,11 @@ public class StudentTaskSDjpaService implements StudentTaskService {
     }
 
     @Override
+    public Set<StudentTask> findAllByTitleIgnoreCase(String title) {
+        return studentTaskRepository.findAllByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
     public StudentTask findByTitleAndTeacherUploaderId(String title, Long id) {
         return studentTaskRepository.findByTitleAndTeacherUploader_Id(title, id).orElse(null);
     }

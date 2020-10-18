@@ -8,6 +8,8 @@ import java.util.Set;
 public interface StudentTaskService extends BaseService<StudentTask, Long> {
     StudentTask findByTitle(String title);
 
+    Set<StudentTask> findAllByTitleIgnoreCase(String title);
+
     StudentTask findByTitleAndTeacherUploaderId(String title, Long id);
 
     StudentTask findByTeacherLastName(String lastName);
