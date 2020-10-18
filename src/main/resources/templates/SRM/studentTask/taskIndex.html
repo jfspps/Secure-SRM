@@ -41,7 +41,8 @@
                                                                              th:text="${task.id}"></a></th>
             <td class="px-3" th:text="${task.title}"></td>
             <td class="px-3" th:text="${task.maxScore}"></td>
-            <td class="px-3" th:text="${task.contributor}"></td>
+            <td class="px-3" th:if="${task.isContributor()}">Yes</td>
+            <td class="px-3" th:unless="${task.isContributor()}">No</td>
             <td class="px-3" th:text="${task.teacherUploader.firstName + ' ' + task.teacherUploader.lastName}"></td>
             <td class="px-3" th:text="${task.subject.subjectName}"></td>
             <td class="px-3" th:text="${task.assignmentType.description}"></td>

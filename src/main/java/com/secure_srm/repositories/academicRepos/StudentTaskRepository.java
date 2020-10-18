@@ -5,6 +5,7 @@ import com.secure_srm.model.academic.StudentTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 //the implementation of the following methods is supplied automatically by JPA
 
@@ -19,7 +20,7 @@ public interface StudentTaskRepository extends JpaRepository<StudentTask, Long> 
 
     Optional<StudentTask> findByTeacherUploader_FirstNameAndTeacherUploader_LastName(String firstName, String lastName);
 
-    Optional<StudentTask> findBySubject_SubjectName(String subjectName);
+    Set<StudentTask> findAllBySubject_SubjectName(String subjectName);
 
     Optional<StudentTask> findByAssignmentType_Description(String description);
 

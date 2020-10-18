@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>New student result</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
+<div class="container" sec:authorize="hasAuthority('teacher.create')">
+    <div class="row">
+        <div class="col">
+            <h2>New student result</h2>
+            <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting changes.</p>
+        </div>
+    </div>
+
+    <form method="get" th:action="@{/studentResult/new/search}"
+          class="form-horizontal" id="refine-teachers-form">
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Student search</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="StudentLastName" placeholder="Student last name"
+                       aria-label="Search" maxlength="50">
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Student task search</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="TaskTitle" placeholder="Student task title"
+                       aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Refine all lists</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
+    <!--/*@thymesVar id="result" type="com.secure_srm.model.academic.StudentResult"*/-->
+    <form th:object="${result}" method="post" th:action="@{/studentResult/new}"
+          class="form-horizontal" id="change-teacherSet-form">
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Students on record'}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Student name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="studentFound" type="com.secure_srm.model.people.Student"*/-->
+                    <tr th:each="studentFound: ${students}">
+                        <td>
+                            <input type="radio" th:field="*{student}" th:value="${studentFound.id}"/>
+                            <label><a th:text="${studentFound.firstName + ' ' + studentFound.lastName}"
+                                      th:href="@{/students/{studentId}(studentId=${studentFound.id})}"></a> </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" th:text="${'Student tasks on record'}"></label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Student task</th>
+                        <th class="px-3">Subject</th>
+                        <th class="px-3">Task Owner</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="studentTask" type="com.secure_srm.model.academic.StudentTask"*/-->
+                    <tr th:each="studentTask: ${studentTasks}">
+                        <td>
+                            <input type="radio" th:field="*{studentTask}" th:value="${studentTask.id}"/>
+                            <label><a th:text="${studentTask.title}"
+                                      th:href="@{/studentTask/{taskId}(taskId=${studentTask.id})}"></a> </label>
+                        </td>
+                        <td>
+                            <label th:text="${studentTask.subject.subjectName}"></label>
+                        </td>
+                        <td>
+                            <label th:text="${studentTask.teacherUploader.firstName + ' ' + studentTask.teacherUploader.lastName}"></label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Score/grade awarded</label>
+            </div>
+            <div class="col-sm-8">
+                <input size="50" placeholder="Score/grade" th:field="*{score}" />
+            </div>
+        </div>
+
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Comments</label>
+            </div>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="studentComments" rows="3" placeholder="Student result comments" th:field="*{comments}"></textarea>
+            </div>
+        </div>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Teacher marker</label>
+            </div>
+            <div class="col-sm-8">
+                <label class="control-label" th:text="${result.teacher.firstName + ' ' + result.teacher.lastName}"></label>
+            </div>
+        </div>
+
+        <br />
+        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.create')" >
+            <div class="col-sm-2">
+                <button class="btn btn-info" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
+    <div class="row align-items-start">
+        <div class="col-sm-5">
+            <a class="btn btn-outline-primary" th:href="@{/studentResult/index}"
+               role="button">Return to result index</a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

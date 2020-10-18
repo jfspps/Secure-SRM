@@ -3,6 +3,8 @@ package com.secure_srm.services.academicServices;
 import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.services.BaseService;
 
+import java.util.Set;
+
 public interface StudentTaskService extends BaseService<StudentTask, Long> {
     StudentTask findByTitle(String title);
 
@@ -12,7 +14,7 @@ public interface StudentTaskService extends BaseService<StudentTask, Long> {
 
     StudentTask findByTeacherFirstAndLastName(String firstName, String lastName);
 
-    StudentTask findBySubject(String subjectName);
+    Set<StudentTask> findAllBySubject(String subjectName);
 
     StudentTask findByDescription(String description);
 

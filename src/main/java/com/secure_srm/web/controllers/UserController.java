@@ -54,7 +54,6 @@ public class UserController {
     @ModelAttribute("hasSubject")
     public Boolean teachesSubjects(){
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
-//        AuxiliaryController auxiliaryController = new AuxiliaryController(userService);
         return auxiliaryController.teachesASubject();
     }
 
