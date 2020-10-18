@@ -13,7 +13,7 @@
     <table class="table table-hover table-sm table-striped">
         <thead class="thead-light">
         <tr>
-            <th class="px-3" sec:authorize="hasAuthority('admin.update')">ID</th>
+            <th class="px-3" sec:authorize="hasAuthority('teacher.update')">ID</th>
             <th class="px-3">Student</th>
             <th class="px-3">Teacher</th>
             <th class="px-3">Task</th>
@@ -24,7 +24,7 @@
         <tbody th:object="${results}">
         <!--/*@thymesVar id="result" type="com.secure_srm.model.academic.StudentResult"*/-->
         <tr th:if="${results.isEmpty()}">
-            <th class="px-3" sec:authorize="hasAuthority('admin.update')"></th>
+            <th class="px-3" sec:authorize="hasAuthority('teacher.update')"></th>
             <td class="px-3">(No student results on record)</td>
             <td class="px-3"></td>
             <td class="px-3"></td>
@@ -32,7 +32,7 @@
             <td class="px-3"></td>
         </tr>
         <tr th:unless="${results.isEmpty()}" th:each="result: ${results}">
-            <th class="px-3" sec:authorize="hasAuthority('admin.update')"><a role="button"
+            <th class="px-3" sec:authorize="hasAuthority('teacher.update')"><a role="button"
                                                                              class="btn btn-sm btn-outline-info" th:href="@{/studentResults/{id}(id=${result.id})}"
                                                                              th:text="${result.id}"></a></th>
             <td class="px-3" th:text="${result.student.firstName + ' ' + result.student.lastName}"></td>

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -83,12 +84,13 @@ class StudentTaskSDjpaServiceTest {
     }
 
     @Test
-    void findBySubject() {
-        when(studentTaskRepository.findBySubject_SubjectName(anyString())).thenReturn(Optional.of(exam));
+    void findAllBySubject() {
+        when(studentTaskRepository.findAllBySubject_SubjectName(anyString())).thenReturn(Set.of(exam));
 
-        StudentTask found = studentTaskSDjpaService.findBySubject("Noodles");
-        verify(studentTaskRepository, times(1)).findBySubject_SubjectName(anyString());
-        assertEquals(subjectName, found.getSubject().getSubjectName());
+        Set<StudentTask> found = studentTaskSDjpaService.findAllBySubject("Noodles");
+        verify(studentTaskRepository, times(1)).findAllBySubject_SubjectName(anyString());
+        assertEquals(subjectName, found.stream().filter(studentTask ->
+                studentTask.getSubject().getSubjectName().equals("English")).findAny().orElse(null).getSubject().getSubjectName());
     }
 
     @Test

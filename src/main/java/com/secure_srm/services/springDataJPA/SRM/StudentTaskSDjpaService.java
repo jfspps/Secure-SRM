@@ -42,8 +42,8 @@ public class StudentTaskSDjpaService implements StudentTaskService {
     }
 
     @Override
-    public StudentTask findBySubject(String subjectName) {
-        return studentTaskRepository.findBySubject_SubjectName(subjectName).orElse(null);
+    public Set<StudentTask> findAllBySubject(String subjectName) {
+        return studentTaskRepository.findAllBySubject_SubjectName(subjectName);
     }
 
     @Override
