@@ -41,7 +41,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -66,7 +66,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))
@@ -103,7 +103,7 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
 
         StudentTask tempTask = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
-                .maxScore(120)
+                .maxScore("120")
                 .studentResults(new HashSet<>())
                 .subject(tempTeacher.getSubjects().stream().findAny().orElse(null))
                 .teacherUploader(teacherUserService.findById(1L))

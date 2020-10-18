@@ -1,6 +1,7 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.ForbiddenException;
+import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.StudentResult;
 import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Subject;
@@ -159,8 +160,28 @@ public class StudentResultController {
 
         StudentResult savedResult = studentResultService.save(studentResult);
         log.debug("Result from task, " + savedResult.getStudentTask().getTitle() + ", saved");
-        model.addAttribute("resultFeedback", "New result saved");
+
+        if (Long.parseLong(studentResult.getScore()) > Long.parseLong(studentResult.getStudentTask().getMaxScore())){
+            log.debug("Submitted score is greater than the maximum score");
+            model.addAttribute("resultFeedback", "Note: submitted score is greater than the maximum score. Result saved.");
+        } else {
+            model.addAttribute("resultFeedback", "New result saved");
+        }
+
         model.addAttribute("result", savedResult);
+        return "/SRM/studentResults/viewResult";
+    }
+
+    @TeacherRead
+    @GetMapping("/{resultId}")
+    public String getViewResult(Model model, @PathVariable("resultId") String resultID){
+        if (studentResultService.findById(Long.valueOf(resultID)) == null){
+            log.debug("Student result not found");
+            throw new NotFoundException("Student result not found");
+        }
+
+        StudentResult found = studentResultService.findById(Long.valueOf(resultID));
+        model.addAttribute("result", found);
         return "/SRM/studentResults/viewResult";
     }
 }

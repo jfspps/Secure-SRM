@@ -15,7 +15,7 @@
         <tr>
             <th class="px-3" sec:authorize="hasAuthority('teacher.update')">ID</th>
             <th class="px-3">Student</th>
-            <th class="px-3">Teacher</th>
+            <th class="px-3">Teacher (marker)</th>
             <th class="px-3">Task</th>
             <th class="px-3">Score</th>
             <th class="px-3">Comments length</th>
@@ -33,7 +33,7 @@
         </tr>
         <tr th:unless="${results.isEmpty()}" th:each="result: ${results}">
             <th class="px-3" sec:authorize="hasAuthority('teacher.update')"><a role="button"
-                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentResults/{id}(id=${result.id})}"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/studentResult/{id}(id=${result.id})}"
                                                                              th:text="${result.id}"></a></th>
             <td class="px-3" th:text="${result.student.firstName + ' ' + result.student.lastName}"></td>
             <td class="px-3" th:text="${result.teacher.firstName + ' ' + result.teacher.lastName}"></td>

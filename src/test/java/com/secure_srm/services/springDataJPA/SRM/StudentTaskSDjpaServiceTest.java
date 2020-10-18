@@ -29,7 +29,7 @@ class StudentTaskSDjpaServiceTest {
     TeacherUser setter = TeacherUser.builder().firstName(teacherFirstName).lastName(teacherLastName).build();
     final String subjectName = "English";
     Subject subject = Subject.builder().subjectName(subjectName).build();
-    final int maxScore = 54;
+    final String maxScore = "54";
     final String description = "End of term exam";
     AssignmentType assignmentType = AssignmentType.builder().description(description).build();
     final String assignmentTitle = "The merits of testing";
