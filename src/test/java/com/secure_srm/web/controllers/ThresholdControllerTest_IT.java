@@ -1,15 +1,21 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.model.academic.Threshold;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 import javax.transaction.Transactional;
+
+import java.util.HashSet;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -36,5 +42,34 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/threshold/thresholdIndex"))
                 .andExpect(model().attributeExists("thresholds"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getNewThreshold(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/thresholds/new").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/threshold/newThreshold"))
+                .andExpect(model().attributeExists("threshold"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void postNewThreshold(String username, String pwd) throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+
+        mockMvc.perform(post("/thresholds/new").with(httpBasic(username, pwd)).with(csrf())
+                .flashAttr("threshold", tempThreshold))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/threshold/thresholdDetails"))
+                .andExpect(model().attributeExists("threshold"))
+                .andExpect(model().attributeExists("thresholdFeedback"));
     }
 }
