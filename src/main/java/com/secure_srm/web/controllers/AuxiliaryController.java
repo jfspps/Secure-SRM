@@ -3,6 +3,7 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.academic.Threshold;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.people.SubjectClassList;
@@ -135,5 +136,15 @@ public class AuxiliaryController {
         //see FormGroupList's model string comparison method, compareTo()
         Collections.sort(listByLastName);
         return listByLastName;
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by UniqueID
+     */
+    public List<Threshold> sortThresholdByUniqueID(Set<Threshold> thresholdSet) {
+        List<Threshold> listByUniqueID = new ArrayList<>(thresholdSet);
+        //see Threshold's model string comparison method, compareTo()
+        Collections.sort(listByUniqueID);
+        return listByUniqueID;
     }
 }

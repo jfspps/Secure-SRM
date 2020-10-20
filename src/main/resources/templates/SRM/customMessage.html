@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Problem</h5>
                     <p th:object="${message}" th:text="${message}"></p>
-                    <p th:object="${resolution}" th:if="${!resolution.isEmpty()}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="${resolution}">Resolve</a></p>
+                    <p th:object="${resolution}" th:if="${resolution != null}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="${resolution}">Resolve</a></p>
                 </div>
             </div>
         </div>

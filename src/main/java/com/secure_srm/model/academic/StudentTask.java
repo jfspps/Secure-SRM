@@ -44,4 +44,6 @@ public class StudentTask extends BaseEntity {
 
     @OneToMany(mappedBy = "studentTask")
     private Set<StudentResult> studentResults = new HashSet<>();
+
+    //todo: add ThresholdList property
 }

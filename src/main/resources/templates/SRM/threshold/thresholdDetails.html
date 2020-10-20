@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Academic threshold details</title>
+</head>
+<body>
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container" sec:authorize="hasAuthority('teacher.read')">
+    <div class="row">
+        <div class="col">
+            <h2>Academic threshold details</h2>
+        </div>
+    </div>
+    <!--/*@thymesVar id="threshold" type="com.secure_srm.model.academic.Threshold"*/-->
+    <form th:object="${threshold}" method="get">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Threshold owner</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{uploader.firstName + ' ' + uploader.lastName}"></label>
+                <!--/*@thymesVar id="thresholdFeedback" type="java.lang.String"*/-->
+                <span class="help-block" th:if="${thresholdFeedback != null}">
+                <p class="alert alert-info" th:text="${thresholdFeedback}"></p>
+            </span>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Numerical threshold</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="*{numerical}"></label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Letter grade or designation</b></label>
+            </div>
+            <div class="col-sm-8">
+                <p>Letter grade awarded to raw scores when less than or equal to above numerical threshold (subject to other thresholds)</p>
+                <label size="50" th:text="*{alphabetical}"></label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Unique ID</b></label>
+            </div>
+            <div class="col-sm-8">
+                <label size="50" th:text="${threshold.uniqueId}">Yes</label>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
+            <div class="col-sm-10">
+                <a class="btn btn-outline-info" href="/thresholds/index" role="button">Academic threshold index</a>
+                <a class="btn btn-outline-warning" th:href="@{/thresholds/{Id}/edit(Id=${threshold.id})}"
+                   role="button" sec:authorize="hasAuthority('teacher.update')">Edit threshold</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>
