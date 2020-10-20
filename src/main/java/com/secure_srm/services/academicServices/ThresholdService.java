@@ -13,4 +13,8 @@ public interface ThresholdService extends BaseService<Threshold, Long> {
     Set<Threshold> findAllByUploaderLastName(String lastName);
 
     Set<Threshold> findAllByUniqueIDContainingIgnoreCase(String uniqueID);
+
+    Threshold findByUniqueID(String uniqueID);
+
+    Set<Threshold> findAllByUniqueID(String uniqueID);
 }

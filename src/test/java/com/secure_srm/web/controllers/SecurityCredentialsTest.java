@@ -52,6 +52,12 @@ public abstract class SecurityCredentialsTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ThresholdService thresholdService;
+
+    @Autowired
+    ThresholdListService thresholdListService;
+
     protected MockMvc mockMvc;
 
     private final static String JOHNSMITH_ADMINPWD = "johnsmith123";

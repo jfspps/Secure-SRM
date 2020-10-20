@@ -72,4 +72,78 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("threshold"))
                 .andExpect(model().attributeExists("thresholdFeedback"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getViewThreshold(String username, String pwd) throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(get("/thresholds/" + saved.getId()).with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/threshold/thresholdDetails"))
+                .andExpect(model().attributeExists("threshold"));
+    }
+
+    @WithUserDetails("marymanning")
+    @Test
+    void getUpdateThreshold_permitted() throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(get("/thresholds/" + saved.getId() + "/edit").with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/threshold/updateThreshold"))
+                .andExpect(model().attributeExists("threshold"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getUpdateThreshold_denied() throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(get("/thresholds/" + saved.getId() + "/edit").with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/customMessage"))
+                .andExpect(model().attribute("message", "You are only permitted to edit your own thresholds"));
+    }
+
+    @WithUserDetails("marymanning")
+    @Test
+    void postUpdateThreshold() throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(post("/thresholds/" + saved.getId() + "/edit").with(csrf())
+                .flashAttr("threshold", saved))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/threshold/thresholdDetails"))
+                .andExpect(model().attributeExists("threshold"))
+                .andExpect(model().attributeExists("thresholdFeedback"));
+    }
 }

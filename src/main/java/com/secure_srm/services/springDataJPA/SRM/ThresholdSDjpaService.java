@@ -32,6 +32,11 @@ public class ThresholdSDjpaService implements ThresholdService {
     }
 
     @Override
+    public Threshold findByUniqueID(String uniqueID) {
+        return thresholdRepository.findByUniqueId(uniqueID).orElse(null);
+    }
+
+    @Override
     public Set<Threshold> findAllByUploaderLastName(String lastName) {
         return thresholdRepository.findAllByUploader_LastName(lastName);
     }
@@ -39,6 +44,11 @@ public class ThresholdSDjpaService implements ThresholdService {
     @Override
     public Set<Threshold> findAllByUniqueIDContainingIgnoreCase(String uniqueID) {
         return thresholdRepository.findAllByUniqueIdContainingIgnoreCase(uniqueID);
+    }
+
+    @Override
+    public Set<Threshold> findAllByUniqueID(String uniqueID) {
+        return thresholdRepository.findAllByUniqueId(uniqueID);
     }
 
     @Override

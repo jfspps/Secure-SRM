@@ -31,7 +31,7 @@
         </tr>
         <tr th:unless="${thresholds.isEmpty()}" th:each="threshold: ${thresholds}">
             <th class="px-3" sec:authorize="hasAuthority('teacher.read')"><a role="button"
-                                                                             class="btn btn-sm btn-outline-info" th:href="@{/threshold/{id}(id=${threshold.id})}"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/thresholds/{id}(id=${threshold.id})}"
                                                                              th:text="${threshold.id}"></a></th>
             <td class="px-3" th:text="${threshold.numerical}"></td>
             <td class="px-3" th:text="${threshold.alphabetical}"></td>
