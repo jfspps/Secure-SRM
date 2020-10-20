@@ -32,6 +32,16 @@ public class ThresholdSDjpaService implements ThresholdService {
     }
 
     @Override
+    public Set<Threshold> findAllByUploaderLastName(String lastName) {
+        return thresholdRepository.findAllByUploader_LastName(lastName);
+    }
+
+    @Override
+    public Set<Threshold> findAllByUniqueIDContainingIgnoreCase(String uniqueID) {
+        return thresholdRepository.findAllByUniqueIdContainingIgnoreCase(uniqueID);
+    }
+
+    @Override
     public Threshold save(Threshold object) {
         return thresholdRepository.save(object);
     }

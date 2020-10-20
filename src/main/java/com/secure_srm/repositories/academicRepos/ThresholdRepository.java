@@ -4,6 +4,7 @@ import com.secure_srm.model.academic.Threshold;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 
 //the implementation of the following methods is supplied automatically by JPA
@@ -14,4 +15,8 @@ public interface ThresholdRepository extends JpaRepository<Threshold, Long> {
     Optional<Threshold> findByNumerical(int numericalBoundary);
 
     Optional<Threshold> findByAlphabetical(String letterGrade);
+
+    Set<Threshold> findAllByUploader_LastName(String lastName);
+
+    Set<Threshold> findAllByUniqueIdContainingIgnoreCase(String uniqueID);
 }
