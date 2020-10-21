@@ -4,6 +4,7 @@ import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.AssignmentType;
 import com.secure_srm.model.academic.Subject;
 import com.secure_srm.model.academic.Threshold;
+import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.people.SubjectClassList;
@@ -144,6 +145,16 @@ public class AuxiliaryController {
     public List<Threshold> sortThresholdByUniqueID(Set<Threshold> thresholdSet) {
         List<Threshold> listByUniqueID = new ArrayList<>(thresholdSet);
         //see Threshold's model string comparison method, compareTo()
+        Collections.sort(listByUniqueID);
+        return listByUniqueID;
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by UniqueID
+     */
+    public List<ThresholdList> sortThresholdListByUniqueID(Set<ThresholdList> thresholdListSet) {
+        List<ThresholdList> listByUniqueID = new ArrayList<>(thresholdListSet);
+        //see ThresholdList's model string comparison method, compareTo()
         Collections.sort(listByUniqueID);
         return listByUniqueID;
     }
