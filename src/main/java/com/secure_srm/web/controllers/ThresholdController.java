@@ -83,7 +83,7 @@ public class ThresholdController {
         TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         submittedThreshold.setUploader(currentTeacher);
 
-        if (thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId()) != null){
+        if (!submittedThreshold.getUniqueId().isBlank() && thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId()) != null){
             Set<Threshold> thresholdsOneFile = thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId());
             Optional<Threshold> found = thresholdsOneFile.stream().filter(threshold -> threshold.getUploader().equals(currentTeacher)).findAny();
 

@@ -87,16 +87,16 @@ public class StudentResultControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("studentTasks"));
     }
 
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
-    @ParameterizedTest
-    void getNewStudentResults_EmptyTaskDB(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/studentResult/new").with(httpBasic(username, pwd)))
-                .andExpect(status().is(200))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/customMessage"))
-                .andExpect(model().attributeExists("message"))
-                .andExpect(model().attributeExists("resolution"));
-    }
+//    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+//    @ParameterizedTest
+//    void getNewStudentResults_EmptyTaskDB(String username, String pwd) throws Exception {
+//        mockMvc.perform(get("/studentResult/new").with(httpBasic(username, pwd)))
+//                .andExpect(status().is(200))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("/SRM/customMessage"))
+//                .andExpect(model().attributeExists("message"))
+//                .andExpect(model().attributeExists("resolution"));
+//    }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
     @ParameterizedTest

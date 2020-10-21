@@ -108,12 +108,12 @@ public class StudentReportController {
             return "/SRM/studentReports/newReport";
         }
 
-        if (reportService.findByStudentLastName(report.getStudent().getLastName()) != null &&
+        if (!report.getUniqueIdentifier().isBlank() && reportService.findByStudentLastName(report.getStudent().getLastName()) != null &&
         reportService.findBySubject(report.getSubject().getSubjectName()) != null){
             //check the unique identifier against records with saved student and subject details
             if (reportService.findByUniqueIdentifier(report.getUniqueIdentifier()) != null){
                 log.debug("Report with given unique identifier already exists");
-                model.addAttribute("uniqueId", "Report with given unique identifier already exists");
+                model.addAttribute("uniqueId", "Unique identifier " + report.getUniqueIdentifier() + " already exists");
                 model.addAttribute("students", studentService.findAll());
                 model.addAttribute("subjects", subjectService.findAll());
                 model.addAttribute("report", report);
