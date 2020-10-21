@@ -71,4 +71,16 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("thresholds"))
                 .andExpect(model().attributeExists("thresholdListFeedback"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void viewThresholdList(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/thresholdLists/1").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/thresholdList/viewThresholdList"))
+                .andExpect(model().attributeExists("thresholdList"))
+                .andExpect(model().attributeExists("thresholds"))
+                .andExpect(model().attributeExists("teacher"));
+    }
 }

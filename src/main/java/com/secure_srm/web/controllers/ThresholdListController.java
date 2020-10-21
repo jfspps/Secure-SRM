@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Threshold;
 import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.security.TeacherUser;
@@ -125,6 +126,24 @@ public class ThresholdListController {
         model.addAttribute("thresholds", saved.getThresholds());
         model.addAttribute("thresholdListFeedback", "Threshold-list saved");
 
+        model.addAttribute("teacher", currentTeacher);
+        return "/SRM/thresholdList/viewThresholdList";
+    }
+
+    @TeacherRead
+    @GetMapping("/{id}")
+    public String viewThresholdList(Model model, @PathVariable("id") String thresholdListID){
+        if (thresholdListService.findById(Long.valueOf(thresholdListID)) == null){
+            log.debug("Threshold list not found");
+            throw new NotFoundException("Threshold list not found");
+        }
+
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
+        model.addAttribute("teacher", currentTeacher);
+
+        ThresholdList found = thresholdListService.findById(Long.valueOf(thresholdListID));
+        model.addAttribute("thresholdList", found);
+        model.addAttribute("thresholds", found.getThresholds());
         return "/SRM/thresholdList/viewThresholdList";
     }
 }
