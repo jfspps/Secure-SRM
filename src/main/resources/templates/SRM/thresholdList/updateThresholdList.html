@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>New academic threshold list</title>
+    <title>Update threshold list</title>
 </head>
 <body>
 <nav th:replace="fragments/navThresholdListSearch :: nav"></nav>
@@ -12,12 +12,13 @@
 <div class="container" sec:authorize="hasAuthority('teacher.create')">
     <div class="row">
         <div class="col">
-            <h2>New academic threshold list</h2>
-            <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting changes.</p>
+            <h2>Update academic threshold list</h2>
+            <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting changes.
+                All current thresholds saved to this record are also viewed when searching.</p>
         </div>
     </div>
 
-    <form method="get" th:action="@{/thresholdLists/new/search}"
+    <form method="get" th:action="@{/thresholdLists/{id}/edit/search(id=${thresholdList.id})}"
           class="form-horizontal" id="refine-teachers-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -33,7 +34,7 @@
     <br />
 
     <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
-    <form th:object="${thresholdList}" method="post" th:action="@{/thresholdLists/new}"
+    <form th:object="${thresholdList}" method="post" th:action="@{/thresholdLists/{id}/edit(id=${thresholdList.id})}"
           class="form-horizontal" id="change-teacherSet-form">
 
         <div class="row align-items-start">
@@ -102,7 +103,7 @@
         <br />
         <div class="row align-items-start" sec:authorize="hasAuthority('teacher.create')" >
             <div class="col-sm-2">
-                <button class="btn btn-info" type="submit">Submit</button>
+                <button class="btn btn-info" type="submit">Submit changes</button>
             </div>
         </div>
     </form>

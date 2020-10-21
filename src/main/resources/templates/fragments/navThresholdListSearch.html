@@ -75,7 +75,7 @@
 
         <ul class="navbar-nav ml-auto">
             <li class="nav-item" sec:authorize="hasAuthority('admin.create')">
-                <a class="btn btn-primary mr-sm-2" type="button" th:href="@{/guardians/new}">New Guardian</a>
+                <a class="btn btn-primary mr-sm-2" type="button" th:href="@{/thresholdLists/new}">New Threshold-list</a>
             </li>
             <!--        name="uniqueID" must match controller listStudents() parameter-->
             <form class="form-inline my-2 my-lg-0" th:action="@{/thresholdLists/index}" method="get" sec:authorize="hasAuthority('teacher.read')">

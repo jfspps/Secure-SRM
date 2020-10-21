@@ -101,6 +101,7 @@ public class ThresholdController {
         log.debug("New threshold saved");
         model.addAttribute("thresholdFeedback", "New threshold saved");
         model.addAttribute("threshold", saved);
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 
@@ -113,6 +114,7 @@ public class ThresholdController {
         }
 
         model.addAttribute("threshold", thresholdService.findById(Long.valueOf(thresholdId)));
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 
@@ -166,6 +168,7 @@ public class ThresholdController {
         log.debug("Threshold updated");
         model.addAttribute("thresholdFeedback", "Threshold updated");
         model.addAttribute("threshold", saved);
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 }

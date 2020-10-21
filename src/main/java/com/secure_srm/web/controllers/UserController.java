@@ -262,7 +262,8 @@ public class UserController {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
         model.addAttribute("user", auxiliaryController.getUsername());
-        AdminUser adminUser = AdminUser.builder().build();
+        ContactDetail blankContact = ContactDetail.builder().email("").phoneNumber("").build();
+        AdminUser adminUser = AdminUser.builder().contactDetail(blankContact).build();
         model.addAttribute("newAdmin", adminUser);
         return "adminCreate";
     }
@@ -397,7 +398,8 @@ public class UserController {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
         model.addAttribute("user", auxiliaryController.getUsername());
-        TeacherUser teacherUser = TeacherUser.builder().build();
+        ContactDetail blankContact = ContactDetail.builder().email("").phoneNumber("").build();
+        TeacherUser teacherUser = TeacherUser.builder().contactDetail(blankContact).build();
         model.addAttribute("newTeacher", teacherUser);
         return "teacherCreate";
     }
@@ -521,7 +523,8 @@ public class UserController {
         User user = User.builder().build();
         model.addAttribute("newUser", user);
         model.addAttribute("user", auxiliaryController.getUsername());
-        GuardianUser guardianUser = GuardianUser.builder().build();
+        ContactDetail blankContact = ContactDetail.builder().email("").phoneNumber("").build();
+        GuardianUser guardianUser = GuardianUser.builder().contactDetail(blankContact).build();
         model.addAttribute("newGuardian", guardianUser);
         return "guardianCreate";
     }
