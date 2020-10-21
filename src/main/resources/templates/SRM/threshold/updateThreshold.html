@@ -36,9 +36,9 @@
                 <label class="control-label">Letter grade or designation</label>
             </div>
             <div class="col-sm-8">
-                <p>Letter grade awarded to raw scores when less than or equal to above numerical threshold (subject to other thresholds).
-                    Other designations e.g. MERIT, PASS, etc. may be used in addition to A+, C--, D*, f, b1, etc.</p>
                 <input size="50" placeholder="Letter grade or designation" th:field="*{alphabetical}"/>
+                <p>Letter grade above is awarded to raw scores which are less than or equal to above numerical threshold (subject to higher thresholds).
+                    Other designations e.g. MERIT, PASS, etc. may be used in addition to A+, C--, D*, f, b1, etc.</p>
             </div>
         </div>
         <br />
@@ -78,7 +78,7 @@
 
     <div class="row align-items-start">
         <div class="col-sm-5">
-            <a class="btn btn-outline-primary" th:href="@{/threshold/index}"
+            <a class="btn btn-outline-primary" th:href="@{/thresholds/index}"
                role="button">Return to threshold index</a>
         </div>
     </div>

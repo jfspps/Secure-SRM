@@ -70,7 +70,8 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/threshold/thresholdDetails"))
                 .andExpect(model().attributeExists("threshold"))
-                .andExpect(model().attributeExists("thresholdFeedback"));
+                .andExpect(model().attributeExists("thresholdFeedback"))
+                .andExpect(model().attributeExists("teacher"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -88,7 +89,8 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/threshold/thresholdDetails"))
-                .andExpect(model().attributeExists("threshold"));
+                .andExpect(model().attributeExists("threshold"))
+                .andExpect(model().attributeExists("teacher"));
     }
 
     @WithUserDetails("marymanning")
@@ -144,6 +146,7 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/threshold/thresholdDetails"))
                 .andExpect(model().attributeExists("threshold"))
-                .andExpect(model().attributeExists("thresholdFeedback"));
+                .andExpect(model().attributeExists("thresholdFeedback"))
+                .andExpect(model().attributeExists("teacher"));
     }
 }

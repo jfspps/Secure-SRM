@@ -59,7 +59,7 @@ public class StudentReportController {
     @TeacherCreate
     @GetMapping("/new")
     public String getNewReport(Model model){
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
 
         model.addAttribute("report", Report.builder().teacher(currentTeacher).build());
         model.addAttribute("students", studentService.findAll());
@@ -71,7 +71,7 @@ public class StudentReportController {
     @GetMapping("/new/search")
     public String getNewReport_refineOptions(Model model, @ModelAttribute("report") Report report,
                                              String StudentLastName, String SubjectName){
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         report.setTeacher(currentTeacher);
         model.addAttribute("report", report);
 
@@ -95,7 +95,7 @@ public class StudentReportController {
     @TeacherCreate
     @PostMapping("/new")
     public String postNewReport(Model model, @ModelAttribute("report") Report report){
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         report.setTeacher(currentTeacher);
 
         //check that all three properties are populated
@@ -108,12 +108,12 @@ public class StudentReportController {
             return "/SRM/studentReports/newReport";
         }
 
-        if (reportService.findByStudentLastName(report.getStudent().getLastName()) != null &&
+        if (!report.getUniqueIdentifier().isBlank() && reportService.findByStudentLastName(report.getStudent().getLastName()) != null &&
         reportService.findBySubject(report.getSubject().getSubjectName()) != null){
             //check the unique identifier against records with saved student and subject details
             if (reportService.findByUniqueIdentifier(report.getUniqueIdentifier()) != null){
                 log.debug("Report with given unique identifier already exists");
-                model.addAttribute("uniqueId", "Report with given unique identifier already exists");
+                model.addAttribute("uniqueId", "Unique identifier " + report.getUniqueIdentifier() + " already exists");
                 model.addAttribute("students", studentService.findAll());
                 model.addAttribute("subjects", subjectService.findAll());
                 model.addAttribute("report", report);
@@ -150,7 +150,7 @@ public class StudentReportController {
         }
 
         Report onFile = reportService.findById(Long.valueOf(reportID));
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         if (!onFile.getTeacher().equals(currentTeacher)){
             log.debug("Teacher not permitted to edit reports of other teachers");
             model.addAttribute("message", "You are not permitted to edit reports of other teachers");

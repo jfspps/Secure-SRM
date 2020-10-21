@@ -122,7 +122,7 @@
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label" size="30"><b>Subjects studied</b></label>
+                <label class="control-label" size="30"><b>Subject group names</b></label>
             </div>
             <div class="col-sm-8">
                 <span th:if="${student.getSubjectClassLists().size() == 0}">
@@ -130,8 +130,9 @@
                 </span>
                 <!--/*@thymesVar id="subjectList" type="com.secure_srm.model.people.SubjectClassList"*/-->
                 <span th:unless="${student.getSubjectClassLists().size() == 0}" th:each="subjectList: ${subjectClassLists}">
-                    <label size="50" th:text="${'Group name: ' + subjectList.groupName}">Subject group name to appear here</label>
-                    <label size="50" th:text="${'Subject: ' + subjectList.groupName}">Subject name to appear here</label>
+                    <div>
+                        <label th:text="${subjectList.groupName + ' (' + subjectList.subject.subjectName + ')'}">Subject group name to appear here</label>
+                    </div>
                 </span>
             </div>
         </div>

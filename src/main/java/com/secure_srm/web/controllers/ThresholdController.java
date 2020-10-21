@@ -67,7 +67,7 @@ public class ThresholdController {
             return "/SRM/customMessage";
         }
 
-        TeacherUser teacherUser = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser teacherUser = auxiliaryController.getCurrentTeacherUser();
         model.addAttribute("threshold", Threshold.builder().uploader(teacherUser).build());
         return "/SRM/threshold/newThreshold";
     }
@@ -80,10 +80,10 @@ public class ThresholdController {
             return "/SRM/customMessage";
         }
 
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         submittedThreshold.setUploader(currentTeacher);
 
-        if (thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId()) != null){
+        if (!submittedThreshold.getUniqueId().isBlank() && thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId()) != null){
             Set<Threshold> thresholdsOneFile = thresholdService.findAllByUniqueID(submittedThreshold.getUniqueId());
             Optional<Threshold> found = thresholdsOneFile.stream().filter(threshold -> threshold.getUploader().equals(currentTeacher)).findAny();
 
@@ -101,6 +101,7 @@ public class ThresholdController {
         log.debug("New threshold saved");
         model.addAttribute("thresholdFeedback", "New threshold saved");
         model.addAttribute("threshold", saved);
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 
@@ -113,6 +114,7 @@ public class ThresholdController {
         }
 
         model.addAttribute("threshold", thresholdService.findById(Long.valueOf(thresholdId)));
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 
@@ -125,7 +127,7 @@ public class ThresholdController {
         }
 
         Threshold onFile = thresholdService.findById(Long.valueOf(thresholdId));
-        TeacherUser currentUser = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentUser = auxiliaryController.getCurrentTeacherUser();
 
         if (!onFile.getUploader().equals(currentUser)){
             log.debug("Teachers not allowed to edit other teachers' thresholds");
@@ -141,7 +143,7 @@ public class ThresholdController {
     @PostMapping("/{id}/edit")
     public String postUpdateThreshold(@ModelAttribute("threshold") Threshold submittedThreshold, Model model,
                                       @PathVariable("id") String thresholdId){
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         Threshold onFile = thresholdService.findById(Long.valueOf(thresholdId));
 
         //allow for the same uniqueID (equivalent to no change)
@@ -166,6 +168,7 @@ public class ThresholdController {
         log.debug("Threshold updated");
         model.addAttribute("thresholdFeedback", "Threshold updated");
         model.addAttribute("threshold", saved);
+        model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
     }
 }

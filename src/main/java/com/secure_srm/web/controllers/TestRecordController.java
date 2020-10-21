@@ -27,7 +27,6 @@ public class TestRecordController {
 
     private final TestRecordService testRecordService;
     private final UserService userService;
-    private final GuardianUserService guardianUserService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder

@@ -103,7 +103,7 @@ public class TeacherController {
             model.addAttribute("teacher", found);
             model.addAttribute("subjectsTaught", found.getSubjects());
             model.addAttribute("newTeacher", "Teacher already on file, record presented here");
-            return "/teachers/updateTeacher";
+            return "/SRM/teachers/updateTeacher";
         }
     }
 

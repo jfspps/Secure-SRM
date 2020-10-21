@@ -53,6 +53,7 @@
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentTask/new}">Student task</a>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholds/new}">Academic threshold</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholdLists/new}">Academic threshold-list</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
                     </span>
@@ -61,6 +62,7 @@
                     <a class="dropdown-item" th:href="@{/studentTask/index}">Student task summary</a>
                     <a class="dropdown-item" th:href="@{/assignmentTypes/index}">Assignment type summary</a>
                     <a class="dropdown-item" th:href="@{/thresholds/index}">Academic threshold summary</a>
+                    <a class="dropdown-item" th:href="@{/thresholdLists/index}">Academic threshold-list summary</a>
                     <a class="dropdown-item" th:href="@{/studentReports/index}">Student report summary</a>
                     <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
                 </div>
@@ -73,9 +75,9 @@
 
         <ul class="navbar-nav ml-auto">
             <li class="nav-item" sec:authorize="hasAuthority('admin.create')">
-                <a class="btn btn-primary mr-sm-2" type="button" th:href="@{/guardians/new}">New Guardian</a>
+                <a class="btn btn-primary mr-sm-2" type="button" th:href="@{/thresholds/new}">New Threshold</a>
             </li>
-            <!--        name="lastName" must match controller listStudents() parameter-->
+            <!--        name="uniqueID" must match controller listStudents() parameter-->
             <form class="form-inline my-2 my-lg-0" th:action="@{/thresholds/index}" method="get" sec:authorize="hasAuthority('teacher.read')">
                 <input class="form-control mr-sm-2" type="text" name="uniqueID" placeholder="Threshold unique ID" aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Search</button>

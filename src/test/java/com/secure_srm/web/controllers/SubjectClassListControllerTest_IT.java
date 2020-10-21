@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @Transactional
 @SpringBootTest
-public class SubjectClassListController_IT extends SecurityCredentialsTest {
+public class SubjectClassListControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest

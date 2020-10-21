@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @SpringBootTest
 //substitute @WebMvcTest for @SpringBootTest to guarantee tests capture all Spring Boot dependencies which were loaded at the time
-class UserControllerTest extends SecurityCredentialsTest {
+class UserControllerTest_IT extends SecurityCredentialsTest {
 
     @WithAnonymousUser
     @Test

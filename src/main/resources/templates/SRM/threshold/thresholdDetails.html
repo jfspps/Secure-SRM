@@ -46,8 +46,8 @@
                 <label class="control-label" size="30"><b>Letter grade or designation</b></label>
             </div>
             <div class="col-sm-8">
-                <p>Letter grade awarded to raw scores when less than or equal to above numerical threshold (subject to other thresholds)</p>
                 <label size="50" th:text="*{alphabetical}"></label>
+                <p>Letter grade awarded to raw scores when less than or equal to above numerical threshold (subject to other thresholds)</p>
             </div>
         </div>
         <br/>
@@ -65,8 +65,8 @@
         <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/thresholds/index" role="button">Academic threshold index</a>
-                <a class="btn btn-outline-warning" th:href="@{/thresholds/{Id}/edit(Id=${threshold.id})}"
-                   role="button" sec:authorize="hasAuthority('teacher.update')">Edit threshold</a>
+                <a class="btn btn-outline-warning" th:object="${teacher}" th:if="${threshold.uploader == teacher}"
+                   th:href="@{/thresholds/{Id}/edit(Id=${threshold.id})}" role="button">Edit threshold</a>
             </div>
         </div>
     </form>

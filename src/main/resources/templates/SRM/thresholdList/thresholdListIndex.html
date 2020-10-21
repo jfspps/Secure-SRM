@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Academic threshold list</title>
+</head>
+<body>
+<nav th:replace="fragments/navThresholdListSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<div class="container-fluid px-0" sec:authorize="hasAuthority('teacher.read')">
+    <table class="table table-hover table-sm table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th class="px-3" sec:authorize="hasAuthority('teacher.update')">ID</th>
+            <th class="px-3">Unique identifier</th>
+            <th class="px-3">Number of thresholds</th>
+            <th class="px-3">Threshold list owner</th>
+        </tr>
+        </thead>
+        <tbody th:object="${thresholdLists}">
+        <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
+        <tr th:if="${thresholdLists.isEmpty()}">
+            <th class="px-3" sec:authorize="hasAuthority('teacher.update')"></th>
+            <td class="px-3">(No threshold lists on record)</td>
+            <td class="px-3"></td>
+            <td class="px-3"></td>
+        </tr>
+        <tr th:unless="${thresholdLists.isEmpty()}" th:each="thresholdList: ${thresholdLists}">
+            <th class="px-3" sec:authorize="hasAuthority('teacher.read')"><a role="button"
+                                                                             class="btn btn-sm btn-outline-info" th:href="@{/thresholdLists/{id}(id=${thresholdList.id})}"
+                                                                             th:text="${thresholdList.id}"></a></th>
+            <td class="px-3" th:text="${thresholdList.uniqueID}"></td>
+            <td class="px-3" th:text="${thresholdList.thresholds.size()}"></td>
+            <td class="px-3" th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>

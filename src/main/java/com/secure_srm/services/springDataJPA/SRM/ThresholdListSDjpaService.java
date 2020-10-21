@@ -32,6 +32,16 @@ public class ThresholdListSDjpaService implements ThresholdListService {
     }
 
     @Override
+    public ThresholdList findByUniqueID(String uniqueID) {
+        return thresholdListRepository.findByUniqueID(uniqueID).orElse(null);
+    }
+
+    @Override
+    public Set<ThresholdList> findAllByUniqueIDContainingIgnoreCase(String uniqueID) {
+        return thresholdListRepository.findAllByUniqueIDContainingIgnoreCase(uniqueID);
+    }
+
+    @Override
     public Set<ThresholdList> findAll() {
         Set<ThresholdList> thresholdLists = new HashSet<>();
         thresholdLists.addAll(thresholdListRepository.findAll());

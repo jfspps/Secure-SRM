@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @Transactional
 @SpringBootTest
-public class AssignmentTypeController_IT extends SecurityCredentialsTest{
+public class AssignmentTypeControllerTest_IT extends SecurityCredentialsTest{
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest
