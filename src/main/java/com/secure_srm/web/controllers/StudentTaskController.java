@@ -70,7 +70,7 @@ public class StudentTaskController {
             throw new NotFoundException("Username not recognised");
         }
 
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         if (currentTeacher == null){
             log.debug("TeacherUser not recognised");
             throw new ForbiddenException("TeacherUser not recognised");
@@ -123,7 +123,7 @@ public class StudentTaskController {
         }
 
         //set current teacherUser
-        TeacherUser currentTeacher = userService.findById(Long.valueOf(auxiliaryController.getUserId())).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         studentTask.setTeacherUploader(currentTeacher);
 
         StudentTask saved = studentTaskService.save(studentTask);

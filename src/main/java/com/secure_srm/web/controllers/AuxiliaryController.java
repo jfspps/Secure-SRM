@@ -8,9 +8,7 @@ import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.people.SubjectClassList;
-import com.secure_srm.model.security.GuardianUser;
-import com.secure_srm.model.security.TeacherUser;
-import com.secure_srm.model.security.User;
+import com.secure_srm.model.security.*;
 import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
@@ -67,6 +65,71 @@ public class AuxiliaryController {
             return currentUser.getTeacherUser() != null && !currentUser.getTeacherUser().getSubjects().isEmpty();
         }
         return false;
+    }
+
+    /**
+     * Returns the current TeacherUser
+     * */
+    public TeacherUser getCurrentTeacherUser(){
+        TeacherUser found = userService.findByUsername(getUsername()).getTeacherUser();
+        if (found != null){
+            return found;
+        } else {
+            log.debug("TeacherUser not found");
+            return null;
+        }
+    }
+
+    /**
+     * Returns the current AdminUser
+     * */
+    public AdminUser getCurrentAdminUser(){
+        AdminUser found = userService.findByUsername(getUsername()).getAdminUser();
+        if (found != null){
+            return found;
+        } else {
+            log.debug("AdminUser not found");
+            return null;
+        }
+    }
+
+    /**
+     * Returns the current GuardianUser
+     * */
+    public GuardianUser getCurrentGuardianUser(){
+        GuardianUser found = userService.findByUsername(getUsername()).getGuardianUser();
+        if (found != null){
+            return found;
+        } else {
+            log.debug("GuardianUser not found");
+            return null;
+        }
+    }
+
+    /**
+     * Returns the current RootUser
+     * */
+    public RootUser getCurrentRootUser(){
+        RootUser found = userService.findByUsername(getUsername()).getRootUser();
+        if (found != null){
+            return found;
+        } else {
+            log.debug("RootUser not found");
+            return null;
+        }
+    }
+
+    /**
+     * Returns the current User
+     * */
+    public User getCurrentUser(){
+        User found = userService.findByUsername(getUsername());
+        if (found != null){
+            return found;
+        } else {
+            log.debug("User not found");
+            return null;
+        }
     }
 
     /**

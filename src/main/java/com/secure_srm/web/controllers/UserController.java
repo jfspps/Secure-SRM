@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -78,7 +77,7 @@ public class UserController {
     @GuardianRead
     @GetMapping("/authenticated")
     public String userLogin(Model model) {
-        User user = userService.findByUsername(auxiliaryController.getUsername());
+        User user = auxiliaryController.getCurrentUser();
         model.addAttribute("userID", user.getId());
         model.addAttribute("user", auxiliaryController.getUsername());
         if (user.getAdminUser() != null){
@@ -132,8 +131,7 @@ public class UserController {
     @GuardianRead
     @GetMapping("/userPage")
     public String userPage(Model model) {
-        User user = userService.findByUsername(auxiliaryController.getUsername());
-        model.addAttribute("userID", user.getId());
+        model.addAttribute("userID", auxiliaryController.getCurrentUser().getId());
         model.addAttribute("user", auxiliaryController.getUsername());
         return "userPage";
     }
@@ -157,8 +155,7 @@ public class UserController {
         model.addAttribute("GuardianUsersFound", GuardianUsers);
 
         //current authenticated user details
-        User user = userService.findByUsername(auxiliaryController.getUsername());
-        model.addAttribute("userID", user.getId());
+        model.addAttribute("userID", auxiliaryController.getCurrentUser().getId());
         model.addAttribute("user", auxiliaryController.getUsername());
         return "adminPage";
     }
@@ -180,8 +177,7 @@ public class UserController {
         //userSet is never null if user has one of the above roles
         Set<User> userSet = new HashSet<>(userService.findAll());
         model.addAttribute("usersFound", userSet);
-        User currentUser = userService.findByUsername(auxiliaryController.getUsername());
-        model.addAttribute("userID", currentUser.getId());
+        model.addAttribute("userID", auxiliaryController.getCurrentUser().getId());
         return "userPage";
     }
 
@@ -234,7 +230,7 @@ public class UserController {
     public String postDeleteUser(@PathVariable String userID, Model model) {
         if (userService.findById(Long.valueOf(userID)) != null) {
             User currentUser = userService.findById(Long.valueOf(userID));
-            if (Long.valueOf(userID).equals(userService.findByUsername(auxiliaryController.getUsername()).getId())) {
+            if (Long.valueOf(userID).equals(auxiliaryController.getCurrentUser().getId())) {
                 log.debug("Cannot delete yourself");
                 model.addAttribute("deniedDelete", "You are not permitted to delete your own account");
                 model.addAttribute("returnURL", userTypeUpdatePage(currentUser) + "/" + userID);

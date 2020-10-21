@@ -75,7 +75,7 @@ public class StudentResultController {
             return "/SRM/customMessage";
         }
 
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         Set<Subject> subjectsTaught = currentTeacher.getSubjects();
         model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(studentService.findAll()));
 
@@ -107,7 +107,7 @@ public class StudentResultController {
             model.addAttribute("students", studentSet);
         }
 
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         Set<Subject> subjectsTaught = currentTeacher.getSubjects();
         Set<StudentTask> tasks = new HashSet<>();
         for (Subject subject: subjectsTaught) {
@@ -132,7 +132,7 @@ public class StudentResultController {
     @TeacherCreate
     @PostMapping("/new")
     public String postNewResult(@Valid @ModelAttribute("result") StudentResult studentResult, BindingResult bindingResult, Model model){
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
 
         if (bindingResult.hasErrors()){
             bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
@@ -199,7 +199,7 @@ public class StudentResultController {
             throw new NotFoundException("Student result not found");
         }
         StudentResult found = studentResultService.findById(Long.valueOf(resultID));
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
 
         //check that the current teacher is the result's marker
         if (found.getTeacher() != currentTeacher){
@@ -261,7 +261,7 @@ public class StudentResultController {
             log.debug("Student result not found");
             throw new NotFoundException("Student result not found");
         }
-        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         StudentResult resultOnFile = studentResultService.findById(Long.valueOf(resultID));
 
         //check that the current teacher is the result's marker
