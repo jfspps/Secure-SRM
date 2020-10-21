@@ -1,12 +1,10 @@
 package com.secure_srm.bootstrap;
 
-import com.secure_srm.model.academic.AssignmentType;
-import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.academic.*;
 import com.secure_srm.model.people.*;
 import com.secure_srm.model.security.*;
 import com.secure_srm.services.TestRecordService;
-import com.secure_srm.services.academicServices.AssignmentTypeService;
-import com.secure_srm.services.academicServices.SubjectService;
+import com.secure_srm.services.academicServices.*;
 import com.secure_srm.services.peopleServices.*;
 import com.secure_srm.services.securityServices.*;
 import lombok.RequiredArgsConstructor;
@@ -42,25 +40,48 @@ public class DataLoader_SDjpa implements CommandLineRunner {
     private final FormGroupListService formGroupListService;
     private final AssignmentTypeService assignmentTypeService;
     private final SubjectClassListService subjectClassListService;
+    private final StudentTaskService studentTaskService;
+    private final StudentResultService studentResultService;
+    private final ThresholdService thresholdService;
+    private final ThresholdListService thresholdListService;
 
     @Override
     public void run(String... args) {
         log.debug("Starting Bootloader...");
-        log.debug("Users currently on file: " + userService.findAll().size());
-        log.debug("Authorities currently on file: " + authorityService.findAll().size());
-        log.debug("Roles currently on file: " + roleService.findAll().size());
 
-        if (userService.findAll().isEmpty()){
+        if (authorityService.findAll().isEmpty() || roleService.findAll().isEmpty()){
             loadSecurityData();
-            loadAdminUsers();
-            loadTeacherUsers();
-            loadGuardianUsers();
-        } else
-            log.debug("Users database already contains data; no changes made");
+        } else {
+            log.debug("Authority and Roles already found. No changes made.");
+        }
 
-        loadTestRecord();
-        log.debug("TestRecords loaded: " + testRecordService.findAll().size());
-        loadSRM_data();
+        if (adminUserService.findAll().isEmpty()){
+            loadAdminUsers();
+        } else {
+            log.debug("Admin users already found. No changes made.");
+        }
+
+        if (teacherUserService.findAll().isEmpty()){
+            loadTeacherUsers();
+        } else {
+            log.debug("Teacher users already found. No changes made.");
+        }
+
+        if (guardianUserService.findAll().isEmpty()){
+            loadGuardianUsers();
+        } else {
+            log.debug("Guardian users already found. No changes made.");
+        }
+
+        if (testRecordService.findAll().isEmpty()){
+            loadTestRecord();
+            log.debug("TestRecords loaded: " + testRecordService.findAll().size());
+        } else {
+            log.debug("TestRecords already found. No changes made.");
+        }
+
+        loadSRM_personnel_data();
+        loadSRM_academic_data();
     }
 
     private void loadTestRecord() {
@@ -208,7 +229,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         log.debug("TeacherUsers added: " + keithJonesUser.getUsername() + " " + maryManningUser.getUsername());
     }
 
-    public void loadSRM_data(){
+    public void loadSRM_personnel_data(){
         //build a temporary POJO from Student, Teacher and Guardian classes and add (inject) to each respective service
         //three students, two teachers and two guardians
 
@@ -235,35 +256,35 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         Student student2 = Student.builder().firstName("Elizabeth").middleNames("").lastName("Jones").build();
         Student student3 = Student.builder().firstName("Helen").middleNames("").lastName("Jones").build();
 
-        TeacherUser teacher1 = teacherUserService.findByFirstNameAndLastName("Keith", "Jones");
-        teacher1.setContactDetail(teacher1Contact);
+        TeacherUser keithJonesTeacher = teacherUserService.findByFirstNameAndLastName("Keith", "Jones");
+        keithJonesTeacher.setContactDetail(teacher1Contact);
 
-        TeacherUser teacher2 = teacherUserService.findByFirstNameAndLastName("Mary", "Manning");
-        teacher2.setContactDetail(teacher2Contact);
+        TeacherUser maryManningTeacher = teacherUserService.findByFirstNameAndLastName("Mary", "Manning");
+        maryManningTeacher.setContactDetail(teacher2Contact);
 
         //academic details
         Subject mathematics = Subject.builder().subjectName("Mathematics").build();
         Set<TeacherUser> teachers1 = new HashSet<>();
-        teachers1.add(teacher1);
+        teachers1.add(keithJonesTeacher);
         mathematics.setTeachers(teachers1);
         Set<Subject> teacher1subjects = new HashSet<>();
         teacher1subjects.add(mathematics);
-        teacher1.setSubjects(teacher1subjects);
+        keithJonesTeacher.setSubjects(teacher1subjects);
 
         Subject english = Subject.builder().subjectName("English").build();
         Set<TeacherUser> teachers2 = new HashSet<>();
-        teachers2.add(teacher2);
+        teachers2.add(maryManningTeacher);
         english.setTeachers(teachers2);
         Set<Subject> teacher2subjects = new HashSet<>();
         teacher2subjects.add(english);
-        teacher2.setSubjects(teacher2subjects);
+        maryManningTeacher.setSubjects(teacher2subjects);
 
         subjectService.save(mathematics);
         subjectService.save(english);
         log.debug("Subjects loaded to DB");
 
-        teacherUserService.save(teacher1);
-        teacherUserService.save(teacher2);
+        teacherUserService.save(keithJonesTeacher);
+        teacherUserService.save(maryManningTeacher);
         log.debug("Teachers re-loaded to DB");
 
         GuardianUser guardian1 = guardianUserService.findByFirstNameAndLastName("Paul", "Smith");
@@ -275,9 +296,9 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         guardian2.setContactDetail(guardianContactDetail2);
 
         //set students' tutors
-        student1.setTeacher(teacher1);
-        student2.setTeacher(teacher2);
-        student3.setTeacher(teacher2);
+        student1.setTeacher(keithJonesTeacher);
+        student2.setTeacher(maryManningTeacher);
+        student3.setTeacher(maryManningTeacher);
 
         //set students' contact details and guardians
         student1.setContactDetail(guardianContactDetail1);
@@ -314,8 +335,8 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         Set<Student> studentGroup2 = new HashSet<>();
         studentGroup1.add(student2);
         studentGroup2.add(student3);
-        FormGroupList formGroupList1 = FormGroupList.builder().studentList(studentGroup1).groupName("Group 1").teacher(teacher1).build();
-        FormGroupList formGroupList2 = FormGroupList.builder().studentList(studentGroup2).groupName("Group 2").teacher(teacher2).build();
+        FormGroupList formGroupList1 = FormGroupList.builder().studentList(studentGroup1).groupName("Group 1").teacher(keithJonesTeacher).build();
+        FormGroupList formGroupList2 = FormGroupList.builder().studentList(studentGroup2).groupName("Group 2").teacher(maryManningTeacher).build();
         student1.setFormGroupList(formGroupList1);
         student2.setFormGroupList(formGroupList2);
         student3.setFormGroupList(formGroupList2);
@@ -325,8 +346,17 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         log.debug("FormGroupList loaded to DB");
 
         //Subject class lists
-        SubjectClassList subjectClassList_Math = SubjectClassList.builder().subject(mathematics).teacher(teacher1).groupName("Math_101").build();
-        SubjectClassList subjectClassList_Eng = SubjectClassList.builder().subject(english).teacher(teacher2).groupName("English_101").build();
+        SubjectClassList subjectClassList_Math = SubjectClassList.builder().subject(mathematics).teacher(keithJonesTeacher).groupName("Math_101").build();
+        SubjectClassList subjectClassList_Eng = SubjectClassList.builder().subject(english).teacher(maryManningTeacher).groupName("English_101").build();
+
+        //add Students to class lists
+        Set<SubjectClassList> studentSubjectsList = new HashSet<>(Set.of(subjectClassList_Eng, subjectClassList_Math));
+        student1.setSubjectClassLists(studentSubjectsList);
+        student2.setSubjectClassLists(studentSubjectsList);
+        student3.setSubjectClassLists(studentSubjectsList);
+        subjectClassList_Eng.setStudentList(Set.of(student1, student2, student3));
+        subjectClassList_Math.setStudentList(Set.of(student1, student2, student3));
+
         subjectClassListService.save(subjectClassList_Eng);
         subjectClassListService.save(subjectClassList_Math);
         log.debug("SubjectClassList loaded to DB");
@@ -343,6 +373,332 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         assignmentTypeService.save(AssignmentType.builder().description("Service").build());
         log.debug("Assignment types loaded to DB");
 
-        log.debug("================ Finished uploading SRM data to DB ============");
+        log.debug("================ Finished uploading SRM personnel data to DB ============");
+    }
+
+    private void loadSRM_academic_data() {
+        TeacherUser keithjones = teacherUserService.findByFirstNameAndLastName("Keith", "Jones");
+        TeacherUser marymanning = teacherUserService.findByFirstNameAndLastName("Mary", "Manning");
+
+        AssignmentType coursework = assignmentTypeService.findByDescription("Coursework");
+        AssignmentType interview = assignmentTypeService.findByDescription("Interview");
+        AssignmentType quiz = assignmentTypeService.findByDescription("Quiz");
+
+        //Build studentTasks
+        StudentTask EnglishEssayTask = StudentTask.builder()
+                .assignmentType(coursework)
+                .contributor(true)
+                .maxScore("60")
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findBySubjectName("English"))
+                .teacherUploader(marymanning)
+                .title("William Wordsworth")
+                .build();
+
+        StudentTask EnglishEssayPlay = StudentTask.builder()
+                .assignmentType(interview)
+                .contributor(true)
+                .maxScore("40")
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findBySubjectName("English"))
+                .teacherUploader(marymanning)
+                .title("Elizabethan times")
+                .build();
+
+        StudentTask Calculus1Quiz = StudentTask.builder()
+                .assignmentType(quiz)
+                .contributor(true)
+                .maxScore("100")
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findBySubjectName("Mathematics"))
+                .teacherUploader(keithjones)
+                .title("Single variable calc. 1")
+                .build();
+
+        StudentTask Statistics3Quiz = StudentTask.builder()
+                .assignmentType(quiz)
+                .contributor(true)
+                .maxScore("100")
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findBySubjectName("Mathematics"))
+                .teacherUploader(keithjones)
+                .title("Intro Stats 3")
+                .build();
+
+        //build StudentResults: EnglishEssayTask /60
+        StudentResult student1EnglishEssayTask = StudentResult.builder()
+                .studentTask(EnglishEssayTask)
+                .student(studentService.findById(1L))
+                .score("38")
+                .comments("Good!")
+                .teacher(marymanning)
+                .build();
+
+        StudentResult student2EnglishEssayTask = StudentResult.builder()
+                .studentTask(EnglishEssayTask)
+                .student(studentService.findById(2L))
+                .score("30")
+                .comments("Well written!")
+                .teacher(marymanning)
+                .build();
+
+        StudentResult student3EnglishEssayTask = StudentResult.builder()
+                .studentTask(EnglishEssayTask)
+                .student(studentService.findById(3L))
+                .score("48")
+                .comments("Great work!")
+                .teacher(marymanning)
+                .build();
+        EnglishEssayTask.setStudentResults(Set.of(student1EnglishEssayTask, student2EnglishEssayTask, student3EnglishEssayTask));
+        coursework.setStudentResults(Set.of(student1EnglishEssayTask, student2EnglishEssayTask, student3EnglishEssayTask));
+
+        //build StudentResults: EnglishEssayPlay /40
+        StudentResult student1EnglishEssayPlay = StudentResult.builder()
+                .studentTask(EnglishEssayPlay)
+                .student(studentService.findById(1L))
+                .score("25")
+                .comments("Good stuff!")
+                .teacher(keithjones)
+                .build();
+
+        StudentResult student2EnglishEssayPlay = StudentResult.builder()
+                .studentTask(EnglishEssayPlay)
+                .student(studentService.findById(2L))
+                .comments("Absent")
+                .teacher(marymanning)
+                .build();
+
+        StudentResult student3EnglishEssayPlay = StudentResult.builder()
+                .studentTask(EnglishEssayPlay)
+                .student(studentService.findById(3L))
+                .score("35")
+                .comments("Did very well!")
+                .teacher(marymanning)
+                .build();
+        EnglishEssayPlay.setStudentResults(Set.of(student1EnglishEssayPlay, student2EnglishEssayPlay, student3EnglishEssayPlay));
+        interview.setStudentResults(Set.of(student1EnglishEssayPlay, student2EnglishEssayPlay, student3EnglishEssayPlay));
+
+        //build StudentResults: Calculus1Quiz /100
+        StudentResult student1Calculus1Quiz = StudentResult.builder()
+                .studentTask(Calculus1Quiz)
+                .student(studentService.findById(1L))
+                .score("83")
+                .comments("Excellent")
+                .teacher(keithjones)
+                .build();
+
+        StudentResult student2Calculus1Quiz = StudentResult.builder()
+                .studentTask(Calculus1Quiz)
+                .student(studentService.findById(2L))
+                .score("61")
+                .comments("Good effort")
+                .teacher(keithjones)
+                .build();
+
+        StudentResult student3Calculus1Quiz = StudentResult.builder()
+                .studentTask(Calculus1Quiz)
+                .student(studentService.findById(3L))
+                .score("65")
+                .comments("Did well")
+                .teacher(keithjones)
+                .build();
+        Calculus1Quiz.setStudentResults(Set.of(student1Calculus1Quiz, student2Calculus1Quiz, student3Calculus1Quiz));
+
+        //build StudentResults: Statistics3Quiz /100
+        StudentResult student1Statistics3Quiz = StudentResult.builder()
+                .studentTask(Statistics3Quiz)
+                .student(studentService.findById(1L))
+                .score("88")
+                .comments("Excellent")
+                .teacher(keithjones)
+                .build();
+
+        StudentResult student2Statistics3Quiz = StudentResult.builder()
+                .studentTask(Statistics3Quiz)
+                .student(studentService.findById(2L))
+                .score("70")
+                .comments("Good work")
+                .teacher(keithjones)
+                .build();
+
+        StudentResult student3Statistics3Quiz = StudentResult.builder()
+                .studentTask(Statistics3Quiz)
+                .student(studentService.findById(3L))
+                .score("71")
+                .comments("Did very well")
+                .teacher(keithjones)
+                .build();
+
+        quiz.setStudentResults(Set.of(student1Calculus1Quiz, student2Calculus1Quiz, student3Calculus1Quiz,
+                student1Statistics3Quiz, student2Statistics3Quiz, student3Statistics3Quiz));
+
+        studentTaskService.save(EnglishEssayPlay);
+        studentTaskService.save(EnglishEssayTask);
+        studentTaskService.save(Calculus1Quiz);
+        studentTaskService.save(Statistics3Quiz);
+        log.debug("Student tasks saved");
+
+        studentResultService.save(student1Calculus1Quiz);
+        studentResultService.save(student1Statistics3Quiz);
+        studentResultService.save(student1EnglishEssayPlay);
+        studentResultService.save(student1EnglishEssayTask);
+
+        studentResultService.save(student2Calculus1Quiz);
+        studentResultService.save(student2Statistics3Quiz);
+        studentResultService.save(student2EnglishEssayPlay);
+        studentResultService.save(student2EnglishEssayTask);
+
+        studentResultService.save(student3Calculus1Quiz);
+        studentResultService.save(student3Statistics3Quiz);
+        studentResultService.save(student3EnglishEssayPlay);
+        studentResultService.save(student3EnglishEssayTask);
+        log.debug("Student results saved");
+
+        assignmentTypeService.save(quiz);
+        assignmentTypeService.save(coursework);
+        assignmentTypeService.save(interview);
+        log.debug("Assignment types updated");
+
+        //English thresholds, EnglishEssayTask /60, EnglishEssayPlay /40
+        Threshold EnglishEssayPassThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(25)
+                .alphabetical("PASS")
+                .uniqueId("EnglishEssayPassThreshold")
+                .uploader(marymanning)
+                .build();
+
+        Threshold EnglishEssayMeritThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(35)
+                .alphabetical("MERIT")
+                .uniqueId("EnglishEssayMeritThreshold")
+                .uploader(marymanning)
+                .build();
+
+        Threshold EnglishEssayDistinctionThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(45)
+                .alphabetical("DISTINCTION")
+                .uniqueId("EnglishEssayDistinctionThreshold")
+                .uploader(marymanning)
+                .build();
+
+        Threshold EnglishPlayPassThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(15)
+                .alphabetical("PASS")
+                .uniqueId("EnglishPlayPassThreshold")
+                .uploader(marymanning)
+                .build();
+
+        Threshold EnglishPlayMeritThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(25)
+                .alphabetical("MERIT")
+                .uniqueId("EnglishPlayMeritThreshold")
+                .uploader(marymanning)
+                .build();
+
+        Threshold EnglishPlayDistinctionThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("DISTINCTION")
+                .uniqueId("EnglishPlayDistinctionThreshold")
+                .uploader(marymanning)
+                .build();
+
+        //Math thresholds, /100
+        Threshold MathPassThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(40)
+                .alphabetical("PASS")
+                .uniqueId("MathPassThreshold")
+                .uploader(keithjones)
+                .build();
+
+        Threshold MathDThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(50)
+                .alphabetical("D")
+                .uniqueId("MathDThreshold")
+                .uploader(keithjones)
+                .build();
+
+        Threshold MathCThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(60)
+                .alphabetical("C")
+                .uniqueId("MathCThreshold")
+                .uploader(keithjones)
+                .build();
+
+        Threshold MathBThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(70)
+                .alphabetical("B")
+                .uniqueId("MathBThreshold")
+                .uploader(keithjones)
+                .build();
+
+        Threshold MathAThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(80)
+                .alphabetical("A")
+                .uniqueId("MathAThreshold")
+                .uploader(keithjones)
+                .build();
+
+        Threshold MathAPlusThreshold = Threshold.builder().thresholdLists(new HashSet<>())
+                .numerical(90)
+                .alphabetical("A+")
+                .uniqueId("MathAPlusThreshold")
+                .uploader(keithjones)
+                .build();
+
+        //threshold lists
+        ThresholdList EnglishEssayThresholds = ThresholdList.builder()
+                .thresholds(Set.of(EnglishEssayDistinctionThreshold, EnglishEssayMeritThreshold, EnglishEssayPassThreshold))
+                .uniqueID("English essay grades")
+                .uploader(marymanning).build();
+
+        ThresholdList EnglishPlayThresholds = ThresholdList.builder()
+                .thresholds(Set.of(EnglishPlayDistinctionThreshold, EnglishPlayMeritThreshold, EnglishPlayPassThreshold))
+                .uniqueID("English play grades")
+                .uploader(marymanning).build();
+
+        ThresholdList MathThresholds = ThresholdList.builder()
+                .thresholds(Set.of(MathPassThreshold, MathDThreshold, MathCThreshold, MathBThreshold, MathAThreshold, MathAPlusThreshold))
+                .uniqueID("Math thresholds")
+                .uploader(keithjones).build();
+
+        EnglishEssayDistinctionThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
+        EnglishEssayMeritThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
+        EnglishEssayPassThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
+
+        EnglishPlayDistinctionThreshold.setThresholdLists(Set.of(EnglishPlayThresholds));
+        EnglishPlayMeritThreshold.setThresholdLists(Set.of(EnglishPlayThresholds));
+        EnglishPlayPassThreshold.setThresholdLists(Set.of(EnglishPlayThresholds));
+
+        MathPassThreshold.setThresholdLists(Set.of(MathThresholds));
+        MathDThreshold.setThresholdLists(Set.of(MathThresholds));
+        MathCThreshold.setThresholdLists(Set.of(MathThresholds));
+        MathBThreshold.setThresholdLists(Set.of(MathThresholds));
+        MathAThreshold.setThresholdLists(Set.of(MathThresholds));
+        MathAPlusThreshold.setThresholdLists(Set.of(MathThresholds));
+
+        thresholdService.save(EnglishEssayDistinctionThreshold);
+        thresholdService.save(EnglishEssayMeritThreshold);
+        thresholdService.save(EnglishEssayPassThreshold);
+
+        thresholdService.save(EnglishPlayDistinctionThreshold);
+        thresholdService.save(EnglishPlayMeritThreshold);
+        thresholdService.save(EnglishPlayPassThreshold);
+
+        thresholdService.save(MathPassThreshold);
+        thresholdService.save(MathDThreshold);
+        thresholdService.save(MathCThreshold);
+        thresholdService.save(MathBThreshold);
+        thresholdService.save(MathAThreshold);
+        thresholdService.save(MathAPlusThreshold);
+        log.debug("Thresholds saved");
+
+        //save threshold-lists AFTER thresholds
+
+        thresholdListService.save(EnglishEssayThresholds);
+        thresholdListService.save(EnglishPlayThresholds);
+        thresholdListService.save(MathThresholds);
+        log.debug("Threshold lists saved");
+
+        log.debug("================ Finished uploading SRM academic data to DB ============");
     }
 }
