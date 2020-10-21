@@ -35,6 +35,7 @@ public class StudentReportController {
     private final TeacherUserService teacherUserService;
     private final SubjectService subjectService;
     private final AuxiliaryController auxiliaryController;
+    private final UserService userService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -58,8 +59,9 @@ public class StudentReportController {
     @TeacherCreate
     @GetMapping("/new")
     public String getNewReport(Model model){
-        model.addAttribute("report", Report.builder().build());
-        model.addAttribute("teachers", teacherUserService.findAll());
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+
+        model.addAttribute("report", Report.builder().teacher(currentTeacher).build());
         model.addAttribute("students", studentService.findAll());
         model.addAttribute("subjects", subjectService.findAll());
         return "/SRM/studentReports/newReport";
@@ -67,23 +69,16 @@ public class StudentReportController {
 
     @TeacherCreate
     @GetMapping("/new/search")
-    public String getNewReport_refineOptions(Model model, @ModelAttribute("report") Report report, String TeacherLastName,
+    public String getNewReport_refineOptions(Model model, @ModelAttribute("report") Report report,
                                              String StudentLastName, String SubjectName){
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        report.setTeacher(currentTeacher);
         model.addAttribute("report", report);
-
-        if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", teacherUserService.findAll());
-        } else {
-            Set<TeacherUser> teacherUsers = new HashSet<>(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName));
-            teacherUsers.add(report.getTeacher());
-            model.addAttribute("teachers", teacherUsers);
-        }
 
         if (StudentLastName == null || StudentLastName.isEmpty()){
             model.addAttribute("students", studentService.findAll());
         } else {
             Set<Student> students = new HashSet<>(studentService.findAllByLastNameContainingIgnoreCase(StudentLastName));
-            students.add(report.getStudent());
             model.addAttribute("students", students);
         }
 
@@ -91,7 +86,6 @@ public class StudentReportController {
             model.addAttribute("subjects", subjectService.findAll());
         } else {
             Set<Subject> subjects = new HashSet<>(subjectService.findBySubjectNameContainingIgnoreCase(SubjectName));
-            subjects.add(report.getSubject());
             model.addAttribute("subjects", subjects);
         }
 
@@ -101,25 +95,25 @@ public class StudentReportController {
     @TeacherCreate
     @PostMapping("/new")
     public String postNewReport(Model model, @ModelAttribute("report") Report report){
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        report.setTeacher(currentTeacher);
+
         //check that all three properties are populated
-        if (report.getStudent() == null || report.getSubject() == null || report.getTeacher() == null){
-            log.debug("Missing student, teacher and/or subject properties");
-            model.addAttribute("teachers", teacherUserService.findAll());
+        if (report.getStudent() == null || report.getSubject() == null){
+            log.debug("Missing student and/or subject properties");
             model.addAttribute("students", studentService.findAll());
             model.addAttribute("subjects", subjectService.findAll());
             model.addAttribute("report", report);
-            model.addAttribute("uniqueId", "Please choose a teacher, student and subject");
+            model.addAttribute("uniqueId", "Please choose a student and subject");
             return "/SRM/studentReports/newReport";
         }
 
         if (reportService.findByStudentLastName(report.getStudent().getLastName()) != null &&
-        reportService.findByTeacherLastName(report.getTeacher().getLastName()) != null &&
         reportService.findBySubject(report.getSubject().getSubjectName()) != null){
-            //check the unique identifier
+            //check the unique identifier against records with saved student and subject details
             if (reportService.findByUniqueIdentifier(report.getUniqueIdentifier()) != null){
                 log.debug("Report with given unique identifier already exists");
                 model.addAttribute("uniqueId", "Report with given unique identifier already exists");
-                model.addAttribute("teachers", teacherUserService.findAll());
                 model.addAttribute("students", studentService.findAll());
                 model.addAttribute("subjects", subjectService.findAll());
                 model.addAttribute("report", report);
@@ -155,7 +149,14 @@ public class StudentReportController {
             throw new NotFoundException("Report not found");
         }
 
-        model.addAttribute("teachers", teacherUserService.findAll());
+        Report onFile = reportService.findById(Long.valueOf(reportID));
+        TeacherUser currentTeacher = userService.findByUsername(auxiliaryController.getUsername()).getTeacherUser();
+        if (!onFile.getTeacher().equals(currentTeacher)){
+            log.debug("Teacher not permitted to edit reports of other teachers");
+            model.addAttribute("message", "You are not permitted to edit reports of other teachers");
+            return "/SRM/customMessage";
+        }
+
         model.addAttribute("students", studentService.findAll());
         model.addAttribute("subjects", subjectService.findAll());
         model.addAttribute("report", reportService.findById(Long.valueOf(reportID)));
@@ -167,10 +168,22 @@ public class StudentReportController {
     public String postUpdateReport(Model model, @ModelAttribute("report") Report report,
                                    @PathVariable("reportID") String reportID){
         Report onFile = reportService.findById(Long.valueOf(reportID));
+
+        if (!onFile.getUniqueIdentifier().equals(report.getUniqueIdentifier())){
+            //check the unique identifier
+            if (reportService.findByUniqueIdentifier(report.getUniqueIdentifier()) != null){
+                log.debug("Report with given unique identifier already exists");
+                model.addAttribute("students", studentService.findAll());
+                model.addAttribute("subjects", subjectService.findAll());
+                model.addAttribute("report", onFile);
+                model.addAttribute("reportFeedback", "Unique identifier \"" + report.getUniqueIdentifier() + "\" already exists");
+                return "/SRM/studentReports/updateReport";
+            }
+        }
+
         onFile.setComments(report.getComments());
         onFile.setStudent(report.getStudent());
         onFile.setSubject(report.getSubject());
-        onFile.setTeacher(report.getTeacher());
 
         Report saved = reportService.save(onFile);
         log.debug("Student report updated");

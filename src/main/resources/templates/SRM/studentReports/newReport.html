@@ -20,16 +20,6 @@
 
     <form method="get" th:action="@{/studentReports/new/search}"
           class="form-horizontal" id="refine-teachers-form">
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label>Teacher search</label>
-            </div>
-            <div class="col-sm-8">
-                <input class="form-control mr-sm-2" type="text" name="TeacherLastName" placeholder="Teacher last name"
-                       aria-label="Search" maxlength="50">
-            </div>
-        </div>
-        <br />
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -58,31 +48,6 @@
     <!--/*@thymesVar id="report" type="com.secure_srm.model.academic.Report"*/-->
     <form th:object="${report}" method="post" th:action="@{/studentReports/new}"
           class="form-horizontal" id="change-teacherSet-form">
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Report writer</label>
-            </div>
-            <div class="col-sm-8">
-                <table class="table table-hover table-sm table-striped">
-                    <thead class="thead-light">
-                    <tr>
-                        <th class="px-3">Teacher name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--/*@thymesVar id="teacherFound" type="com.secure_srm.model.security.TeacherUser"*/-->
-                    <tr th:each="teacherFound: ${teachers}">
-                        <td>
-                            <input type="radio" th:field="*{teacher}" th:value="${teacherFound.id}" />
-                            <label><a th:text="${teacherFound.firstName + ' ' + teacherFound.lastName}"
-                                      th:href="@{/teachers/{teacherId}(teacherId=${teacherFound.id})}"></a></label>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <br />
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -161,10 +126,21 @@
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Unique identifier" th:field="*{uniqueIdentifier}"/>
+                <p>The unique identifier is compared to all reports from all teachers. Different teachers must all use different identifiers.</p>
                 <!--/*@thymesVar id="uniqueId" type="java.lang.String"*/-->
                 <span class="help-block" th:if="${uniqueId != null}">
                     <p class="alert alert-info" th:text="${uniqueId}"></p>
                 </span>
+            </div>
+        </div>
+
+        <br />
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Report writer (teacher)</label>
+            </div>
+            <div class="col-sm-8">
+                <label class="control-label" th:text="${report.teacher.firstName + ' ' + report.teacher.lastName}"></label>
             </div>
         </div>
 

@@ -49,6 +49,7 @@
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Unique identifier" th:field="*{uniqueId}"/>
+                <p>The unique identifier is compared to all thresholds for the current teacher only (not against all teachers). Different teachers can save thresholds with the same identifier.</p>
                 <!--/*@thymesVar id="thresholdFeedback" type="java.lang.String"*/-->
                 <span class="help-block" th:if="${thresholdFeedback != null}">
                     <p class="alert alert-info" th:text="${thresholdFeedback}"></p>
