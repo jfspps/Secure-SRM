@@ -152,7 +152,7 @@ public class ThresholdController {
 
                 if (found.isPresent()){
                     log.debug("Unique ID already in use");
-                    model.addAttribute("thresholdFeedback", "Unique ID already in use");
+                    model.addAttribute("thresholdFeedback", "Unique ID \"" + submittedThreshold.getUniqueId() + "\" already exists");
                     model.addAttribute("threshold", onFile);
                     return "/SRM/threshold/updateThreshold";
                 }
