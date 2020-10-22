@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,6 @@ public class UserController {
     private final ContactDetailService contactDetailService;
     private final AuxiliaryController auxiliaryController;
 
-    private final String INVALID_USERNAME = "User's username length must be >= 8 characters";
     private final String INVALID_ADMIN_NAME = "AdminUser's name length must be >= 8 characters";
 
     //prevent the HTTP form POST from editing listed properties
@@ -63,6 +61,16 @@ public class UserController {
     @GetMapping("/login")
     public String loginPage() {
         return "login";
+    }
+
+    //this overrides the default GET logout page
+    @GetMapping("/logout")
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        return "redirect:/welcome";
     }
 
     //sets login-error to true and triggers login.html to display 'wrong user or password'
@@ -126,9 +134,11 @@ public class UserController {
         }
     }
 
+    // AdminPages (perform CRUD ops on AdminUsers) =================================================================
+
     @AdminRead
     @GetMapping("/adminPage")
-    public String adminPage(Model model) {
+    public String getAdminPage(Model model) {
         Set<User> AdminUsers = userService.findAll().stream().filter(
                 user -> user.getAdminUser() != null
         ).collect(Collectors.toSet());
@@ -140,15 +150,7 @@ public class UserController {
         return "adminPage";
     }
 
-    //this overrides the default GET logout page
-    @GetMapping("/logout")
-    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        return "redirect:/welcome";
-    }
+    // Global password methods and routes =========================================================================
 
     @AdminUpdate
     @PostMapping("/resetPassword/{userID}")
@@ -182,47 +184,25 @@ public class UserController {
     @PostMapping("/changePassword/{userID}")
     public String postChangePassword(@PathVariable String userID,
                                      @Valid @ModelAttribute("currentUser") User passwordChangeUser,
-                                     BindingResult bindingResult) {
-        if (userService.findById(Long.valueOf(userID)) != null) {
-            if (passwordIsOK(bindingResult, true, passwordChangeUser.getPassword())) {
-                User saved = changeUserPassword(Long.valueOf(userID), passwordChangeUser);
-                return "redirect:/" + userTypeUpdatePage(saved) + "/" + saved.getId();
-            } else {
-                User found = userService.findById(Long.valueOf(userID));
-                return "redirect:/" + userTypeUpdatePage(found) + "/" + found.getId();
-            }
+                                     BindingResult bindingResult, Model model) {
+        if (userService.findById(Long.valueOf(userID)) == null) {
+            log.debug("User not found");
+            throw new NotFoundException("User not found");
         }
-        log.debug("User with ID: " + userID + " not found");
-        return "redirect:/adminPage";
-    }
 
-    @AdminDelete
-    @PostMapping("/deleteUser/{userID}")
-    public String postDeleteUser(@PathVariable String userID, Model model) {
-        if (userService.findById(Long.valueOf(userID)) != null) {
-            User currentUser = userService.findById(Long.valueOf(userID));
-            if (Long.valueOf(userID).equals(auxiliaryController.getCurrentUser().getId())) {
-                log.debug("Cannot delete yourself");
-                model.addAttribute("deniedDelete", "You are not permitted to delete your own account");
-                model.addAttribute("returnURL", userTypeUpdatePage(currentUser) + "/" + userID);
-                model.addAttribute("pageTitle", "previous page");
-            } else {
-                if (userTypeDeleteSuccess(currentUser, userID)) {
-                    model.addAttribute("confirmDelete", "User with username \"" + currentUser.getUsername()
-                            + "\" successfully deleted");
-                    model.addAttribute("returnURL", "adminPage");
-                    model.addAttribute("pageTitle", "Admin page");
-                } else {
-                    model.addAttribute("deniedDelete", "User with username \"" + currentUser.getUsername()
-                            + "\" was not deleted");
-                    model.addAttribute("returnURL", "updateAdmin/" + currentUser.getId());
-                    model.addAttribute("pageTitle", "previous page");
-                }
-            }
-            return "confirmDelete";
+        if (bindingResult.hasErrors()){
+            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            model.addAttribute("user", auxiliaryController.getUsername());
+            model.addAttribute("currentUser", passwordChangeUser);
+            model.addAttribute("currentAdminUser", passwordChangeUser.getAdminUser());
+            return "adminUpdate";
         }
-        log.debug("User with ID: " + userID + " not found");
-        return "redirect:/adminPage";
+
+        User found = userService.findById(Long.valueOf(userID));
+        found.setPassword(passwordEncoder.encode(passwordChangeUser.getPassword()));
+        User saved = userService.save(found);
+        log.debug("Password change for " + saved.getUsername() + " has been saved");
+        return "adminPage";
     }
 
     // Admin CRUD ops =======================================================================================
@@ -244,14 +224,9 @@ public class UserController {
     public String postNewAdmin(@Valid @ModelAttribute("newAdmin") AdminUser newAdminUser,
                                BindingResult adminBindingResult, @Valid @ModelAttribute("newUser") User newUser,
                                BindingResult userBindingResult) {
-        boolean checksOut = true;
-
-        checksOut = passwordIsOK(userBindingResult, checksOut, newUser.getPassword());
-        checksOut = newUser_usernameIsOK(userBindingResult, checksOut, newUser.getUsername());
-        checksOut = firstName_lastName_isOK(adminBindingResult, checksOut, newAdminUser.getFirstName(),
-                newAdminUser.getLastName());
-
-        if (!checksOut) {
+        if (adminBindingResult.hasErrors() || userBindingResult.hasErrors()){
+            adminBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             return "adminCreate";
         }
 
@@ -291,7 +266,11 @@ public class UserController {
     @AdminUpdate
     @GetMapping("/updateAdmin/{adminUserID}")
     public String getUpdateAdmin(Model model, @PathVariable String adminUserID) {
-        checkUserId(adminUserID);
+        if (userService.findById(Long.valueOf(adminUserID)) == null) {
+            log.debug("User not found");
+            throw new NotFoundException("User with given ID not found");
+        }
+
         User user = userService.findById(Long.valueOf(adminUserID));
         //guard against wrong adminUser by user ID
         if (user.getAdminUser() == null) {
@@ -313,46 +292,41 @@ public class UserController {
                                         BindingResult userBindingResult,
                                         @Valid @ModelAttribute("currentAdminUser") AdminUser currentAdminUser,
                                         BindingResult adminBindingResult, Model model) {
-        checkUserId(adminUserID);
-
-        User userToBeUpdated = userService.findById(Long.valueOf(adminUserID));
-        //either the username is empty or is already on file
-        boolean allGood = true;
-        allGood = checkUsername(currentUser, userBindingResult, model, userToBeUpdated, allGood,
-                userAlreadyExists(currentUser.getUsername()));
-
-        //either the adminUser name field is empty or is already on file
-        if (adminBindingResult.hasErrors()) {
-            model.addAttribute("adminUserNameError", INVALID_ADMIN_NAME);
-            allGood = false;
-        } else if (adminUserAlreadyExists(currentAdminUser.getFirstName(), currentAdminUser.getLastName()) == null
-                || (userToBeUpdated.getAdminUser().getFirstName().equals(currentAdminUser.getFirstName())) &&
-                (userToBeUpdated.getAdminUser().getLastName().equals(currentAdminUser.getLastName()))){
-
-            //AdminUser not found or AdminUser firstName and lastName not changed
-            userToBeUpdated.getAdminUser().setFirstName(currentAdminUser.getFirstName());
-            userToBeUpdated.getAdminUser().setLastName(currentAdminUser.getLastName());
-        } else {
-            model.addAttribute("adminUserExists", "AdminUser with given name already exists");
-            allGood = false;
+        if (userService.findById(Long.valueOf(adminUserID)) == null) {
+            log.debug("User not found");
+            throw new NotFoundException("User with given ID not found");
         }
 
-        //send submitted form data back
-        if (!allGood) {
-            userToBeUpdated.setUsername(currentUser.getUsername());
-            userToBeUpdated.getAdminUser().setFirstName(currentAdminUser.getFirstName());
-            userToBeUpdated.getAdminUser().setLastName(currentAdminUser.getLastName());
+        User onFile = userService.findById(Long.valueOf(adminUserID));
+
+        if (userBindingResult.hasErrors() || adminBindingResult.hasErrors()){
+            adminBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("user", auxiliaryController.getUsername());
-            model.addAttribute("currentUser", userToBeUpdated);
-            model.addAttribute("currentAdminUser", userToBeUpdated.getAdminUser());
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("currentAdminUser", currentAdminUser);
+            return "adminUpdate";
+        }
+
+        //check for the same username
+        if (userService.findByUsername(currentUser.getUsername()) != null){
+            log.debug("Username already in use");
+            model.addAttribute("usernameExists", "Username already in use");
+            model.addAttribute("user", auxiliaryController.getUsername());
+            model.addAttribute("currentUser", currentUser);
+            model.addAttribute("currentAdminUser", currentAdminUser);
             return "adminUpdate";
         }
 
         //sync. account related settings (lockout, enabled, etc.)
-        syncAccountSettings(currentUser, userToBeUpdated);
+        onFile.setAccountNonLocked(currentUser.isAccountNonLocked());
+        onFile.setAccountNonExpired(currentUser.isAccountNonExpired());
+        onFile.setCredentialsNonExpired(currentUser.isCredentialsNonExpired());
+        onFile.setEnabled(currentUser.isEnabled());
+
 
         //save changes
-        User saved = userService.save(userToBeUpdated);
+        User saved = userService.save(onFile);
         log.debug("Username: " + saved.getUsername() + ", adminUser name: " + saved.getAdminUser().getFirstName() +
                 " " + saved.getAdminUser().getLastName() + " saved");
         model.addAttribute("AdminUserSaved", "Updates applied successfully");
@@ -361,39 +335,38 @@ public class UserController {
         return "adminUpdate";
     }
 
+    //this was previously generalised for all user types but at present only works on AdminUsers
+    @AdminDelete
+    @PostMapping("/deleteUser/{userID}")
+    public String postDeleteUser(@PathVariable String userID, Model model) {
+        if (userService.findById(Long.valueOf(userID)) != null) {
+            User currentUser = userService.findById(Long.valueOf(userID));
+            if (Long.valueOf(userID).equals(auxiliaryController.getCurrentUser().getId())) {
+                log.debug("Cannot delete yourself");
+                model.addAttribute("deniedDelete", "You are not permitted to delete your own account");
+                model.addAttribute("returnURL", userTypeUpdatePage(currentUser) + "/" + userID);
+                model.addAttribute("pageTitle", "previous page");
+            } else {
+                if (userTypeDeleteSuccess(currentUser, userID)) {
+                    model.addAttribute("confirmDelete", "User with username \"" + currentUser.getUsername()
+                            + "\" successfully deleted");
+                    model.addAttribute("returnURL", "adminPage");
+                    model.addAttribute("pageTitle", "Admin page");
+                } else {
+                    model.addAttribute("deniedDelete", "User with username \"" + currentUser.getUsername()
+                            + "\" was not deleted");
+                    model.addAttribute("returnURL", "updateAdmin/" + currentUser.getId());
+                    model.addAttribute("pageTitle", "previous page");
+                }
+            }
+            return "confirmDelete";
+        }
+        log.debug("User with ID: " + userID + " not found");
+        return "redirect:/adminPage";
+    }
+
     // end of CRUD ops ==========================================================================================
     //the following methods are called by the above controller methods only if the required parameters are verified
-
-    /**
-     * Validates a submitted username and checks if it already exists on the DB
-     * */
-    @AdminUpdate
-    private boolean checkUsername(User currentUser, BindingResult userBindingResult, Model model,
-                                  User userToBeUpdated, boolean allGood, User user) {
-        if (userBindingResult.hasErrors()) {
-            model.addAttribute("usernameError", INVALID_USERNAME);
-            allGood = false;
-        } else if (user == null
-                || userToBeUpdated.getUsername().equals(currentUser.getUsername())) {
-            //User not on file or username was not changed
-            userToBeUpdated.setUsername(currentUser.getUsername());
-        } else {
-            model.addAttribute("usernameExists", "Username already taken");
-            allGood = false;
-        }
-        return allGood;
-    }
-
-    /**
-     * Checks a user ID prior to a GET request
-     * */
-    @TeacherUpdate
-    private void checkUserId(String userID) {
-        if (userService.findById(Long.valueOf(userID)) == null) {
-            log.debug("User with ID " + userID + " not found");
-            throw new NotFoundException("User with given ID not found");
-        }
-    }
 
     /**Updates contact details*/
     @GuardianUpdate
@@ -432,65 +405,6 @@ public class UserController {
             return false;
         } else
             return true;
-    }
-
-    @AdminUpdate
-    private User changeUserPassword(Long userID, User userOnFile) {
-        User found = userService.findById(userID);
-        found.setPassword(passwordEncoder.encode(userOnFile.getPassword()));
-        User saved = userService.save(found);
-        log.debug("Password change for " + saved.getUsername() + " has been saved");
-        return saved;
-    }
-
-    /**
-     * Checks if a AdminUser/TeacherUser/GuardianUser name property is valid
-     */
-    @AdminCreate
-    private boolean firstName_lastName_isOK(BindingResult result, boolean checksOut, String firstName, String lastName) {
-        if (firstName == null || lastName == null) {
-            log.debug("Null firstName and lastName passed");
-            checksOut = false;
-        } else if (result.hasErrors()) {
-                result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
-                checksOut = false;
-        }
-        return checksOut;
-    }
-
-    /**
-     * Checks if a User username property is valid
-     */
-    @AdminCreate
-    private boolean newUser_usernameIsOK(BindingResult result, boolean checksOut, String username) {
-        if (username == null){
-            log.debug("Null username passed");
-            checksOut = false;
-        } else if (result.hasErrors()) {
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
-            checksOut = false;
-        }
-        return checksOut;
-    }
-
-    @AdminUpdate
-    private boolean passwordIsOK(BindingResult result, boolean checksOut, String password) {
-        if (password == null){
-            log.debug("Null password passed");
-            checksOut = false;
-        } else if (result.hasErrors()) {
-            result.getAllErrors().forEach(objectError -> log.debug(objectError.getDefaultMessage()));
-            checksOut = false;
-        }
-        return checksOut;
-    }
-
-    @AdminUpdate
-    private void syncAccountSettings(User currentUser, User userToBeUpdated) {
-        userToBeUpdated.setAccountNonLocked(currentUser.isAccountNonLocked());
-        userToBeUpdated.setAccountNonExpired(currentUser.isAccountNonExpired());
-        userToBeUpdated.setCredentialsNonExpired(currentUser.isCredentialsNonExpired());
-        userToBeUpdated.setEnabled(currentUser.isEnabled());
     }
 
     @AdminUpdate
