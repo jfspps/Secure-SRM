@@ -231,11 +231,11 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
     void postResetPassword_TEACHER(String username, String pwd) throws Exception {
         mockMvc.perform(post("/resetPassword/3").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name("teacherUpdate"))
+                .andExpect(view().name("/SRM/teachers/updateTeacher"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("currentUser"))
                 .andExpect(model().attributeExists("confirmReset"))
-                .andExpect(model().attributeExists("currentTeacherUser"));
+                .andExpect(model().attributeExists("teacher"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")

@@ -20,11 +20,15 @@ public class Threshold extends BaseEntity implements Comparable<Threshold>{
     //maps a numerical score with a A*/B-/D+/MERIT/DISTINCTION etc...
 
     private int numerical;
-    private String alphabetical;
 
-    private String uniqueId;
+    @Builder.Default
+    private String alphabetical = "";
+
+    @Builder.Default
+    private String uniqueId = "";
 
     @ManyToMany(mappedBy = "thresholds")
+    @Builder.Default
     private Set<ThresholdList> thresholdLists = new HashSet<>();
 
     //custom comparator (list by uniqueId)

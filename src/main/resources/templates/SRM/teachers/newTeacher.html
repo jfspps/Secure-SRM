@@ -16,58 +16,78 @@
             <h2>New teacher record</h2>
         </div>
     </div>
-    <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-    <form th:object="${teacher}" th:action="@{/teachers/new}" method="post" class="form-horizontal" id="add-teacher-form">
+    <!--/*@thymesVar id="user" type="com.secure_srm.model.security.User"*/-->
+    <form th:object="${user}" th:action="@{/teachers/new}" method="post" class="form-horizontal" id="add-teacher-form">
+
+        <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+            <p>Errors with form data listed below</p>
+        </div>
+
         <div class="row align-items-start">
-
-            <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
-                <p>Errors with form data listed below</p>
-            </div>
-
             <div class="col-sm-2">
-                <label class="control-label">Teacher name (required)</label>
+                <label class="control-label">SRM login details (required)</label>
             </div>
             <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
-                <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                <input size="50" placeholder="Username" th:field="*{username}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('username')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('username')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                <input type="password" size="50" placeholder="Password" th:field="*{password}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('password')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('password')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <br/>
+
+        <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+        <div th:object="${teacher}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Teacher name (required)</label>
+                </div>
+                <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                    <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
                     <ul>
                         <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
-                <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                    <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
                     <ul>
                         <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
+                </div>
             </div>
+            <br/>
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Department (optional)</label>
+                </div>
+                <div class="col-sm-8">
+                    <input size="50" placeholder="Department name" th:field="*{department}"/>
+                </div>
+            </div>
+            <br />
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Teacher contact details (optional)</label>
+                </div>
+                <div class="col-sm-8">
+                    <input placeholder="Email address" id="email" size="40" th:field="*{contactDetail.email}"/>
+                    <br />
+                    <input placeholder="Phone number" id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+                </div>
+            </div>
+            <br/>
         </div>
-        <br/>
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Department (optional)</label>
-            </div>
-            <div class="col-sm-8"  th:class="${#fields.hasErrors('department')} ? 'col-sm-8 has-error' : 'col-sm-8'">
-                <input size="50" placeholder="Department name" th:field="*{department}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('department')}">
-                    <ul>
-                        <li th:each="err : ${#fields.errors('department')}" th:text="${err}">Error</li>
-                    </ul>
-                </span>
-            </div>
-        </div>
-        <br />
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Teacher contact details (optional)</label>
-            </div>
-            <div class="col-sm-8">
-                <input placeholder="Email address" id="email" size="40" th:field="*{contactDetail.email}"/>
-                <br />
-                <input placeholder="Phone number" id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
-            </div>
-        </div>
-        <br/>
+
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <button class="btn btn-info" type="submit" th:with="text=${teacher['new']} ? 'Add teacher' : 'Update teacher'"
@@ -75,7 +95,6 @@
             </div>
         </div>
     </form>
-    <br/>
 </div>
 
 <footer th:replace="fragments/footer :: footer"></footer>

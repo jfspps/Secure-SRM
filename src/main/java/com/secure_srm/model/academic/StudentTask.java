@@ -27,9 +27,11 @@ public class StudentTask extends BaseEntity {
     @Size(min = 1, max = 255)
     private String title;
 
-    private String maxScore;        //boxed Integer can be null; allows for letter grades or no score at all
+    @Builder.Default
+    private String maxScore = "";        //allows for letter grades or no score at all
 
-    private boolean contributor;     //purpose is to state whether this contributes to an overall end-of-term/...score
+    @Builder.Default
+    private boolean contributor = true;     //purpose is to state whether this contributes to an overall end-of-term/...score
 
     @OneToOne
     private TeacherUser teacherUploader;
@@ -43,6 +45,7 @@ public class StudentTask extends BaseEntity {
     private AssignmentType assignmentType;
 
     @OneToMany(mappedBy = "studentTask")
+    @Builder.Default
     private Set<StudentResult> studentResults = new HashSet<>();
 
     //todo: add ThresholdList property

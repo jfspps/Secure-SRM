@@ -17,9 +17,9 @@ import javax.validation.constraints.Email;
 @Table(name = "contact_detail")
 public class ContactDetail extends BaseEntity {
 
-    @Column(name = "email")
-    private String email;
+    @Builder.Default
+    private String email = "";
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @Builder.Default
+    private String phoneNumber = "";
 }

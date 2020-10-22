@@ -15,6 +15,10 @@
     <div class="row">
         <div class="col">
             <h2>Teacher details</h2>
+            <!--/*@thymesVar id="userFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${userFeedback != null}">
+                <p class="alert alert-info" th:text="${userFeedback}"></p>
+            </span>
         </div>
     </div>
     <form th:object="${teacher}" method="get">
@@ -36,26 +40,25 @@
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Department</b></label>
             </div>
-            <div class="col-sm-8" th:if="${teacher.department.isEmpty()}">
+            <div class="col-sm-8" th:if="*{department.isBlank()}">
                 <label size="50" th:text="${'(Not registered to a dept.)'}"></label>
             </div>
-            <div class="col-sm-8" th:unless="${teacher.department.isEmpty()}">
+            <div class="col-sm-8" th:unless="*{department.isBlank()}">
                 <label size="50" th:text="*{department}">Department of...</label>
             </div>
         </div>
         <br/>
 
-        <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
-        <div class="row align-items-start" th:if="${teacher.getSubjects().isEmpty()}">
+        <div class="row align-items-start" th:if="*{subjects.isEmpty()}">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Subject taught</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="${'No registered subjects on file'}"></label>
+                <label size="50" th:text="${'(No registered subjects on file)'}"></label>
             </div>
         </div>
-        <div class="row align-items-start" th:unless="${teacher.getSubjects().isEmpty()}"
-             th:each="subject: ${subjectsTaught}">
+        <div class="row align-items-start" th:unless="*{subjects.isEmpty()}"
+             th:each="subject: ${teacher.subjects}">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Subject taught</b></label>
             </div>
@@ -70,10 +73,10 @@
                 <label class="control-label" size="30"><b>Email address</b></label>
             </div>
             <div class="col-sm-8">
-                <span th:if="${teacher.contactDetail.email.isEmpty()}">
+                <span th:if="*{contactDetail?.email?.isBlank()}">
                     <label size="50">(No email address on record)</label>
                 </span>
-                <span th:unless="${teacher.contactDetail.email.isEmpty()}">
+                <span th:unless="*{contactDetail?.email?.isBlank()}">
                     <label size="50" th:text="*{contactDetail.email}">Email address to appear here</label>
                 </span>
             </div>
@@ -84,10 +87,10 @@
                 <label class="control-label" size="30"><b>Phone number</b></label>
             </div>
             <div class="col-sm-8">
-                <span th:if="${teacher.contactDetail.phoneNumber.isEmpty()}">
+                <span th:if="*{contactDetail?.phoneNumber?.isBlank()}">
                     <label size="50">(No phone number on record)</label>
                 </span>
-                <span th:unless="${teacher.contactDetail.phoneNumber.isEmpty()}">
+                <span th:unless="*{contactDetail?.phoneNumber?.isBlank()}">
                     <label size="50" th:text="*{contactDetail.phoneNumber}">Phone number to appear here</label>
                 </span>
             </div>

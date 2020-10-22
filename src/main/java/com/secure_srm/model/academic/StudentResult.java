@@ -27,6 +27,9 @@ public class StudentResult extends BaseEntity {
     @ManyToOne
     private StudentTask studentTask;
 
-    private String score;           //allow for numerical or letter based results
-    private String comments;
+    @Builder.Default
+    private String score = "";           //allow for numerical or letter based results
+
+    @Builder.Default
+    private String comments = "";
 }

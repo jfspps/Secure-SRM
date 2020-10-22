@@ -191,20 +191,21 @@ public class UserController {
             log.debug("Password was reset");
             model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", currentUser);
-            model.addAttribute("confirmReset", "Password has been reset");
+            model.addAttribute("confirmReset", "Password has been reset and changes have been saved.");
             if (currentUser.getAdminUser() != null){
                 model.addAttribute("currentAdminUser", currentUser.getAdminUser());
                 return "adminUpdate";
             } else if (currentUser.getTeacherUser() != null){
-                model.addAttribute("currentTeacherUser", currentUser.getTeacherUser());
-                return "teacherUpdate";
+                model.addAttribute("teacher", currentUser.getTeacherUser());
+                model.addAttribute("user", currentUser);
+                return "/SRM/teachers/updateTeacher";
             } else {
                 model.addAttribute("currentGuardianUser", currentUser.getGuardianUser());
                 return "guardianUpdate";
             }
         }
-        log.debug("User with ID: " + userID + " not found");
-        return "redirect:/adminPage";
+        log.debug("User not found");
+        throw new NotFoundException("User not found");
     }
 
     @AdminUpdate

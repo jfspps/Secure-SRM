@@ -22,6 +22,7 @@ public class AssignmentType extends BaseEntity implements Comparable<AssignmentT
     private String description;
 
     @OneToMany
+    @Builder.Default
     private Set<StudentResult> studentResults = new HashSet<>();
 
     //custom comparator (list assignment types alphabetically)

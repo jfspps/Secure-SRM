@@ -25,6 +25,7 @@ public class SubjectClassList extends BaseEntity implements Comparable<SubjectCl
     private String groupName;
 
     @ManyToMany(mappedBy = "subjectClassLists")
+    @Builder.Default
     private Set<Student> studentList = new HashSet<>();
 
     @OneToOne

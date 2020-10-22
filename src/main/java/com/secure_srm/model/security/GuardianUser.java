@@ -32,7 +32,8 @@ public class GuardianUser extends BaseEntity implements Comparable<GuardianUser>
     private String lastName;
 
     @OneToMany(mappedBy = "guardianUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    Set<User> users;
+    @Builder.Default
+    Set<User> users = new HashSet<>();
 
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
@@ -43,8 +44,9 @@ public class GuardianUser extends BaseEntity implements Comparable<GuardianUser>
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
     @JsonIgnore
-    //"guardians" refers to the Set<Guardian> fro Student
+    //"guardians" refers to the Set<Guardian> from Student
     @ManyToMany(mappedBy = "guardians")
+    @Builder.Default
     private Set<Student> students = new HashSet<>();
 
     @OneToOne

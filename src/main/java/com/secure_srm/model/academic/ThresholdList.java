@@ -19,9 +19,11 @@ public class ThresholdList extends BaseEntity implements Comparable<ThresholdLis
     @JoinTable(name = "thresholdList_threshold",
             joinColumns = @JoinColumn(name = "thresholdlist_id"), inverseJoinColumns = @JoinColumn(name = "threshold_id"))
     @ManyToMany
+    @Builder.Default
     private Set<Threshold> thresholds = new HashSet<>();
 
-    private String uniqueID;
+    @Builder.Default
+    private String uniqueID = "";
 
     //custom comparator (list by uniqueId)
     @Override
