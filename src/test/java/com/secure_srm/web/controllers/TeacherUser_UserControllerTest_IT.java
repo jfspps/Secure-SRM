@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @Transactional
 @SpringBootTest
-public class TeacherUserControllerTest_IT_IT extends UserControllerTest_IT {
+public class TeacherUser_UserControllerTest_IT extends UserControllerTest_IT {
 
     // user and TeacherUser CRUD tests ===============================================================================
     //context loads adminUsers, teacherUsers, followed by guardianUsers

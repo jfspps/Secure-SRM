@@ -2,12 +2,15 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
+import com.secure_srm.model.security.Role;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
+import com.secure_srm.services.securityServices.RoleService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
@@ -15,9 +18,12 @@ import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,6 +41,9 @@ public class TeacherController {
     private final ContactDetailService contactDetailService;
     private final SubjectService subjectService;
     private final AuxiliaryController auxiliaryController;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -43,7 +52,7 @@ public class TeacherController {
     }
 
     @ModelAttribute("hasSubject")
-    public Boolean teachesSubjects(){
+    public Boolean teachesSubjects() {
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
         return auxiliaryController.teachesASubject();
     }
@@ -51,7 +60,7 @@ public class TeacherController {
     @TeacherRead
     @GetMapping({"", "/", "/index"})
     public String listTeachers(Model model, String lastName) {
-        if(lastName == null || lastName.isEmpty()){
+        if (lastName == null || lastName.isEmpty()) {
             model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
         } else {
             model.addAttribute("teachers",
@@ -60,6 +69,7 @@ public class TeacherController {
         return "/SRM/teachers/teacherIndex";
     }
 
+    //note that User username and account properties are only accessible via updateTeacher
     @TeacherRead
     @GetMapping("/{teacherId}")
     public ModelAndView getTeacherDetails(@PathVariable String teacherId) {
@@ -79,111 +89,132 @@ public class TeacherController {
     @AdminCreate
     @GetMapping("/new")
     public String getNewTeacher(Model model) {
-        model.addAttribute("teacher", TeacherUser.builder().build());
+        User user = User.builder().build();
+        TeacherUser teacherUser = TeacherUser.builder().contactDetail(ContactDetail.builder().build()).build();
+        user.setTeacherUser(teacherUser);
+        teacherUser.setUsers(Set.of(user));
+        model.addAttribute("teacher", teacherUser);
+        model.addAttribute("user", user);
         return "/SRM/teachers/newTeacher";
     }
 
     @AdminCreate
     @PostMapping("/new")
-    public String postNewTeacher(@Valid @ModelAttribute("teacher") TeacherUser teacher, BindingResult bindingResult,
-                                 Model model) {
-        if (bindingResult.hasErrors()){
-            bindingResult.getAllErrors().forEach(objectError -> log.info(objectError.toString()));
+    public String postNewTeacher(@Valid @ModelAttribute("teacher") TeacherUser teacher, BindingResult teacherUserResults,
+                                 @Valid @ModelAttribute("user") User user, BindingResult userResults, Model model) {
+        if (teacherUserResults.hasErrors() || userResults.hasErrors()) {
+            teacherUserResults.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            userResults.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+
+            model.addAttribute("teacher", teacher);
+            model.addAttribute("user", user);
             return "/SRM/teachers/newTeacher";
         }
 
-        if (teacherUserService.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName()) == null) {
-            contactDetailService.save(teacher.getContactDetail());
-            TeacherUser savedTeacher = teacherUserService.save(teacher);
-            //head straight to the update page to edit other properties
-            return "redirect:/teachers/" + savedTeacher.getId() + "/edit";
-        } else {
-            log.info("Current teacher is already on file");
-            TeacherUser found = teacherUserService.findByFirstNameAndLastName(teacher.getFirstName(), teacher.getLastName());
-            model.addAttribute("teacher", found);
-            model.addAttribute("subjectsTaught", found.getSubjects());
-            model.addAttribute("newTeacher", "Teacher already on file, record presented here");
-            return "/SRM/teachers/updateTeacher";
+        //check username
+        if (userService.findByUsername(user.getUsername()) != null) {
+            userResults.rejectValue("username", "duplicate", "Already in use");
+            model.addAttribute("teacher", teacher);
+            model.addAttribute("user", user);
+            return "/SRM/teachers/newTeacher";
         }
+
+        //no default value for contactDetails (save before saving teacherUser)
+        if (teacher.getContactDetail() == null) {
+            teacher.setContactDetail(ContactDetail.builder().build());
+        }
+        contactDetailService.save(teacher.getContactDetail());
+
+        TeacherUser savedTeacherUser = teacherUserService.save(teacher);
+
+        user.setRoles(Set.of(roleService.findByRoleName("TEACHER")));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setTeacherUser(savedTeacherUser);
+        User savedUser = userService.save(user);
+
+        log.debug("User with id: " + savedUser.getId() + " and teacher with id: " + savedTeacherUser.getId() + " saved");
+        model.addAttribute("userFeedback", "Teacher details saved");
+        model.addAttribute("teacher", savedTeacherUser);
+        return "/SRM/teachers/teacherDetails";
     }
 
     @AdminUpdate
     @GetMapping("/{teacherId}/edit")
     public String getUpdateTeacher(@PathVariable String teacherId, Model model) {
         if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
-            log.debug("Teacher with ID: " + teacherId + " not found");
+            log.debug("Teacher not found");
             throw new NotFoundException("Teacher not found");
-        } else {
-            TeacherUser teacherFound = teacherUserService.findById(Long.valueOf(teacherId));
-            Set<Subject> subjectList = new HashSet<>(teacherFound.getSubjects());
-            model.addAttribute("subjectsTaught", subjectList);
-            model.addAttribute("teacher", teacherFound);
-            return "/SRM/teachers/updateTeacher";
         }
+
+        TeacherUser teacherFound = teacherUserService.findById(Long.valueOf(teacherId));
+        model.addAttribute("teacher", teacherFound);
+        model.addAttribute("user", teacherFound.getUsers().stream().findFirst().get());
+        model.addAttribute("subjectsOnFile", auxiliaryController.sortSetBySubjectName(subjectService.findAll()));
+        return "/SRM/teachers/updateTeacher";
     }
 
     @AdminUpdate
     @PostMapping("/{teacherId}/edit")
-    public String postUpdateTeacher(@Valid @ModelAttribute("teacher") TeacherUser teacher, BindingResult bindingResult,
-                                    @PathVariable String teacherId, Model model) {
-        if (bindingResult.hasErrors()){
-            bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
-            //ID info would be lost by now
-            TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
-            Set<Subject> subjects = teacherOnFile.getSubjects();
-            model.addAttribute("subjectsTaught", subjects);
-            teacher.setId(teacherOnFile.getId());
-            teacher.setSubjects(subjects);
-            teacher.setContactDetail(teacherOnFile.getContactDetail());
+    public String postUpdateTeacher(@Valid @ModelAttribute("teacher") TeacherUser teacher, BindingResult teacherResult,
+                                    @PathVariable String teacherId, Model model,
+                                    @Valid @ModelAttribute("user") User user, BindingResult userResult) {
+        if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
+            log.debug("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
+        TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
+
+        //check form data
+        if (teacherResult.hasErrors() || userResult.hasErrors()) {
+            teacherResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+            userResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
+
+            teacher.setId(Long.valueOf(teacherId));     //ID lost here; prevent "teachers//edit" passed to the header
             model.addAttribute("teacher", teacher);
+            model.addAttribute("user", user);
+            model.addAttribute("subjectsOnFile", auxiliaryController.sortSetBySubjectName(subjectService.findAll()));
             return "/SRM/teachers/updateTeacher";
         }
 
         //recall all other variables and pass to the DB (Subject properties handled elsewhere)
-        TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
+        User userFound = teacherOnFile.getUsers().stream().findFirst().get();
+
+        //process User username
+        if (!user.getUsername().equals(userFound.getUsername())){
+            if (userService.findByUsername(user.getUsername()) != null){
+                log.debug("Username already exists");
+                userResult.rejectValue("username", "duplicate", "Already in use");
+                model.addAttribute("teacher", teacher);
+                model.addAttribute("user", user);
+                model.addAttribute("subjectsOnFile", auxiliaryController.sortSetBySubjectName(subjectService.findAll()));
+                return "/SRM/teachers/updateTeacher";
+            }
+        }
 
         teacherOnFile.setFirstName(teacher.getFirstName());
         teacherOnFile.setLastName(teacher.getLastName());
         teacherOnFile.setDepartment(teacher.getDepartment());
-
-        teacherOnFile.setContactDetail(contactDetailService.save(teacher.getContactDetail()));
-
-        TeacherUser savedTeacher = teacherUserService.save(teacherOnFile);
-        model.addAttribute("teacher", savedTeacher);
-        model.addAttribute("subjectsTaught", savedTeacher.getSubjects());
-        model.addAttribute("newTeacher", "Teacher details updated");
-        return "/SRM/teachers/teacherDetails";
-    }
-
-    @AdminUpdate
-    @GetMapping("/{teacherId}/subjects")
-    public String getUpdateSubject(Model model, @PathVariable String teacherId){
-        if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
-            log.debug("Teacher with ID: " + teacherId + " not found");
-            throw new NotFoundException("Teacher not found");
-        } else {
-            model.addAttribute("subjectSet", subjectService.findAll());
-            model.addAttribute("teacher", teacherUserService.findById(Long.valueOf(teacherId)));
-            return "/SRM/subjects/subjectSet";
-        }
-    }
-
-    @AdminUpdate
-    @PostMapping("/{teacherId}/subjects")
-    public String postUpdateSubject(Model model, @PathVariable String teacherId,
-                                    @ModelAttribute("teacher") TeacherUser teacher){
-        TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
-
         teacherOnFile.setSubjects(teacher.getSubjects());
-        teacher.getSubjects().stream().forEach(subject -> {
-            subject.getTeachers().add(teacherOnFile);
-            subjectService.save(subject);
-        });
 
-        TeacherUser saved = teacherUserService.save(teacherOnFile);
-        model.addAttribute("teacher", saved);
-        model.addAttribute("subjectsTaught", saved.getSubjects());
-        model.addAttribute("newTeacher", "Teacher subject details updated");
+        ContactDetail contactDetailFound;
+        if (teacher.getContactDetail() != null){
+            contactDetailFound = teacher.getContactDetail();
+        } else {
+            contactDetailFound = ContactDetail.builder().build();
+        }
+        teacherOnFile.setContactDetail(contactDetailService.save(contactDetailFound));
+        TeacherUser savedTeacher = teacherUserService.save(teacherOnFile);
+
+        //update User
+        userFound.setAccountNonLocked(user.isAccountNonLocked());
+        userFound.setAccountNonExpired(user.isAccountNonExpired());
+        userFound.setCredentialsNonExpired(user.isCredentialsNonExpired());
+        userFound.setEnabled(user.isEnabled());
+        User savedUser = userService.save(userFound);
+
+        log.debug("User with id: " + savedUser.getId() + " and teacher with id: " + savedTeacher.getId() + " updated");
+        model.addAttribute("userFeedback", "Teacher details updated");
+        model.addAttribute("teacher", savedTeacher);
         return "/SRM/teachers/teacherDetails";
     }
 }
