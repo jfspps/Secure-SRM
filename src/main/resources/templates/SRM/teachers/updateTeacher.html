@@ -18,12 +18,12 @@
         </div>
     </div>
 
+    <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+        <p>Errors with form data listed below</p>
+    </div>
+
     <form th:action="@{/teachers/{teacherID}/edit(teacherID=${teacher.id})}"
           method="post" class="form-horizontal" id="add-teacher-form">
-
-        <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
-            <p>Errors with form data listed below</p>
-        </div>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -44,7 +44,7 @@
         <div th:object="${teacher}">
             <div class="row align-items-start">
                 <div class="col-sm-2">
-                    <label class="control-label">Teacher name</label>
+                    <label class="control-label">Teacher name (required)</label>
                 </div>
                 <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
                     <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
@@ -61,9 +61,10 @@
                 </span>
                 </div>
             </div>
+            <br />
             <div class="row align-items-start">
                 <div class="col-sm-2">
-                    <label class="control-label">Department</label>
+                    <label class="control-label">Department (optional) </label>
                 </div>
                 <div class="col-sm-8">
                     <input size="50" placeholder="Department name" th:field="*{department}"/>
@@ -75,7 +76,7 @@
             <!--/*@thymesVar id="subject" type="com.secure_srm.model.academic.Subject"*/-->
             <div class="row align-items-start">
                 <div class="col-sm-2">
-                    <label class="control-label">Subject(s) taught</label>
+                    <label class="control-label">Subject(s) taught (optional)</label>
                 </div>
                 <div class="col-sm-8" th:if="*{subjects.isEmpty()}">
                     <label size="50">(no subject on file)</label>
@@ -93,7 +94,7 @@
 
             <div class="row align-items-start">
                 <div class="col-sm-2">
-                    <label class="control-label">Contact details</label>
+                    <label class="control-label">Contact details (optional) </label>
                 </div>
                 <div class="col-sm-8">
                     <div>
@@ -109,29 +110,45 @@
             <br/>
         </div>
 
-        <div>
-            <p th:text="${'Account created: ' + user.getCreatedDate()}">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Time-stamps</label>
+            </div>
+            <div class="col-sm-8">
+                <div>
+                    <p th:text="${'Account created: ' + user.getCreatedDate()}">
+                </div>
+                <div>
+                    <p th:text="${'Account last modified: ' + user.getLastModifiedDate()}"></p>
+                </div>
+            </div>
         </div>
-        <div>
-            <p th:text="${'Account last modified: ' + user.getLastModifiedDate()}"></p>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Current access</label>
+            </div>
+            <div class="col-sm-8">
+                <div>
+                    <label>Account is enabled: </label>
+                    <input type="checkbox" th:field="*{enabled}" th:value="${user.enabled}"/>
+                </div>
+                <div>
+                    <label>Account is not locked: </label>
+                    <input type="checkbox" th:field="*{accountNonLocked}" th:value="${user.accountNonLocked}"/>
+                </div>
+                <div>
+                    <label>Account has not expired: </label>
+                    <input type="checkbox" th:field="*{accountNonExpired}" th:value="${user.accountNonExpired}"/>
+                </div>
+                <div>
+                    <label>Account credentials have not expired: </label>
+                    <input type="checkbox" th:field="*{credentialsNonExpired}"
+                           th:value="${user.credentialsNonExpired}"/>
+                </div>
+            </div>
         </div>
-        <div>
-            <label>Account is enabled: </label>
-            <input type="checkbox" th:field="*{enabled}" th:value="${user.enabled}"/>
-        </div>
-        <div>
-            <label>Account is not locked: </label>
-            <input type="checkbox" th:field="*{accountNonLocked}" th:value="${user.accountNonLocked}"/>
-        </div>
-        <div>
-            <label>Account has not expired: </label>
-            <input type="checkbox" th:field="*{accountNonExpired}" th:value="${user.accountNonExpired}"/>
-        </div>
-        <div>
-            <label>Account credentials have not expired: </label>
-            <input type="checkbox" th:field="*{credentialsNonExpired}"
-                   th:value="${user.credentialsNonExpired}"/>
-        </div>
+
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-2">

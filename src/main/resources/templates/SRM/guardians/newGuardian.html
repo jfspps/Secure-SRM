@@ -16,57 +16,83 @@
             <h2>New guardian record</h2>
         </div>
     </div>
-    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
-    <form th:object="${guardian}" method="post" th:action="@{/guardians/new}" class="form-horizontal" id="add-guardian-form">
+    <!--/*@thymesVar id="user" type="com.secure_srm.model.security.User"*/-->
+    <form th:object="${user}" method="post" th:action="@{/guardians/new}" class="form-horizontal" id="add-guardian-form">
+
+        <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+            <p>Errors with form data listed below</p>
+        </div>
+
         <div class="row align-items-start">
-
-            <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
-                <p>Errors with form data listed below</p>
-            </div>
-
             <div class="col-sm-2">
-                <label class="control-label">Guardian name (required)</label>
+                <label class="control-label">SRM login details (required)</label>
             </div>
             <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
-                <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                <input size="50" placeholder="Username" th:field="*{username}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('username')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('username')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                <input type="password" size="50" placeholder="Password" th:field="*{password}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('password')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('password')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+            </div>
+        </div>
+        <br/>
+
+        <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+        <div th:object="${guardian}">
+            <div class="row align-items-start">
+
+                <div class="col-sm-2">
+                    <label class="control-label">Guardian name (required)</label>
+                </div>
+                <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                    <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
                     <ul>
                         <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
-                <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                    <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
                     <ul>
                         <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
+                </div>
             </div>
+            <br />
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Guardian address (optional)</label>
+                </div>
+                <div class="col-sm-8">
+                    <input placeholder="Address first line" id="firstLine" size="40" th:field="*{address.firstLine}"/>
+                    <br />
+                    <input placeholder="Address second line" id="secondLine" size="40" th:field="*{address.secondLine}"/>
+                    <br />
+                    <input placeholder="Post code" id="postCode" size="40" th:field="*{address.postcode}"/>
+                </div>
+            </div>
+            <br />
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Guardian contact details (optional)</label>
+                </div>
+                <div class="col-sm-8">
+                    <input placeholder="Email address" id="email" size="40" th:field="*{contactDetail.email}"/>
+                    <br />
+                    <input placeholder="Phone number" id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+                </div>
+            </div>
+            <br />
         </div>
-        <br />
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Guardian address (optional)</label>
-            </div>
-            <div class="col-sm-8">
-                <input placeholder="Address first line" id="firstLine" size="40" th:field="*{address.firstLine}"/>
-                <br />
-                <input placeholder="Address second line" id="secondLine" size="40" th:field="*{address.secondLine}"/>
-                <br />
-                <input placeholder="Post code" id="postCode" size="40" th:field="*{address.postcode}"/>
-            </div>
-        </div>
-        <br />
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Guardian contact details (optional)</label>
-            </div>
-            <div class="col-sm-8">
-                <input placeholder="Email address" id="email" size="40" th:field="*{contactDetail.email}"/>
-                <br />
-                <input placeholder="Phone number" id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
-            </div>
-        </div>
-        <br />
+
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <button class="btn btn-info" type="submit">Add guardian</button>

@@ -17,6 +17,7 @@
             <p>You are logged in with <b>ID:</b> <span th:text="${userID}"></span> and <b>username:</b> <span
                     sec:authentication="name"></span></p>
             <p><b>Your permissions:</b> <span sec:authentication="principal.authorities"></span></p>
+            <a class="btn btn-outline-primary" th:href="@{/changePassword}" role="button">Change password</a>
             <hr>
         </div>
     </div>

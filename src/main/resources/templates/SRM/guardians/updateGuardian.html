@@ -9,87 +9,152 @@
 <nav th:replace="fragments/navTeacherSearch :: nav"></nav>
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-<div class="container" sec:authorize="hasAuthority('admin.update')">
+<!--/*@thymesVar id="user" type="com.secure_srm.model.security.User"*/-->
+<div class="container" sec:authorize="hasAuthority('admin.update')" th:object="${user}" >
     <br/>
     <div class="row">
         <div class="col">
-            <h2>Guardian details</h2>
+            <h2>Update Guardian details</h2>
         </div>
     </div>
-    <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
-    <form th:object="${guardian}" method="post" th:action="@{/guardians/{id}/edit(id=${guardian.id})}"
+
+    <div th:if="${#fields.hasErrors('*')}" class="col-sm-12 alert alert-danger" role="alert">
+        <p>Errors with form data listed below</p>
+    </div>
+
+    <form method="post" th:action="@{/guardians/{id}/edit(id=${guardian.id})}"
           class="form-horizontal" id="add-guardian-form">
+
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Guardian name</label>
+                <label class="control-label">SRM login details (required)</label>
             </div>
             <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
-                <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                <input size="50" placeholder="Username" th:field="*{username}" th:errorclass="has-error"/>
+                <span class="help-block" th:if="${#fields.hasErrors('username')}">
                     <ul>
-                        <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
-                    </ul>
-                </span>
-                <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
-                    <ul>
-                        <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                        <li th:each="err : ${#fields.errors('username')}" th:text="${err}">Error</li>
                     </ul>
                 </span>
             </div>
         </div>
         <br/>
-        <div class="row align-items-start">
-            <div class="col-sm-2">
-                <label class="control-label">Student records (click name to edit)</label>
+
+        <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
+        <div th:object="${guardian}">
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Guardian name</label>
+                </div>
+                <div class="col-sm-8" th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
+                    <input size="50" placeholder="First name" th:field="*{firstName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('firstName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('firstName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                    <input size="50" placeholder="Last name" th:field="*{lastName}" th:errorclass="has-error"/>
+                    <span class="help-block" th:if="${#fields.hasErrors('lastName')}">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('lastName')}" th:text="${err}">Error</li>
+                    </ul>
+                </span>
+                </div>
             </div>
-            <div class="col-sm-8">
-                <span th:if="${guardian.getStudents() == null}">
+            <br/>
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Student records (click name to edit)</label>
+                </div>
+                <div class="col-sm-8">
+                <span th:if="${guardian.getStudents().isEmpty()}">
                     <label size="50" th:text="'No students on file'">Number of students</label><br/>
                 </span>
-                <span th:unless="${guardian.getStudents() == null}">
+                    <span th:unless="${guardian.getStudents().isEmpty()}">
                     <div th:each="student: ${guardian.getStudents()}">
                         <label><a th:text="${student.firstName} + ' ' + ${student.lastName}"
                                   th:href="@{/students/{studentID}/edit(studentID=${student.id})}"></a></label>
                     </div>
                 </span>
-                <a th:href="@{/guardians/{guardianId}/addRemoveStudents(guardianId=${guardian.id})}"
-                   class="btn btn-sm btn-outline-info">Add/remove student</a>
+                    <a th:href="@{/guardians/{guardianId}/addRemoveStudents(guardianId=${guardian.id})}"
+                       class="btn btn-sm btn-outline-info">Add/remove student</a>
+                </div>
             </div>
+            <br/>
+
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Address</label>
+                </div>
+                <div class="col-sm-8">
+                    <label for="firstLine">First line </label>
+                    <input id="firstLine" size="40" th:field="*{address.firstLine}"/>
+                    <br/>
+                    <label for="secondLine">Second line</label>
+                    <input id="secondLine" size="40" th:field="*{address.secondLine}"/>
+                    <br/>
+                    <label for="postCode">Post code</label>
+                    <input id="postCode" size="40" th:field="*{address.postcode}"/>
+                    <br/>
+                </div>
+            </div>
+            <br/>
+
+            <div class="row align-items-start">
+                <div class="col-sm-2">
+                    <label class="control-label">Contact details</label>
+                </div>
+                <div class="col-sm-8">
+                    <label for="emailAddress">Email address </label>
+                    <input id="emailAddress" size="40" th:field="*{contactDetail.email}"/>
+                    <br/>
+                    <label for="phoneNumber">Phone number</label>
+                    <input id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
+                    <br/>
+                </div>
+            </div>
+            <br/>
         </div>
-        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Address</label>
+                <label class="control-label">Time-stamps</label>
             </div>
             <div class="col-sm-8">
-                <label for="firstLine">First line </label>
-                <input id="firstLine" size="40" th:field="*{address.firstLine}"/>
-                <br/>
-                <label for="secondLine">Second line</label>
-                <input id="secondLine" size="40" th:field="*{address.secondLine}"/>
-                <br/>
-                <label for="postCode">Post code</label>
-                <input id="postCode" size="40" th:field="*{address.postcode}"/>
-                <br/>
+                <div>
+                    <p th:text="${'Account created: ' + user.getCreatedDate()}">
+                </div>
+                <div>
+                    <p th:text="${'Account last modified: ' + user.getLastModifiedDate()}"></p>
+                </div>
             </div>
         </div>
-        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Contact details</label>
+                <label class="control-label">Current access</label>
             </div>
             <div class="col-sm-8">
-                <label for="emailAddress">Email address </label>
-                <input id="emailAddress" size="40" th:field="*{contactDetail.email}"/>
-                <br/>
-                <label for="phoneNumber">Phone number</label>
-                <input id="phoneNumber" size="40" th:field="*{contactDetail.phoneNumber}"/>
-                <br/>
+                <div>
+                    <label>Account is enabled: </label>
+                    <input type="checkbox" th:field="*{enabled}" th:value="${user.enabled}"/>
+                </div>
+                <div>
+                    <label>Account is not locked: </label>
+                    <input type="checkbox" th:field="*{accountNonLocked}" th:value="${user.accountNonLocked}"/>
+                </div>
+                <div>
+                    <label>Account has not expired: </label>
+                    <input type="checkbox" th:field="*{accountNonExpired}" th:value="${user.accountNonExpired}"/>
+                </div>
+                <div>
+                    <label>Account credentials have not expired: </label>
+                    <input type="checkbox" th:field="*{credentialsNonExpired}"
+                           th:value="${user.credentialsNonExpired}"/>
+                </div>
             </div>
         </div>
+
         <br/>
 
         <div class="row align-items-start">
@@ -101,6 +166,16 @@
                    role="button">View summary</a>
             </div>
         </div>
+    </form>
+
+    <hr>
+    <form th:action="@{/resetPassword/{ID}(ID=${user.id})}" method="post"
+          sec:authorize="hasAuthority('admin.update')">
+        <input type="submit" value="Reset password" style="width: 200px"/>
+        <span class="help-block">
+                    <!--/*@thymesVar id="confirmReset" type="java.lang.String"*/-->
+                    <p class="alert-success" th:if="${confirmReset != null}" th:text="${confirmReset}"></p>
+                </span>
     </form>
 </div>
 
