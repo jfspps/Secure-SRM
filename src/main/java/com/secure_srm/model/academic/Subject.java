@@ -33,6 +33,7 @@ public class Subject extends BaseEntity implements Comparable<Subject>{
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
     @JsonIgnore
+    @Builder.Default
     private Set<TeacherUser> teachers = new HashSet<>();
 
     //custom comparator (list by subject name)

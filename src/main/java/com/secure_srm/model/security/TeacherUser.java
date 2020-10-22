@@ -32,7 +32,8 @@ public class TeacherUser extends BaseEntity implements Comparable<TeacherUser>{
     private String lastName;
 
     @OneToMany(mappedBy = "teacherUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    Set<User> users;
+    @Builder.Default
+    Set<User> users = new HashSet<>();
 
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
@@ -40,9 +41,11 @@ public class TeacherUser extends BaseEntity implements Comparable<TeacherUser>{
     @JoinTable(name = "teacher_subject",
             joinColumns = @JoinColumn(name = "teacher_id"), inverseJoinColumns = @JoinColumn(name = "subject_id"))
     @ManyToMany
+    @Builder.Default
     private Set<Subject> subjects = new HashSet<>();
 
-    private String department;
+    @Builder.Default
+    private String department = "";
 
     @OneToOne
     private ContactDetail contactDetail;

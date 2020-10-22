@@ -1,10 +1,7 @@
 package com.secure_srm.model.people;
 
 import com.secure_srm.model.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,11 +10,14 @@ import java.util.Set;
 
 @Setter
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentList extends BaseEntity {
 
-    private String groupName;
+    @Builder.Default
+    private String groupName = "";
 
-    Set<Student> students = new HashSet<>();
+    @Builder.Default
+    private Set<Student> students = new HashSet<>();
 }

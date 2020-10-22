@@ -25,7 +25,9 @@ public class Report extends BaseEntity {
     @OneToOne
     private Subject subject;
 
-    private String comments;
+    @Builder.Default
+    private String comments = "";
 
-    private String uniqueIdentifier;
+    @Builder.Default
+    private String uniqueIdentifier = "";
 }

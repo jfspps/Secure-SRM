@@ -24,6 +24,7 @@ public class FormGroupList extends BaseEntity implements Comparable<FormGroupLis
     private String groupName;
 
     @OneToMany(mappedBy = "formGroupList")
+    @Builder.Default
     private Set<Student> studentList = new HashSet<>();
 
     @OneToOne

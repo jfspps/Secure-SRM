@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -25,7 +26,7 @@ public class RootUser extends BaseEntity implements Comparable<RootUser>{
     private String lastName;
 
     @OneToMany(mappedBy = "rootUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    Set<User> users;
+    Set<User> users = new HashSet<>();
 
     @OneToOne
     private ContactDetail contactDetail;

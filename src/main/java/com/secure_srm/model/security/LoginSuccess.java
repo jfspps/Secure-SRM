@@ -19,5 +19,6 @@ public class LoginSuccess extends BaseEntity {
     @ManyToOne
     private User user;
 
-    private String sourceIP;
+    @Builder.Default
+    private String sourceIP = "";
 }

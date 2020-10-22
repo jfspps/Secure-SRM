@@ -13,9 +13,12 @@ import javax.persistence.Entity;
 @Entity
 public class Address extends BaseEntity {
 
-    private String firstLine;
+    @Builder.Default
+    private String firstLine = "";
 
-    private String secondLine;
+    @Builder.Default
+    private String secondLine = "";
 
-    private String postcode;
+    @Builder.Default
+    private String postcode = "";
 }

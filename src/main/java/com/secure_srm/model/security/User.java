@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     @JoinTable(name = "user_role",
             joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
             inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     //recall from the DB as needed (when User is injected into the context, converting Authorities from Roles is handled here
     //instead of through JPAUserDetails (ensure roles is loaded eagerly, not lazily, above)
@@ -115,5 +116,6 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
 
     //testRecord mappings, one user to many testRecords
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<TestRecord> testRecords;
+    @Builder.Default
+    private Set<TestRecord> testRecords = new HashSet<>();
 }

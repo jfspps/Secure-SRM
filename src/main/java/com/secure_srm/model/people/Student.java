@@ -26,7 +26,8 @@ public class Student extends BaseEntity implements Comparable<Student>{
     @Size(min = 1, max = 255)
     private String lastName;
 
-    private String middleNames;
+    @Builder.Default
+    private String middleNames = "";
 
     //the @JsonIgnore added to prevent Spring from creating infinitely long JSONs
     //(https://stackoverflow.com/questions/20813496/tomcat-exception-cannot-call-senderror-after-the-response-has-been-committed)
@@ -34,6 +35,7 @@ public class Student extends BaseEntity implements Comparable<Student>{
     @JoinTable(name = "student_guardian",
             joinColumns = @JoinColumn(name = "student_id"), inverseJoinColumns = @JoinColumn(name = "guardian_id"))
     @ManyToMany
+    @Builder.Default
     private Set<GuardianUser> guardians = new HashSet<>();
 
     //personal tutor; no need for cascading
@@ -45,6 +47,7 @@ public class Student extends BaseEntity implements Comparable<Student>{
     @JoinTable(name = "student_subjectlist",
             joinColumns = @JoinColumn(name = "student_id"), inverseJoinColumns = @JoinColumn(name = "subjectclasslist_id"))
     @ManyToMany
+    @Builder.Default
     private Set<SubjectClassList> subjectClassLists = new HashSet<>();
 
     @JsonIgnore

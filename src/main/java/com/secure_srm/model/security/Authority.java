@@ -4,6 +4,7 @@ import com.secure_srm.model.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 //USER <--> ROLE <--> AUTHORITY
@@ -16,8 +17,10 @@ import java.util.Set;
 @Entity
 public class Authority extends BaseEntity {
 
-    private String permission;
+    @Builder.Default
+    private String permission = "";
 
     @ManyToMany(mappedBy = "authorities")
-    private Set<Role> roles;
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 }

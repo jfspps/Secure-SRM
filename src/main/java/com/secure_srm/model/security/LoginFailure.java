@@ -19,7 +19,9 @@ public class LoginFailure extends BaseEntity {
     @ManyToOne
     private User user;
 
-    private String sourceIP;
+    @Builder.Default
+    private String sourceIP = "";
 
-    private String usernameEntered;
+    @Builder.Default
+    private String usernameEntered = "";
 }
