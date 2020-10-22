@@ -108,76 +108,12 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
     @ParameterizedTest
-    void redirectToLoginWhenRequestingUserPage_AllUsers(String username, String pwd) throws Exception {
-        //see https://www.baeldung.com/spring-security-redirect-login
-
-        MockHttpServletRequestBuilder securedResourceAccess = get("/userPage");
-
-        //gather what happens when accessing /authenticated as an anonymous user
-        MvcResult unauthenticatedResult = mockMvc
-                .perform(securedResourceAccess)
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-
-        //retrieve any session data
-        MockHttpSession session = (MockHttpSession) unauthenticatedResult
-                .getRequest()
-                .getSession();
-
-        //post login data under same session
-        mockMvc
-                .perform(post("/login")
-                        .param("username", username)
-                        .param("password", pwd)
-                        .session(session)
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("**/userPage"))
-                .andReturn();
-
-        //verify that the user session enables future access without re-logging in
-        mockMvc
-                .perform(securedResourceAccess.session(session))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("user"))
-                .andExpect(model().attributeExists("userID"));
-    }
-
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
-    @ParameterizedTest
     void loginAuthHttpBasic_AllUsers_Authenticated(String username, String pwd) throws Exception {
         mockMvc.perform(get("/authenticated").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("authenticated"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("userID"));
-    }
-
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
-    @ParameterizedTest
-    void loginAuthHttpBasic_AllUsers_UserPage(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/userPage").with(httpBasic(username, pwd)))
-                .andExpect(status().isOk())
-                .andExpect(view().name("userPage"))
-                .andExpect(model().attributeExists("user"))
-                .andExpect(model().attributeExists("userID"));
-    }
-
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
-    @ParameterizedTest
-    void listUser_SchoolStaff_PASS(String username, String pwd) throws Exception{
-        mockMvc.perform(get("/listUsers").with(httpBasic(username, pwd)))
-                .andExpect(status().isOk())
-                .andExpect(view().name("userPage"))
-                .andExpect(model().attributeExists("usersFound"))
-                .andExpect(model().attributeExists("userID"));
-    }
-
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllGuardians")
-    @ParameterizedTest
-    void listUser_Guardians_FAIL(String username, String pwd) throws Exception{
-        mockMvc.perform(get("/listUsers").with(httpBasic(username, pwd)))
-                .andExpect(status().isForbidden());
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
@@ -188,9 +124,7 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("adminPage"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("userID"))
-                .andExpect(model().attributeExists("GuardianUsersFound"))
-                .andExpect(model().attributeExists("AdminUsersFound"))
-                .andExpect(model().attributeExists("TeacherUsersFound"));
+                .andExpect(model().attributeExists("AdminUsersFound"));
     }
 
     //same test as above with new annotation (username and pwd are pulled from JPAUserDetails)
@@ -202,9 +136,7 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("adminPage"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("userID"))
-                .andExpect(model().attributeExists("GuardianUsersFound"))
-                .andExpect(model().attributeExists("AdminUsersFound"))
-                .andExpect(model().attributeExists("TeacherUsersFound"));
+                .andExpect(model().attributeExists("AdminUsersFound"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllNonAdminUsers")

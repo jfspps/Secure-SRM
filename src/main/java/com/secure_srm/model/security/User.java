@@ -1,11 +1,7 @@
 package com.secure_srm.model.security;
 
 import com.secure_srm.model.BaseEntity;
-import com.secure_srm.model.TestRecord;
-import com.secure_srm.model.people.ContactDetail;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,9 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,9 +107,4 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     //GuardianUser is granted read-only access via selected requests and queries
     @ManyToOne(fetch = FetchType.EAGER)
     private GuardianUser guardianUser;
-
-    //testRecord mappings, one user to many testRecords
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @Builder.Default
-    private Set<TestRecord> testRecords = new HashSet<>();
 }
