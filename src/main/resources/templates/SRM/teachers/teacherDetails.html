@@ -30,10 +30,6 @@
                 <label size="50" th:text="*{firstName}">First name to appear here</label>
                 <label size="50" th:text="*{lastName}">Last name to appear here</label>
             </div>
-            <!--/*@thymesVar id="newTeacher" type="java.lang.String"*/-->
-            <span class="help-block" th:if="${newTeacher != null}">
-                <p class="alert alert-info" th:text="${newTeacher}"></p>
-            </span>
         </div>
         <br/>
         <div class="row align-items-start">

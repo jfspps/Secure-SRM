@@ -75,15 +75,15 @@ public class TeacherController {
     public ModelAndView getTeacherDetails(@PathVariable String teacherId) {
         ModelAndView mav = new ModelAndView("/SRM/teachers/teacherDetails");
         if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
-            log.debug("Teacher with ID: " + teacherId + " not found");
+            log.debug("Teacher not found");
             throw new NotFoundException("Teacher not found");
-        } else {
-            TeacherUser teacher = teacherUserService.findById(Long.valueOf(teacherId));
-            Set<Subject> subjectsTaught = new HashSet<>(teacher.getSubjects());
-            mav.addObject("subjectsTaught", subjectsTaught);
-            mav.addObject("teacher", teacher);
-            return mav;
         }
+
+        TeacherUser teacher = teacherUserService.findById(Long.valueOf(teacherId));
+        Set<Subject> subjectsTaught = new HashSet<>(teacher.getSubjects());
+        mav.addObject("subjectsTaught", subjectsTaught);
+        mav.addObject("teacher", teacher);
+        return mav;
     }
 
     @AdminCreate
@@ -180,8 +180,8 @@ public class TeacherController {
         User userFound = teacherOnFile.getUsers().stream().findFirst().get();
 
         //process User username
-        if (!user.getUsername().equals(userFound.getUsername())){
-            if (userService.findByUsername(user.getUsername()) != null){
+        if (!user.getUsername().equals(userFound.getUsername())) {
+            if (userService.findByUsername(user.getUsername()) != null) {
                 log.debug("Username already exists");
                 userResult.rejectValue("username", "duplicate", "Already in use");
                 model.addAttribute("teacher", teacher);
@@ -197,7 +197,7 @@ public class TeacherController {
         teacherOnFile.setSubjects(teacher.getSubjects());
 
         ContactDetail contactDetailFound;
-        if (teacher.getContactDetail() != null){
+        if (teacher.getContactDetail() != null) {
             contactDetailFound = teacher.getContactDetail();
         } else {
             contactDetailFound = ContactDetail.builder().build();

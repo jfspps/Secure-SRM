@@ -13,6 +13,10 @@
     <div class="row">
         <div class="col">
             <h2>Guardian details</h2>
+            <!--/*@thymesVar id="userFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${userFeedback != null}">
+                <p class="alert alert-info" th:text="${userFeedback}"></p>
+            </span>
         </div>
     </div>
     <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
@@ -25,14 +29,10 @@
                 <label size="50" th:text="*{firstName}">First name to appear here</label>
                 <label size="50" th:text="*{lastName}">Last name to appear here</label>
             </div>
-            <!--/*@thymesVar id="newGuardian" type="java.lang.String"*/-->
-            <span class="help-block" th:if="${newGuardian != null}">
-                <p class="alert alert-info" th:text="${newGuardian}"></p>
-            </span>
         </div>
         <br/>
 
-        <div class="row align-items-start" th:if="${students.isEmpty()}">
+        <div class="row align-items-start" th:if="${guardian.getStudents().isEmpty()}">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Student name</b></label>
             </div>
@@ -40,8 +40,7 @@
                 <label size="50" th:text="${'(No students registered to this Guardian)'}"></label>
             </div>
         </div>
-        <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
-        <div class="row align-items-start" th:unless="${students.isEmpty()}" th:each="student: ${students}">
+        <div class="row align-items-start" th:unless="${guardian.getStudents().isEmpty()}" th:each="student: ${guardian.getStudents()}">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Student name</b></label>
             </div>
@@ -56,10 +55,10 @@
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Address line 1</b></label>
             </div>
-            <div class="col-sm-8" th:if="${guardian.address.firstLine.isEmpty()}">
+            <div class="col-sm-8" th:if="*{address?.firstLine?.isBlank()}">
                 <label size="50">(record not found)</label>
             </div>
-            <div class="col-sm-8" th:unless="${guardian.address.firstLine.isEmpty()}">
+            <div class="col-sm-8" th:unless="*{address?.firstLine?.isBlank()}">
                 <label size="50" th:text="*{address.firstLine}">First line of address to appear here</label>
             </div>
         </div>
@@ -86,7 +85,6 @@
             </div>
         </div>
         <br/>
-
 
         <div class="row align-items-start">
             <div class="col-sm-2">

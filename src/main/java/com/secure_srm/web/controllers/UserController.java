@@ -200,8 +200,9 @@ public class UserController {
                 model.addAttribute("user", currentUser);
                 return "/SRM/teachers/updateTeacher";
             } else {
-                model.addAttribute("currentGuardianUser", currentUser.getGuardianUser());
-                return "guardianUpdate";
+                model.addAttribute("guardian", currentUser.getGuardianUser());
+                model.addAttribute("user", currentUser);
+                return "/SRM/guardians/updateGuardian";
             }
         }
         log.debug("User not found");
