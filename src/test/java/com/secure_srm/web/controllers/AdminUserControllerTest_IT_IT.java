@@ -124,7 +124,6 @@ public class AdminUserControllerTest_IT_IT extends UserControllerTest_IT {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attributeExists("usernameError"))
                 .andExpect(model().attributeExists("currentUser"))
                 .andExpect(model().attributeExists("currentAdminUser"));
     }
@@ -139,7 +138,6 @@ public class AdminUserControllerTest_IT_IT extends UserControllerTest_IT {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attributeExists("adminUserNameError"))
                 .andExpect(model().attributeExists("currentUser"))
                 .andExpect(model().attributeExists("currentAdminUser"));
     }
@@ -169,7 +167,6 @@ public class AdminUserControllerTest_IT_IT extends UserControllerTest_IT {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("adminUpdate"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attributeExists("adminUserExists"))
                 .andExpect(model().attributeExists("currentUser"))
                 .andExpect(model().attributeExists("currentAdminUser"));
     }

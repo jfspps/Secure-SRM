@@ -81,7 +81,7 @@
                 <span th:if="${task.thresholdListSet?.isEmpty()}">
                     <label size="50">(None on record)</label>
                 </span>
-                <!--/*@thymesVar id="thresoldList" type="com.secure_srm.model.academic.ThresholdList"*/-->
+                <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
                 <span th:unless="${task.thresholdListSet?.isEmpty()}" th:each="thresoldList : ${task.thresholdListSet}">
                     <label size="50" th:text="${thresoldList.uniqueID}"></label>
                 </span>

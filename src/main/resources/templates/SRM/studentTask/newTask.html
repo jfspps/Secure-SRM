@@ -17,12 +17,68 @@
         </div>
     </div>
 
+    <form method="get" th:action="@{/studentTask/new/search}"
+          class="form-horizontal" id="refine-teachers-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Threshold lists</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="thresholdListUniqueID" placeholder="Threshold list unique ID"
+                       aria-label="Search" maxlength="50">
+                <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+    <br />
+
     <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
     <form th:object="${task}" method="post" th:action="@{/studentTask/new}"
           class="form-horizontal" id="change-teacherSet-form">
+
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Subject</label>
+                <label class="control-label">Threshold lists (optional)</label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Unique ID</th>
+                        <th class="px-3">Number of thresholds</th>
+                        <th class="px-3">List owner</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <span th:if="${thresholdLists.isEmpty()}">
+                            <tr>
+                                <td></td>
+                                <td>No student tasks on record</td>
+                                <td></td>
+                            </tr>
+                        </span>
+                    <span th:unless="${thresholdLists.isEmpty()}">
+                            <!--/*@thymesVar id="list" type="com.secure_srm.model.academic.ThresholdList"*/-->
+                            <tr th:each="list: ${thresholdLists}">
+                                <td>
+                                    <input type="checkbox" th:field="*{thresholdListSet}" th:value="${list.id}"/>
+                                    <label><a th:text="${list.uniqueID}"
+                                              th:href="@{/thresholdLists/{id}(id=${list.id})}"></a> </label>
+                                </td>
+                                <td th:text="${list.thresholds.size()}"></td>
+                                <td th:text="${list.uploader.firstName + ' ' + list.uploader.lastName}"></td>
+                            </tr>
+                        </span>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Subject (required)</label>
             </div>
             <div class="col-sm-8">
                 <table class="table table-hover table-sm table-striped">
@@ -48,7 +104,7 @@
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Assignment type</label>
+                <label class="control-label">Assignment type (required)</label>
             </div>
             <div class="col-sm-8">
                 <table class="table table-hover table-sm table-striped">
@@ -93,7 +149,7 @@
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Task title</label>
+                <label class="control-label">Task title (required)</label>
             </div>
             <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
                 <input size="50" placeholder="Task title" th:field="*{title}" th:errorclass="has-error"/>
