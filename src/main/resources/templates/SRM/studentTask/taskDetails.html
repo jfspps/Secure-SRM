@@ -74,6 +74,22 @@
         <br/>
 
         <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label" size="30"><b>Threshold-list identifier</b></label>
+            </div>
+            <div class="col-sm-8">
+                <span th:if="${task.thresholdListSet?.isEmpty()}">
+                    <label size="50">(None on record)</label>
+                </span>
+                <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
+                <span th:unless="${task.thresholdListSet?.isEmpty()}" th:each="thresoldList : ${task.thresholdListSet}">
+                    <label size="50" th:text="${thresoldList.uniqueID}"></label>
+                </span>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/studentTask/index" role="button">Student task index</a>
                 <a class="btn btn-outline-warning" th:href="@{/studentTask/{Id}/edit(Id=${task.id})}"

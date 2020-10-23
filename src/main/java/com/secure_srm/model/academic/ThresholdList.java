@@ -1,5 +1,6 @@
 package com.secure_srm.model.academic;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.*;
@@ -35,4 +36,11 @@ public class ThresholdList extends BaseEntity implements Comparable<ThresholdLis
 
     @OneToOne
     private TeacherUser uploader;
+
+    @JsonIgnore
+    @JoinTable(name = "studentTask_thresholdList",
+            joinColumns = @JoinColumn(name = "thresholdList_id"), inverseJoinColumns = @JoinColumn(name = "studentTask_id"))
+    @ManyToMany
+    @Builder.Default
+    private Set<StudentTask> studentTaskSet = new HashSet<>();
 }

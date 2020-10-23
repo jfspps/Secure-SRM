@@ -21,6 +21,8 @@
             <th class="px-3">Subject</th>
             <th class="px-3">Task type</th>
             <th class="px-3">No. of student records</th>
+            <th class="px-3">No. of threshold-lists</th>
+
         </tr>
         </thead>
         <tbody th:object="${tasks}">
@@ -28,6 +30,7 @@
         <tr th:if="${tasks.isEmpty()}">
             <th class="px-3" sec:authorize="hasAuthority('teacher.update')"></th>
             <td class="px-3">(No student tasks on record)</td>
+            <td class="px-3"></td>
             <td class="px-3"></td>
             <td class="px-3"></td>
             <td class="px-3"></td>
@@ -47,6 +50,7 @@
             <td class="px-3" th:text="${task.subject.subjectName}"></td>
             <td class="px-3" th:text="${task.assignmentType.description}"></td>
             <td class="px-3" th:text="${task.studentResults.size()}"></td>
+            <td class="px-3" th:text="${task.thresholdListSet.size()}"></td>
         </tr>
         </tbody>
     </table>

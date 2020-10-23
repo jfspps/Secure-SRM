@@ -1,10 +1,7 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
-import com.secure_srm.model.academic.AssignmentType;
-import com.secure_srm.model.academic.Subject;
-import com.secure_srm.model.academic.Threshold;
-import com.secure_srm.model.academic.ThresholdList;
+import com.secure_srm.model.academic.*;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.people.SubjectClassList;
@@ -220,5 +217,15 @@ public class AuxiliaryController {
         //see ThresholdList's model string comparison method, compareTo()
         Collections.sort(listByUniqueID);
         return listByUniqueID;
+    }
+
+    /**
+     * Returns an ArrayList of items, sorted by UniqueID
+     */
+    public List<StudentTask> sortStudentTaskByTitle(Set<StudentTask> studentTaskSet) {
+        List<StudentTask> listByTitle = new ArrayList<>(studentTaskSet);
+        //see StudentTask's model string comparison method, compareTo()
+        Collections.sort(listByTitle);
+        return listByTitle;
     }
 }

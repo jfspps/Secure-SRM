@@ -42,7 +42,22 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/studentTask/newTask"))
                 .andExpect(model().attributeExists("task"))
                 .andExpect(model().attributeExists("subjects"))
-                .andExpect(model().attributeExists("assignmentTypes"));
+                .andExpect(model().attributeExists("assignmentTypes"))
+                .andExpect(model().attributeExists("thresholdLists"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getNewStudentTask_search(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/studentTask/new/search").with(httpBasic(username, pwd)).with(csrf())
+                .param("thresholdListUniqueID", "Math"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentTask/newTask"))
+                .andExpect(model().attributeExists("task"))
+                .andExpect(model().attributeExists("subjects"))
+                .andExpect(model().attributeExists("assignmentTypes"))
+                .andExpect(model().attributeExists("thresholdLists"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -92,6 +107,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
         StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
                 .contributor(true)
                 .maxScore("120")
+                .thresholdListSet(new HashSet<>())
                 .studentResults(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
@@ -105,7 +121,33 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/studentTask/updateTask"))
                 .andExpect(model().attributeExists("task"))
                 .andExpect(model().attributeExists("subjects"))
-                .andExpect(model().attributeExists("assignmentTypes"));
+                .andExpect(model().attributeExists("assignmentTypes"))
+                .andExpect(model().attributeExists("thresholdLists"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getUpdateStudentTask_search() throws Exception {
+        StudentTask temp = StudentTask.builder().assignmentType(assignmentTypeService.findById(1L))
+                .contributor(true)
+                .maxScore("120")
+                .thresholdListSet(new HashSet<>())
+                .studentResults(new HashSet<>())
+                .subject(subjectService.findById(1L))
+                .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
+                .title("new student task")
+                .build();
+        studentTaskService.save(temp);
+
+        mockMvc.perform(get("/studentTask/" + temp.getId() + "/edit/search").with(csrf())
+                .param("thresholdListUniqueID", "calc"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/studentTask/updateTask"))
+                .andExpect(model().attributeExists("task"))
+                .andExpect(model().attributeExists("subjects"))
+                .andExpect(model().attributeExists("assignmentTypes"))
+                .andExpect(model().attributeExists("thresholdLists"));
     }
 
     @WithUserDetails("marymanning")
@@ -158,6 +200,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
                 .contributor(true)
                 .maxScore("120")
                 .studentResults(new HashSet<>())
+                .thresholdListSet(new HashSet<>())
                 .subject(subjectService.findById(1L))
                 .teacherUploader(userService.findByUsername("keithjones").getTeacherUser())
                 .title("new student task 22")
@@ -167,7 +210,7 @@ public class StudentTaskControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(post("/studentTask/" + temp.getId() + "/edit").with(csrf()))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/studentTask/updateTask"))
+                .andExpect(view().name("/SRM/studentTask/taskDetails"))
                 .andExpect(model().attributeExists("task"))
                 .andExpect(model().attribute("taskFeedback", "You are not permitted to edit this task"));
     }

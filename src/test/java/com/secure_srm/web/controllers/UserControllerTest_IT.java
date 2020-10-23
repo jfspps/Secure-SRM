@@ -49,13 +49,13 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
     @WithMockUser("random")
     @Test
     void loginPage_random() throws Exception {
-        mockMvc.perform(get("/authenticated"))
+        mockMvc.perform(get("/accountSettings"))
                 .andExpect(status().is4xxClientError());
     }
 
     @Test
     void loginAuthHttpBasicFAIL() throws Exception {
-        MvcResult unauthenticatedResult = mockMvc.perform(get("/authenticated").with(httpBasic("randomPerson", "xyz")))
+        MvcResult unauthenticatedResult = mockMvc.perform(get("/accountSettings").with(httpBasic("randomPerson", "xyz")))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
 
@@ -71,12 +71,12 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
     @ParameterizedTest
-    void redirectToLoginWhenRequestingAuthenticated_AllUsers(String username, String pwd) throws Exception {
+    void redirectToLoginWhenRequestingAccountSettings_AllUsers(String username, String pwd) throws Exception {
         //see https://www.baeldung.com/spring-security-redirect-login
 
-        MockHttpServletRequestBuilder securedResourceAccess = get("/authenticated");
+        MockHttpServletRequestBuilder securedResourceAccess = get("/accountSettings");
 
-        //gather what happens when accessing /authenticated as an anonymous user
+        //gather what happens when accessing /accountSettings as an anonymous user
         MvcResult unauthenticatedResult = mockMvc
                 .perform(securedResourceAccess)
                 .andExpect(status().is4xxClientError())
@@ -95,7 +95,7 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
                         .session(session)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("**/authenticated"))
+                .andExpect(redirectedUrlPattern("**/accountSettings"))
                 .andReturn();
 
         //verify that the user session enables future access without re-logging in
@@ -108,10 +108,10 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
     @ParameterizedTest
-    void loginAuthHttpBasic_AllUsers_Authenticated(String username, String pwd) throws Exception {
-        mockMvc.perform(get("/authenticated").with(httpBasic(username, pwd)).with(csrf()))
+    void loginAuthHttpBasic_AllUsers_AccountSettings(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/accountSettings").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("authenticated"))
+                .andExpect(view().name("accountSettings"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("userID"));
     }

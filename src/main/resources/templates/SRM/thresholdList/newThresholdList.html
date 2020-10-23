@@ -26,6 +26,16 @@
             <div class="col-sm-8">
                 <input class="form-control mr-sm-2" type="text" name="thresholdUniqueId" placeholder="Threshold unique ID"
                        aria-label="Search" maxlength="50">
+            </div>
+        </div>
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label>Student tasks</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control mr-sm-2" type="text" name="studentTaskTitle" placeholder="Student task title"
+                       aria-label="Search" maxlength="50">
                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0" type="submit">Search</button>
             </div>
         </div>
@@ -38,7 +48,7 @@
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Thresholds</label>
+                <label class="control-label">Thresholds (required)</label>
             </div>
             <div class="col-sm-8">
                 <table class="table table-hover table-sm table-striped">
@@ -77,7 +87,46 @@
 
         <div class="row align-items-start">
             <div class="col-sm-2">
-                <label class="control-label">Unique ID</label>
+                <label class="control-label">Student tasks (optional)</label>
+            </div>
+            <div class="col-sm-8">
+                <table class="table table-hover table-sm table-striped">
+                    <thead class="thead-light">
+                    <tr>
+                        <th class="px-3">Title</th>
+                        <th class="px-3">Subject</th>
+                        <th class="px-3">Task owner</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <span th:if="${studentTasks.isEmpty()}">
+                            <tr>
+                                <td></td>
+                                <td>No student tasks on record</td>
+                                <td></td>
+                            </tr>
+                        </span>
+                    <span th:unless="${studentTasks.isEmpty()}">
+                            <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
+                            <tr th:each="task: ${studentTasks}">
+                                <td>
+                                    <input type="checkbox" th:field="*{studentTaskSet}" th:value="${task.id}"/>
+                                    <label><a th:text="${task.title}"
+                                              th:href="@{/studentTask/{id}(id=${task.id})}"></a> </label>
+                                </td>
+                                <td th:text="${task.subject.subjectName}"></td>
+                                <td th:text="${task.teacherUploader.firstName + ' ' + task.teacherUploader.lastName}"></td>
+                            </tr>
+                        </span>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <label class="control-label">Unique ID (recommended)</label>
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Unique identifier" th:field="*{uniqueID}"/>

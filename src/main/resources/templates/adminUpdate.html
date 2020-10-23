@@ -30,12 +30,6 @@
                         <label>Admin's last name: </label>
                         <input size="50" type="text" th:field="*{lastName}"/>
                     </div>
-                    <span class="help-block">
-                        <!--/*@thymesVar id="adminUserNameError" type="java.lang.String"*/-->
-                        <p class="alert-warning" th:text="${adminUserNameError}">Error</p>
-                        <!--/*@thymesVar id="adminUserExists" type="java.lang.String"*/-->
-                        <p class="alert-warning" th:text="${adminUserExists}">Error</p>
-                    </span>
                 </div>
                 <div>
                     <label>Weblogin username: </label>
