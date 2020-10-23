@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.exceptions.ForbiddenException;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.security.*;
@@ -47,7 +48,7 @@ public class UserController {
     }
 
     @ModelAttribute("hasSubject")
-    public Boolean teachesSubjects(){
+    public Boolean teachesSubjects() {
         //determines if a User is a teacher and then if they teach anything (blocks New Student Task/Report/Result as appropriate)
         return auxiliaryController.teachesASubject();
     }
@@ -86,11 +87,11 @@ public class UserController {
         User user = auxiliaryController.getCurrentUser();
         model.addAttribute("userID", user.getId());
         model.addAttribute("user", auxiliaryController.getUsername());
-        if (user.getAdminUser() != null){
+        if (user.getAdminUser() != null) {
             model.addAttribute("contactDetails", user.getAdminUser().getContactDetail());
-        } else if (user.getTeacherUser() != null){
+        } else if (user.getTeacherUser() != null) {
             model.addAttribute("contactDetails", user.getTeacherUser().getContactDetail());
-        } else if (user.getGuardianUser() != null){
+        } else if (user.getGuardianUser() != null) {
             model.addAttribute("contactDetails", user.getGuardianUser().getContactDetail());
         }
         return "authenticated";
@@ -98,26 +99,26 @@ public class UserController {
 
     /**
      * Processes contact detail changes via the 'Account Settings' dropdown
-     * */
+     */
     @GuardianUpdate
     @PostMapping("/editContactDetails/{userID}")
     public String updateContactDetails(@PathVariable("userID") String userID, Model model,
-                                       @ModelAttribute("contactDetails") ContactDetail contactDetail){
-        if (userService.findById(Long.valueOf(userID)) == null){
+                                       @ModelAttribute("contactDetails") ContactDetail contactDetail) {
+        if (userService.findById(Long.valueOf(userID)) == null) {
             log.debug("Cannot update contact details with given ID");
             throw new NotFoundException("User with given ID not found");
         } else {
             User userOnFile = userService.findById(Long.valueOf(userID));
             ContactDetail savedContacts;
-            if (userOnFile.getAdminUser() != null){
+            if (userOnFile.getAdminUser() != null) {
                 ContactDetail contactsOnFile = userOnFile.getAdminUser().getContactDetail();
                 savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
                 userOnFile.getAdminUser().setContactDetail(savedContacts);
-            } else if (userOnFile.getTeacherUser() != null){
+            } else if (userOnFile.getTeacherUser() != null) {
                 ContactDetail contactsOnFile = userOnFile.getTeacherUser().getContactDetail();
                 savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
                 userOnFile.getTeacherUser().setContactDetail(savedContacts);
-            } else if (userOnFile.getGuardianUser() != null){
+            } else if (userOnFile.getGuardianUser() != null) {
                 ContactDetail contactsOnFile = userOnFile.getGuardianUser().getContactDetail();
                 savedContacts = syncAndSaveContacts(contactDetail, contactsOnFile);
                 userOnFile.getGuardianUser().setContactDetail(savedContacts);
@@ -163,10 +164,10 @@ public class UserController {
             model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", currentUser);
             model.addAttribute("confirmReset", "Password has been reset and changes have been saved.");
-            if (currentUser.getAdminUser() != null){
+            if (currentUser.getAdminUser() != null) {
                 model.addAttribute("currentAdminUser", currentUser.getAdminUser());
                 return "adminUpdate";
-            } else if (currentUser.getTeacherUser() != null){
+            } else if (currentUser.getTeacherUser() != null) {
                 model.addAttribute("teacher", currentUser.getTeacherUser());
                 model.addAttribute("user", currentUser);
                 return "/SRM/teachers/updateTeacher";
@@ -182,15 +183,15 @@ public class UserController {
 
     @AdminUpdate
     @PostMapping("/changePassword/{userID}")
-    public String postChangePassword(@PathVariable String userID,
-                                     @Valid @ModelAttribute("currentUser") User passwordChangeUser,
-                                     BindingResult bindingResult, Model model) {
+    public String postChangeAdminUserPassword(@PathVariable String userID,
+                                              @Valid @ModelAttribute("currentUser") User passwordChangeUser,
+                                              BindingResult bindingResult, Model model) {
         if (userService.findById(Long.valueOf(userID)) == null) {
             log.debug("User not found");
             throw new NotFoundException("User not found");
         }
 
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("user", auxiliaryController.getUsername());
             model.addAttribute("currentUser", passwordChangeUser);
@@ -203,6 +204,40 @@ public class UserController {
         User saved = userService.save(found);
         log.debug("Password change for " + saved.getUsername() + " has been saved");
         return "adminPage";
+    }
+
+    @GuardianUpdate
+    @GetMapping("/changePassword")
+    public String getChangePassword(Model model) {
+        if (userService.findByUsername(auxiliaryController.getUsername()) == null) {
+            log.debug("Attempt to change password not recognised");
+            throw new ForbiddenException("Attempt to change password not recognised");
+        }
+
+        model.addAttribute("userID", auxiliaryController.getUserId());
+        return "changePassword";
+    }
+
+    @GuardianUpdate
+    @PostMapping("/changePassword")
+    public String getChangePassword(Model model, String newPassword) {
+        if (userService.findByUsername(auxiliaryController.getUsername()) == null) {
+            log.debug("Attempt to change password not recognised");
+            throw new ForbiddenException("Attempt to change password not recognised");
+        }
+
+        if (newPassword == null || newPassword.length() < 2 || newPassword.length() > 255) {
+            model.addAttribute("pwdFeedback", "Passwords must be between 2 and 255 characters long");
+        } else {
+            User currentUser = userService.findByUsername(auxiliaryController.getUsername());
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
+            userService.save(currentUser);
+            log.debug("New password saved");
+            model.addAttribute("pwdFeedback", "Password changed and saved");
+        }
+
+        model.addAttribute("userID", auxiliaryController.getUserId());
+        return "changePassword";
     }
 
     // Admin CRUD ops =======================================================================================
@@ -224,7 +259,7 @@ public class UserController {
     public String postNewAdmin(@Valid @ModelAttribute("newAdmin") AdminUser newAdminUser,
                                BindingResult adminBindingResult, @Valid @ModelAttribute("newUser") User newUser,
                                BindingResult userBindingResult) {
-        if (adminBindingResult.hasErrors() || userBindingResult.hasErrors()){
+        if (adminBindingResult.hasErrors() || userBindingResult.hasErrors()) {
             adminBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             return "adminCreate";
@@ -299,7 +334,7 @@ public class UserController {
 
         User onFile = userService.findById(Long.valueOf(adminUserID));
 
-        if (userBindingResult.hasErrors() || adminBindingResult.hasErrors()){
+        if (userBindingResult.hasErrors() || adminBindingResult.hasErrors()) {
             adminBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             userBindingResult.getAllErrors().forEach(objectError -> log.debug(objectError.toString()));
             model.addAttribute("user", auxiliaryController.getUsername());
@@ -309,7 +344,7 @@ public class UserController {
         }
 
         //check for the same username
-        if (userService.findByUsername(currentUser.getUsername()) != null){
+        if (userService.findByUsername(currentUser.getUsername()) != null) {
             log.debug("Username already in use");
             model.addAttribute("usernameExists", "Username already in use");
             model.addAttribute("user", auxiliaryController.getUsername());
@@ -368,7 +403,9 @@ public class UserController {
     // end of CRUD ops ==========================================================================================
     //the following methods are called by the above controller methods only if the required parameters are verified
 
-    /**Updates contact details*/
+    /**
+     * Updates contact details
+     */
     @GuardianUpdate
     private ContactDetail syncAndSaveContacts(ContactDetail newDetails, ContactDetail contactsOnFile) {
         contactsOnFile.setEmail(newDetails.getEmail());
@@ -420,12 +457,12 @@ public class UserController {
     }
 
     @AdminUpdate
-    private User userAlreadyExists(String username){
-        if (username == null || username.isEmpty()){
+    private User userAlreadyExists(String username) {
+        if (username == null || username.isEmpty()) {
             log.debug("Null or empty username passed");
             return null;
         }
-        if (userService.findAllByUsername(username) == null){
+        if (userService.findAllByUsername(username) == null) {
             log.debug("User, " + username + " not found");
             return null;
         } else {
@@ -435,12 +472,12 @@ public class UserController {
     }
 
     @AdminUpdate
-    private AdminUser adminUserAlreadyExists(String firstName, String lastName){
-        if (firstName == null || lastName == null){
+    private AdminUser adminUserAlreadyExists(String firstName, String lastName) {
+        if (firstName == null || lastName == null) {
             log.debug("AdminUser null firstName and/or lastName passed");
             return null;
         }
-        if (adminUserService.findByFirstNameAndLastName(firstName, lastName) == null){
+        if (adminUserService.findByFirstNameAndLastName(firstName, lastName) == null) {
             log.debug("AdminUser not found");
             return null;
         } else

@@ -205,4 +205,24 @@ class UserControllerTest_IT extends SecurityCredentialsTest {
         mockMvc.perform(post("/changePassword/5000").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().isNotFound());
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
+    @ParameterizedTest
+    void getChangePassword(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/changePassword").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("changePassword"))
+                .andExpect(model().attributeExists("userID"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamAllUsers")
+    @ParameterizedTest
+    void postChangePassword(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/changePassword").with(httpBasic(username, pwd)).with(csrf())
+                .param("newPassword", "hfh8fh09fhsdfkjw3"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("changePassword"))
+                .andExpect(model().attributeExists("userID"))
+                .andExpect(model().attribute("pwdFeedback", "Password changed and saved"));
+    }
 }
