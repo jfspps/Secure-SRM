@@ -47,12 +47,14 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
     @ParameterizedTest
     void getNewThresholdList_search(String username, String pwd) throws Exception {
         mockMvc.perform(get("/thresholdLists/new/search").with(httpBasic(username, pwd)).with(csrf())
-                .param("thresholdUniqueId", "English"))
+                .param("thresholdUniqueId", "English")
+                .param("studentTaskTitle", "English"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/thresholdList/newThresholdList"))
                 .andExpect(model().attributeExists("thresholdList"))
-                .andExpect(model().attributeExists("thresholds"));
+                .andExpect(model().attributeExists("thresholds"))
+                .andExpect(model().attributeExists("studentTasks"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -60,6 +62,7 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
     void postNewThresholdList(String username, String pwd) throws Exception {
         ThresholdList temp = ThresholdList.builder()
                 .thresholds(Set.of(thresholdService.findById(1L)))
+                .studentTaskSet(Set.of(studentTaskService.findById(1L)))
                 .uniqueID("something")
                 .uploader(userService.findByUsername(username).getTeacherUser()).build();
 
@@ -97,7 +100,8 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/thresholdList/updateThresholdList"))
                 .andExpect(model().attributeExists("thresholdList"))
-                .andExpect(model().attributeExists("thresholds"));
+                .andExpect(model().attributeExists("thresholds"))
+                .andExpect(model().attributeExists("studentTasks"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -122,17 +126,19 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
         ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();
 
         mockMvc.perform(get("/thresholdLists/" + found.getId() + "/edit/search").with(httpBasic(username, pwd)).with(csrf())
-                .param("thresholdUniqueId", "English"))
+                .param("thresholdUniqueId", "English")
+                .param("studentTaskTitle", "william"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/thresholdList/updateThresholdList"))
                 .andExpect(model().attributeExists("thresholdList"))
-                .andExpect(model().attributeExists("thresholds"));
+                .andExpect(model().attributeExists("thresholds"))
+                .andExpect(model().attributeExists("studentTasks"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
     @ParameterizedTest
-    void postUpdateThresholdList_search(String username, String pwd) throws Exception {
+    void postUpdateThresholdList(String username, String pwd) throws Exception {
         TeacherUser currentTeacher = userService.findByUsername(username).getTeacherUser();
         Set<ThresholdList> thresholdListSet = thresholdListService.findAll();
         ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();

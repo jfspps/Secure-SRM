@@ -81,9 +81,12 @@ public class UserController {
         return "login";
     }
 
+    /**
+     * Show user account settings and password change option for users
+     * */
     @GuardianRead
-    @GetMapping("/authenticated")
-    public String userLogin(Model model) {
+    @GetMapping("/accountSettings")
+    public String viewAccountSettings(Model model) {
         User user = auxiliaryController.getCurrentUser();
         model.addAttribute("userID", user.getId());
         model.addAttribute("user", auxiliaryController.getUsername());
@@ -94,7 +97,7 @@ public class UserController {
         } else if (user.getGuardianUser() != null) {
             model.addAttribute("contactDetails", user.getGuardianUser().getContactDetail());
         }
-        return "authenticated";
+        return "accountSettings";
     }
 
     /**
@@ -126,12 +129,12 @@ public class UserController {
                 model.addAttribute("contactDetailFeedback", "Contact details not updated");
                 model.addAttribute("contactDetails", ContactDetail.builder()
                         .email("(not saved)").phoneNumber("(not saved)").build());
-                return "/authenticated";
+                return "accountSettings";
             }
             userService.save(userOnFile);
             model.addAttribute("contactDetailFeedback", "Contact details updated");
             model.addAttribute("contactDetails", savedContacts);
-            return "/authenticated";
+            return "accountSettings";
         }
     }
 

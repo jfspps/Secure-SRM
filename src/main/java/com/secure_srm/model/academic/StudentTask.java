@@ -1,14 +1,12 @@
 package com.secure_srm.model.academic;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
@@ -22,7 +20,7 @@ import java.util.Set;
 @Entity
 //POJO for the framework to a piece of HW, coursework, exams, quizzes, projects etc...
 //student specific results are handled by StudentResult
-public class StudentTask extends BaseEntity {
+public class StudentTask extends BaseEntity implements Comparable<StudentTask>{
 
     @Size(min = 1, max = 255)
     private String title;
@@ -48,5 +46,18 @@ public class StudentTask extends BaseEntity {
     @Builder.Default
     private Set<StudentResult> studentResults = new HashSet<>();
 
-    //todo: add ThresholdList property
+    @JsonIgnore
+    @JoinTable(name = "studentTask_thresholdList",
+            joinColumns = @JoinColumn(name = "studentTask_id"), inverseJoinColumns = @JoinColumn(name = "thresholdList_id"))
+    @ManyToMany
+    @Builder.Default
+    private Set<ThresholdList> thresholdListSet = new HashSet<>();
+
+    //custom comparator (list assignment types alphabetically)
+    @Override
+    public int compareTo(StudentTask input) {
+        String thisType = this.getTitle();
+        String inputType = input.getTitle();
+        return thisType.compareTo(inputType);
+    }
 }

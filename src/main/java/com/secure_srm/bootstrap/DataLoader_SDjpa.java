@@ -517,10 +517,10 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         quiz.setStudentResults(Set.of(student1Calculus1Quiz, student2Calculus1Quiz, student3Calculus1Quiz,
                 student1Statistics3Quiz, student2Statistics3Quiz, student3Statistics3Quiz));
 
-        studentTaskService.save(EnglishEssayPlay);
-        studentTaskService.save(EnglishEssayTask);
-        studentTaskService.save(Calculus1Quiz);
-        studentTaskService.save(Statistics3Quiz);
+        StudentTask savedEngEssPlay = studentTaskService.save(EnglishEssayPlay);
+        StudentTask savedEngEssTask = studentTaskService.save(EnglishEssayTask);
+        StudentTask savedMathCalc = studentTaskService.save(Calculus1Quiz);
+        StudentTask savedMathStat = studentTaskService.save(Statistics3Quiz);
         log.debug("Student tasks saved");
 
         studentResultService.save(student1Calculus1Quiz);
@@ -630,7 +630,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
                 .uploader(keithjones)
                 .build();
 
-        //threshold lists
+        //threshold lists (assign thresholds too)
         ThresholdList EnglishEssayThresholds = ThresholdList.builder()
                 .thresholds(Set.of(EnglishEssayDistinctionThreshold, EnglishEssayMeritThreshold, EnglishEssayPassThreshold))
                 .uniqueID("English essay grades")
@@ -646,6 +646,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
                 .uniqueID("Math thresholds")
                 .uploader(keithjones).build();
 
+        //assign threshold-lists to thresholds
         EnglishEssayDistinctionThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
         EnglishEssayMeritThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
         EnglishEssayPassThreshold.setThresholdLists(Set.of(EnglishEssayThresholds));
@@ -679,10 +680,31 @@ public class DataLoader_SDjpa implements CommandLineRunner {
 
         //save threshold-lists AFTER thresholds
 
+        ThresholdList savedEngEss = thresholdListService.save(EnglishEssayThresholds);
+        ThresholdList savedEngPla = thresholdListService.save(EnglishPlayThresholds);
+        ThresholdList savedMath = thresholdListService.save(MathThresholds);
+        log.debug("Threshold lists saved");
+
+        log.debug("================ Linking student tasks to threshold lists ============");
+
+        savedEngEssPlay.setThresholdListSet(Set.of(savedEngPla));
+        savedEngPla.setStudentTaskSet(Set.of(savedEngEssPlay));
+
+        savedEngEssTask.setThresholdListSet(Set.of(savedEngEss));
+        savedEngEss.setStudentTaskSet(Set.of(savedEngEssTask));
+
+        savedMathCalc.setThresholdListSet(Set.of(savedMath));
+        savedMathStat.setThresholdListSet(Set.of(savedMath));
+        savedMath.setStudentTaskSet(Set.of(savedMathCalc, savedMathStat));
+
         thresholdListService.save(EnglishEssayThresholds);
         thresholdListService.save(EnglishPlayThresholds);
         thresholdListService.save(MathThresholds);
-        log.debug("Threshold lists saved");
+
+        studentTaskService.save(EnglishEssayPlay);
+        studentTaskService.save(EnglishEssayTask);
+        studentTaskService.save(Calculus1Quiz);
+        studentTaskService.save(Statistics3Quiz);
 
         log.debug("================ Finished uploading SRM academic data to DB ============");
     }

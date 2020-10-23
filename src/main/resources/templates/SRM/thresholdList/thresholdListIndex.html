@@ -17,6 +17,7 @@
             <th class="px-3">Unique identifier</th>
             <th class="px-3">Number of thresholds</th>
             <th class="px-3">Threshold list owner</th>
+            <th class="px-3">No. of student tasks</th>
         </tr>
         </thead>
         <tbody th:object="${thresholdLists}">
@@ -24,6 +25,7 @@
         <tr th:if="${thresholdLists.isEmpty()}">
             <th class="px-3" sec:authorize="hasAuthority('teacher.update')"></th>
             <td class="px-3">(No threshold lists on record)</td>
+            <td class="px-3"></td>
             <td class="px-3"></td>
             <td class="px-3"></td>
         </tr>
@@ -34,6 +36,7 @@
             <td class="px-3" th:text="${thresholdList.uniqueID}"></td>
             <td class="px-3" th:text="${thresholdList.thresholds.size()}"></td>
             <td class="px-3" th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"></td>
+            <td class="px-3" th:text="${thresholdList.studentTaskSet.size()}"></td>
         </tr>
         </tbody>
     </table>

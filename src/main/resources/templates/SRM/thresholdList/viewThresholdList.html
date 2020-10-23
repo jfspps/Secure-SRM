@@ -74,6 +74,24 @@
     <br/>
 
     <div class="row align-items-start">
+        <div class="col-sm-2">
+            <label class="control-label" size="30"><b>Student task(s) title</b></label>
+        </div>
+        <div class="col-sm-8">
+                <span th:if="${thresholdList.studentTaskSet?.isEmpty()}">
+                    <label size="50">(None on record)</label>
+                </span>
+            <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
+            <span th:unless="${thresholdList.studentTaskSet?.isEmpty()}" th:each="task : ${thresholdList.studentTaskSet}">
+                <div>
+                    <label size="50" th:text="${task.title}"></label>
+                </div>
+            </span>
+        </div>
+    </div>
+    <br/>
+
+    <div class="row align-items-start">
         <div class="col-sm-5">
             <a class="btn btn-outline-primary" th:href="@{/thresholdLists/index}"
                role="button">Return to threshold-list index</a>

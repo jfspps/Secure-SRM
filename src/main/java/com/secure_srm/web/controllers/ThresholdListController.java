@@ -1,9 +1,11 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
+import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Threshold;
 import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.security.TeacherUser;
+import com.secure_srm.services.academicServices.StudentTaskService;
 import com.secure_srm.services.academicServices.ThresholdListService;
 import com.secure_srm.services.academicServices.ThresholdService;
 import com.secure_srm.web.permissionAnnot.TeacherCreate;
@@ -27,6 +29,7 @@ public class ThresholdListController {
     private final AuxiliaryController auxiliaryController;
     private final ThresholdService thresholdService;
     private final ThresholdListService thresholdListService;
+    private final StudentTaskService studentTaskService;
 
     //prevent the HTTP form POST from editing listed properties
     @InitBinder
@@ -64,16 +67,17 @@ public class ThresholdListController {
 
         TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
         List<Threshold> thresholdSet = auxiliaryController.sortThresholdByUniqueID(thresholdService.findAll());
+        List<StudentTask> studentTaskList = auxiliaryController.sortStudentTaskByTitle(studentTaskService.findAll());
         ThresholdList newList = ThresholdList.builder().thresholds(new HashSet<>()).uploader(currentTeacher).build();
         model.addAttribute("thresholds", thresholdSet);
         model.addAttribute("thresholdList", newList);
-
+        model.addAttribute("studentTasks", studentTaskList);
         return "/SRM/thresholdList/newThresholdList";
     }
 
     @TeacherCreate
     @GetMapping("/new/search")
-    public String getNewThresholdList_search(Model model, String thresholdUniqueId){
+    public String getNewThresholdList_search(Model model, String thresholdUniqueId, String studentTaskTitle){
         if (!auxiliaryController.teachesASubject()){
             log.debug("User is not registered with any subject");
             model.addAttribute("message", "You are not currently registered to teach any subject");
@@ -87,9 +91,18 @@ public class ThresholdListController {
         } else {
             thresholdSet = auxiliaryController.sortThresholdByUniqueID(thresholdService.findAll());
         }
+
+        List<StudentTask> studentTaskList;
+        if (studentTaskTitle != null || !studentTaskTitle.isBlank()){
+            studentTaskList = auxiliaryController.sortStudentTaskByTitle(studentTaskService.findAllByTitleIgnoreCase(studentTaskTitle));
+        } else {
+            studentTaskList = auxiliaryController.sortStudentTaskByTitle(studentTaskService.findAll());
+        }
+
         ThresholdList newList = ThresholdList.builder().thresholds(new HashSet<>()).uploader(currentTeacher).build();
         model.addAttribute("thresholds", thresholdSet);
         model.addAttribute("thresholdList", newList);
+        model.addAttribute("studentTasks", studentTaskList);
 
         return "/SRM/thresholdList/newThresholdList";
     }
@@ -122,6 +135,14 @@ public class ThresholdListController {
 
         submittedThresholdList.setUploader(auxiliaryController.getCurrentTeacherUser());
         ThresholdList saved = thresholdListService.save(submittedThresholdList);
+
+        //sync student tasks with this list and save
+        Set<StudentTask> studentTasks = submittedThresholdList.getStudentTaskSet();
+        studentTasks.forEach(studentTask -> {
+            studentTask.getThresholdListSet().add(saved);
+            studentTaskService.save(studentTask);
+        });
+
         log.debug("Threshold-list saved");
         model.addAttribute("thresholdList", saved);
         model.addAttribute("thresholds", saved.getThresholds());
@@ -166,12 +187,14 @@ public class ThresholdListController {
 
         model.addAttribute("thresholdList", found);
         model.addAttribute("thresholds", found.getThresholds());
+        model.addAttribute("studentTasks", found.getStudentTaskSet());
         return "/SRM/thresholdList/updateThresholdList";
     }
 
     @TeacherUpdate
     @GetMapping("/{id}/edit/search")
-    public String getUpdateThresholdList_search(Model model, @PathVariable("id") String thresholdListID, String thresholdUniqueId){
+    public String getUpdateThresholdList_search(Model model, @PathVariable("id") String thresholdListID, String thresholdUniqueId,
+            String studentTaskTitle){
         if (thresholdListService.findById(Long.valueOf(thresholdListID)) == null){
             log.debug("Threshold list not found");
             throw new NotFoundException("Threshold list not found");
@@ -194,6 +217,16 @@ public class ThresholdListController {
             thresholdSet = thresholdService.findAll();
         }
 
+        Set<StudentTask> studentTasks;
+        if (studentTaskTitle != null || !studentTaskTitle.isBlank()){
+            studentTasks = studentTaskService.findAllByTitleIgnoreCase(studentTaskTitle);
+            //ensure stored thresholds are viewable too
+            studentTasks.addAll(found.getStudentTaskSet());
+        } else {
+            studentTasks = studentTaskService.findAll();
+        }
+
+        model.addAttribute("studentTasks", studentTasks);
         model.addAttribute("thresholdList", found);
         model.addAttribute("thresholds", auxiliaryController.sortThresholdByUniqueID(thresholdSet));
         return "/SRM/thresholdList/updateThresholdList";
@@ -246,7 +279,24 @@ public class ThresholdListController {
             thresholdService.save(threshold);
         });
 
+        //update Tasks removed from onFile
+        Set<StudentTask> tasksRemoved = new HashSet<>(onFile.getStudentTaskSet());
+        tasksRemoved.removeIf(submittedThresholdList.getStudentTaskSet()::contains);
+
+        //remove records of removed Tasks
+        tasksRemoved.forEach(studentTask -> {
+            studentTask.getThresholdListSet().remove(onFile);
+            studentTaskService.save(studentTask);
+        });
+
+        //update all submittedThresholdList Tasks
+        submittedThresholdList.getStudentTaskSet().forEach(studentTask -> {
+            studentTask.getThresholdListSet().add(onFile);
+            studentTaskService.save(studentTask);
+        });
+
         onFile.setThresholds(submittedThresholdList.getThresholds());
+        onFile.setStudentTaskSet(submittedThresholdList.getStudentTaskSet());
         ThresholdList saved = thresholdListService.save(onFile);
         log.debug("Threshold-list updated");
         model.addAttribute("thresholdList", saved);
