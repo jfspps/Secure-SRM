@@ -3,7 +3,6 @@ package com.secure_srm.bootstrap;
 import com.secure_srm.model.academic.*;
 import com.secure_srm.model.people.*;
 import com.secure_srm.model.security.*;
-import com.secure_srm.services.TestRecordService;
 import com.secure_srm.services.academicServices.*;
 import com.secure_srm.services.peopleServices.*;
 import com.secure_srm.services.securityServices.*;
@@ -29,7 +28,6 @@ public class DataLoader_SDjpa implements CommandLineRunner {
     private final AdminUserService adminUserService;
     private final GuardianUserService guardianUserService;
     private final TeacherUserService teacherUserService;
-    private final TestRecordService testRecordService;
     private final PasswordEncoder passwordEncoder;
 
     //SRM related
@@ -73,21 +71,8 @@ public class DataLoader_SDjpa implements CommandLineRunner {
             log.debug("Guardian users already found. No changes made.");
         }
 
-        if (testRecordService.findAll().isEmpty()){
-            loadTestRecord();
-            log.debug("TestRecords loaded: " + testRecordService.findAll().size());
-        } else {
-            log.debug("TestRecords already found. No changes made.");
-        }
-
         loadSRM_personnel_data();
         loadSRM_academic_data();
-    }
-
-    private void loadTestRecord() {
-        testRecordService.createTestRecord("Test record 1", "paulsmith");
-        testRecordService.createTestRecord("Test record 2", "alexsmith");
-        testRecordService.createTestRecord("Test record 3", "alexsmith");
     }
 
     private void loadSecurityData(){

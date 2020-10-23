@@ -11,7 +11,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto" sec:authorize="hasAuthority('guardian.read')" >
+        <ul class="navbar-nav mr-auto" sec:authorize="hasAuthority('teacher.read')" >
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="webLoginDropdown" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">Personnel</a>
@@ -34,11 +34,10 @@
                         <a class="dropdown-item" th:href="@{/formGroupList/index}">Form group summary</a>
                         <a class="dropdown-item" th:href="@{/subjectClassList/index}">Subject class summary</a>
                     </span>
-                    <div class="dropdown-divider"></div>
+                    <div sec:authorize="hasAuthority('admin.create')" class="dropdown-divider"></div>
                     <span sec:authorize="hasAuthority('admin.create')">
                         <div class="dropdown-header"><i class="fas fa-user-edit"></i> Weblogin accounts</div>
-                        <a class="dropdown-item" href="/userPage">View DB user records</a>
-                        <a class="dropdown-item" href="/adminPage">Edit DB user records</a>
+                        <a class="dropdown-item" href="/adminPage">Admin users</a>
                     </span>
                 </div>
             </li>
@@ -65,10 +64,6 @@
                     <a class="dropdown-item" th:href="@{/thresholdLists/index}">Academic threshold-list summary</a>
                     <a class="dropdown-item" th:href="@{/studentReports/index}">Student report summary</a>
                     <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
-                </div>
-                <div class="dropdown-menu" aria-labelledby="dbDropdown">
-                    <div class="dropdown-header">Test records</div>
-                    <a class="dropdown-item" th:href="@{/testRecord}"><i class="far fa-newspaper"></i> View/edit test records</a>
                 </div>
             </li>
         </ul>

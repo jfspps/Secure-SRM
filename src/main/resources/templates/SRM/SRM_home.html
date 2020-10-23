@@ -36,7 +36,7 @@
                     <h5 class="card-title">Student results</h5>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentResult/index}">View student results</a></p>
                     <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/studentResult/new}">New student result</a></p>
-                    <h5 class="card-title">Assignments</h5>
+                    <h5 class="card-title">Assignment types and tasks</h5>
                     <p sec:authorize="hasAuthority('admin.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/index}">View assignment types</a></p>
                     <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/assignmentTypes/new}">New assignment type</a></p>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/studentTask/index}">View student tasks</a></p>

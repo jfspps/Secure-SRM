@@ -34,54 +34,6 @@
             <form sec:authorize="hasAuthority('admin.create')" action="/createAdmin">
                 <input type="submit" value="New admin" style="width: 200px">
             </form>
-            <br/>
-            <hr>
-
-            <h3>TeacherUsers on file</h3>
-            <p th:if="${!TeacherUsersFound.isEmpty()}"
-               sec:authorize="hasAuthority('admin.update')">Click an ID to edit or delete a user</p>
-            <p th:unless="${!TeacherUsersFound.isEmpty()}"
-               sec:authorize="hasAuthority('admin.update')">There are no teacherUsers on file</p>
-            <table class="table table-sm" th:if="${!TeacherUsersFound.isEmpty()}">
-                <tr>
-                    <th>Teacher ID</th>
-                    <th>Teacher username</th>
-                </tr>
-                <!--/*@thymesVar id="teacherUser" type="com.secure_srm.model.security.User"*/-->
-                <tr th:each="teacherUser: ${TeacherUsersFound}">
-                    <td><a sec:authorize="hasAuthority('teacher.update')"
-                           th:href="@{/updateTeacher/{userId}(userId=${teacherUser.id})}" th:text="${teacherUser.id}"></a></td>
-                    <td th:text="${teacherUser.username}"></td>
-                </tr>
-            </table>
-            <form sec:authorize="hasAuthority('admin.create')" action="/createTeacher">
-                <input type="submit" value="New teacher" style="width: 200px">
-            </form>
-            <br/>
-            <hr>
-
-            <h3>GuardianUsers on file</h3>
-            <p th:if="${!GuardianUsersFound.isEmpty()}"
-               sec:authorize="hasAuthority('admin.update')">Click an ID to edit or delete a user</p>
-            <p th:unless="${!GuardianUsersFound.isEmpty()}"
-               sec:authorize="hasAuthority('admin.update')">There are no guardianUsers on file</p>
-            <table class="table table-sm" th:if="${!GuardianUsersFound.isEmpty()}">
-                <tr>
-                    <th>Guardian ID</th>
-                    <th>Guardian username</th>
-                </tr>
-                <!--/*@thymesVar id="guardianUser" type="com.secure_srm.model.security.User"*/-->
-                <tr th:each="guardianUser: ${GuardianUsersFound}">
-                    <td><a sec:authorize="hasAuthority('teacher.update')"
-                           th:href="@{/updateGuardian/{userId}(userId=${guardianUser.id})}" th:text="${guardianUser.id}"></a></td>
-                    <td th:text="${guardianUser.username}"></td>
-                </tr>
-            </table>
-            <form sec:authorize="hasAuthority('admin.create')" action="/createGuardian">
-                <input type="submit" value="New guardian" style="width: 200px">
-            </form>
-
-            <hr>
         </div>
     </div>
 </div>
