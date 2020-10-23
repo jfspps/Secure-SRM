@@ -26,7 +26,8 @@
             <label>Task title</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${result.studentTask.title}"></label>
+            <label><a th:text="${result.studentTask.title}"
+            th:href="@{/studentTask/{id}(id=${result.studentTask.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -36,7 +37,9 @@
             <label>Student</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${result.student.firstName + ' ' + result.student.lastName}"></label>
+            <label><a th:text="${result.student.firstName + ' ' + result.student.lastName}"
+                th:href="@{/students/{id}(id=${result.student.id})}">
+            </a></label>
         </div>
     </div>
     <br/>
@@ -64,7 +67,7 @@
             <label>Comments</label>
         </div>
         <div class="col-sm-8">
-            <textarea size="50" th:text="${result.comments}"></textarea>
+            <p th:text="${result.comments}"></p>
         </div>
     </div>
 
@@ -73,7 +76,8 @@
             <label>Teacher (marker)</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${result.teacher.firstName + ' ' + result.teacher.lastName}"></label>
+            <label><a th:text="${result.teacher.firstName + ' ' + result.teacher.lastName}"
+                th:href="@{/teachers/{id}(id=${result.teacher.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -83,7 +87,8 @@
             <label>Teacher (task owner)</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${result.studentTask.teacherUploader.firstName + ' ' + result.studentTask.teacherUploader.lastName}"></label>
+            <label><a th:text="${result.studentTask.teacherUploader.firstName + ' ' + result.studentTask.teacherUploader.lastName}"
+                      th:href="@{/teachers/{id}(id=${result.studentTask.teacherUploader.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -93,7 +98,8 @@
             <label>Subject</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${result.studentTask.subject.subjectName}"></label>
+            <label><a th:text="${result.studentTask.subject.subjectName}"
+                th:href="@{/subjects/{id}(id=${result.studentTask.subject.id})}"></a></label>
         </div>
     </div>
     <br />

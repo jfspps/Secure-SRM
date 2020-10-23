@@ -36,7 +36,8 @@
                 <label class="control-label" size="30"><b>Subject</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="*{subject.subjectName}"></label>
+                <label><a th:text="*{subject.subjectName}"
+                    th:href="@{/subjects/{id}(id=${task.subject.id})}"></a></label>
             </div>
         </div>
         <br/>
@@ -82,8 +83,9 @@
                     <label size="50">(None on record)</label>
                 </span>
                 <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
-                <span th:unless="${task.thresholdListSet?.isEmpty()}" th:each="thresoldList : ${task.thresholdListSet}">
-                    <label size="50" th:text="${thresoldList.uniqueID}"></label>
+                <span th:unless="${task.thresholdListSet?.isEmpty()}" th:each="thresholdList : ${task.thresholdListSet}">
+                    <label><a th:text="${thresholdList.uniqueID}"
+                        th:href="@{/thresholdLists/{id}(id=${thresholdList.id})}"></a></label>
                 </span>
             </div>
         </div>

@@ -26,7 +26,8 @@
             <label><b>Subject teacher</b></label>
         </div>
         <div class="col-sm-8">
-            <label th:text="${subjectClass.teacher.firstName + ' ' + subjectClass.teacher.lastName}"></label>
+            <label><a th:text="${subjectClass.teacher.firstName + ' ' + subjectClass.teacher.lastName}"
+            th:href="@{/teachers/{id}(id=${subjectClass.teacher.id})}"></a></label>
         </div>
     </div>
     <br />
@@ -35,7 +36,8 @@
             <label><b>Subject title</b></label>
         </div>
         <div class="col-sm-8">
-            <label th:text="${subjectClass.subject.subjectName}"></label>
+            <label><a th:text="${subjectClass.subject.subjectName}"
+            th:href="@{/subjects/{id}(id=${subjectClass.subject.id})}"></a></label>
         </div>
     </div>
     <br />

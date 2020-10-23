@@ -52,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 //set pages which do not require authentication
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/", "/welcome").permitAll()
+                .antMatchers("/", "/welcome", "/css/**").permitAll()
                 //override the default login page (see controller)
                 .and().formLogin()
                     .loginPage("/login").permitAll().failureUrl("/login-error")

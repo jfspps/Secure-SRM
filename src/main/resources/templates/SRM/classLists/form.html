@@ -26,7 +26,8 @@
             <label><b>Personal Tutor</b></label>
         </div>
         <div class="col-sm-8">
-            <label th:text="${formGroup.teacher.firstName + ' ' + formGroup.teacher.lastName}"></label>
+            <label><a th:text="${formGroup.teacher.firstName + ' ' + formGroup.teacher.lastName}"
+            th:href="@{/teachers/{id}(id=${formGroup.teacher.id})}"></a></label>
         </div>
     </div>
     <br />

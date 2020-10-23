@@ -22,7 +22,8 @@
                 <label class="control-label" size="30"><b>Threshold owner</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="*{uploader.firstName + ' ' + uploader.lastName}"></label>
+                <label><a th:text="*{uploader.firstName + ' ' + uploader.lastName}"
+                    th:href="@{/teachers/{id}(id=${threshold.uploader.id})}"></a></label>
                 <!--/*@thymesVar id="thresholdFeedback" type="java.lang.String"*/-->
                 <span class="help-block" th:if="${thresholdFeedback != null}">
                 <p class="alert alert-info" th:text="${thresholdFeedback}"></p>
