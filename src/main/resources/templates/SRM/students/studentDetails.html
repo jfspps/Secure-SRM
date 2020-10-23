@@ -131,7 +131,8 @@
                 <!--/*@thymesVar id="subjectList" type="com.secure_srm.model.people.SubjectClassList"*/-->
                 <span th:unless="${student.getSubjectClassLists().size() == 0}" th:each="subjectList: ${subjectClassLists}">
                     <div>
-                        <label th:text="${subjectList.groupName + ' (' + subjectList.subject.subjectName + ')'}">Subject group name to appear here</label>
+                        <label><a th:text="${subjectList.groupName + ' (' + subjectList.subject.subjectName + ')'}"
+                                   th:href="@{/subjectClassList/{ID}(ID=${subjectList.id})}"></a></label>
                     </div>
                 </span>
             </div>

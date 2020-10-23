@@ -42,6 +42,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
     private final StudentResultService studentResultService;
     private final ThresholdService thresholdService;
     private final ThresholdListService thresholdListService;
+    private final ReportService reportService;
 
     @Override
     public void run(String... args) {
@@ -237,9 +238,9 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         addressService.save(address2);
         log.debug("Addresses loaded to DB");
 
-        Student student1 = Student.builder().firstName("John").lastName("Smith").build();
-        Student student2 = Student.builder().firstName("Elizabeth").lastName("Jones").build();
-        Student student3 = Student.builder().firstName("Helen").lastName("Jones").build();
+        Student johnSmithStudent = Student.builder().firstName("John").lastName("Smith").build();
+        Student elizabethJonesStudent = Student.builder().firstName("Elizabeth").lastName("Jones").build();
+        Student helenJonesStudent = Student.builder().firstName("Helen").lastName("Jones").build();
 
         TeacherUser keithJonesTeacher = teacherUserService.findByFirstNameAndLastName("Keith", "Jones");
         keithJonesTeacher.setContactDetail(teacher1Contact);
@@ -281,33 +282,33 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         guardian2.setContactDetail(guardianContactDetail2);
 
         //set students' tutors
-        student1.setTeacher(keithJonesTeacher);
-        student2.setTeacher(maryManningTeacher);
-        student3.setTeacher(maryManningTeacher);
+        johnSmithStudent.setTeacher(keithJonesTeacher);
+        elizabethJonesStudent.setTeacher(maryManningTeacher);
+        helenJonesStudent.setTeacher(maryManningTeacher);
 
         //set students' contact details and guardians
-        student1.setContactDetail(guardianContactDetail1);
-        student2.setContactDetail(guardianContactDetail2);
-        student3.setContactDetail(guardianContactDetail2);
+        johnSmithStudent.setContactDetail(guardianContactDetail1);
+        elizabethJonesStudent.setContactDetail(guardianContactDetail2);
+        helenJonesStudent.setContactDetail(guardianContactDetail2);
 
         //set Guardian 1 and student 1 relationships
         Set<GuardianUser> student1Guardians = new HashSet<>();
         student1Guardians.add(guardian1);
-        student1.setGuardians(student1Guardians);
+        johnSmithStudent.setGuardians(student1Guardians);
 
         Set<Student> guardian1Students = new HashSet<>();
-        guardian1Students.add(student1);
+        guardian1Students.add(johnSmithStudent);
         guardian1.setStudents(guardian1Students);
 
         //set Guardian 2 and students 2&3 relationships
         Set<GuardianUser> student2Guardians = new HashSet<>();
         Set<Student> guardian2Students = new HashSet<>();
         student2Guardians.add(guardian2);
-        student2.setGuardians(student2Guardians);
-        student3.setGuardians(student2Guardians);
+        elizabethJonesStudent.setGuardians(student2Guardians);
+        helenJonesStudent.setGuardians(student2Guardians);
 
-        guardian2Students.add(student2);
-        guardian2Students.add(student3);
+        guardian2Students.add(elizabethJonesStudent);
+        guardian2Students.add(helenJonesStudent);
         guardian2.setStudents(guardian2Students);
 
         guardianUserService.save(guardian1);
@@ -316,15 +317,15 @@ public class DataLoader_SDjpa implements CommandLineRunner {
 
         //Pastoral (form) groups
         Set<Student> studentGroup1 = new HashSet<>();
-        studentGroup1.add(student1);
+        studentGroup1.add(johnSmithStudent);
         Set<Student> studentGroup2 = new HashSet<>();
-        studentGroup1.add(student2);
-        studentGroup2.add(student3);
+        studentGroup1.add(elizabethJonesStudent);
+        studentGroup2.add(helenJonesStudent);
         FormGroupList formGroupList1 = FormGroupList.builder().studentList(studentGroup1).groupName("Group 1").teacher(keithJonesTeacher).build();
         FormGroupList formGroupList2 = FormGroupList.builder().studentList(studentGroup2).groupName("Group 2").teacher(maryManningTeacher).build();
-        student1.setFormGroupList(formGroupList1);
-        student2.setFormGroupList(formGroupList2);
-        student3.setFormGroupList(formGroupList2);
+        johnSmithStudent.setFormGroupList(formGroupList1);
+        elizabethJonesStudent.setFormGroupList(formGroupList2);
+        helenJonesStudent.setFormGroupList(formGroupList2);
 
         formGroupListService.save(formGroupList1);
         formGroupListService.save(formGroupList2);
@@ -336,19 +337,19 @@ public class DataLoader_SDjpa implements CommandLineRunner {
 
         //add Students to class lists
         Set<SubjectClassList> studentSubjectsList = new HashSet<>(Set.of(subjectClassList_Eng, subjectClassList_Math));
-        student1.setSubjectClassLists(studentSubjectsList);
-        student2.setSubjectClassLists(studentSubjectsList);
-        student3.setSubjectClassLists(studentSubjectsList);
-        subjectClassList_Eng.setStudentList(Set.of(student1, student2, student3));
-        subjectClassList_Math.setStudentList(Set.of(student1, student2, student3));
+        johnSmithStudent.setSubjectClassLists(studentSubjectsList);
+        elizabethJonesStudent.setSubjectClassLists(studentSubjectsList);
+        helenJonesStudent.setSubjectClassLists(studentSubjectsList);
+        subjectClassList_Eng.setStudentList(Set.of(johnSmithStudent, elizabethJonesStudent, helenJonesStudent));
+        subjectClassList_Math.setStudentList(Set.of(johnSmithStudent, elizabethJonesStudent, helenJonesStudent));
 
         subjectClassListService.save(subjectClassList_Eng);
         subjectClassListService.save(subjectClassList_Math);
         log.debug("SubjectClassList loaded to DB");
 
-        studentService.save(student1);
-        studentService.save(student2);
-        studentService.save(student3);
+        studentService.save(johnSmithStudent);
+        studentService.save(elizabethJonesStudent);
+        studentService.save(helenJonesStudent);
         log.debug("Students loaded to DB");
 
         assignmentTypeService.save(AssignmentType.builder().description("Mock exam").build());
@@ -357,6 +358,29 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         assignmentTypeService.save(AssignmentType.builder().description("Interview").build());
         assignmentTypeService.save(AssignmentType.builder().description("Service").build());
         log.debug("Assignment types loaded to DB");
+
+        Report johnSmithReport = Report.builder().comments("Doing well this term! Keep it up.")
+                .student(johnSmithStudent)
+                .subject(mathematics)
+                .teacher(keithJonesTeacher)
+                .uniqueIdentifier("MathJohnSmith").build();
+
+        Report elizabethJonesReport = Report.builder().comments("Has made good progress so far.")
+                .student(elizabethJonesStudent)
+                .subject(english)
+                .teacher(maryManningTeacher)
+                .uniqueIdentifier("EngElizabethJones").build();
+
+        Report helenJonesReport = Report.builder().comments("Well done Helen, you have made a great start!")
+                .student(helenJonesStudent)
+                .subject(english)
+                .teacher(maryManningTeacher)
+                .uniqueIdentifier("EngHelenJones").build();
+
+        reportService.save(johnSmithReport);
+        reportService.save(elizabethJonesReport);
+        reportService.save(helenJonesReport);
+        log.debug("Student reports saved");
 
         log.debug("================ Finished uploading SRM personnel data to DB ============");
     }
@@ -685,8 +709,6 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         ThresholdList savedMath = thresholdListService.save(MathThresholds);
         log.debug("Threshold lists saved");
 
-        log.debug("================ Linking student tasks to threshold lists ============");
-
         savedEngEssPlay.setThresholdListSet(Set.of(savedEngPla));
         savedEngPla.setStudentTaskSet(Set.of(savedEngEssPlay));
 
@@ -705,6 +727,8 @@ public class DataLoader_SDjpa implements CommandLineRunner {
         studentTaskService.save(EnglishEssayTask);
         studentTaskService.save(Calculus1Quiz);
         studentTaskService.save(Statistics3Quiz);
+
+        log.debug("Thresholds and student tasks linked");
 
         log.debug("================ Finished uploading SRM academic data to DB ============");
     }

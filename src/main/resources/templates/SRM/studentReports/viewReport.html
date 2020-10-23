@@ -27,7 +27,8 @@
             <label>Student</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${report.student.firstName + ' ' + report.student.lastName}"></label>
+            <label><a th:text="${report.student.firstName + ' ' + report.student.lastName}"
+                th:href="@{/students/{id}(id=${report.student.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -37,7 +38,8 @@
             <label>Teacher (reporter)</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${report.teacher.firstName + ' ' + report.teacher.lastName}"></label>
+            <label><a th:text="${report.teacher.firstName + ' ' + report.teacher.lastName}"
+                th:href="@{/teachers/{id}(id=${report.teacher.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -47,7 +49,8 @@
             <label>Subject</label>
         </div>
         <div class="col-sm-8">
-            <label size="50" th:text="${report.subject.subjectName}"></label>
+            <label><a th:text="${report.subject.subjectName}"
+                      th:href="@{/subjects/{id}(id=${report.subject.id})}"></a></label>
         </div>
     </div>
 
@@ -65,7 +68,7 @@
             <label>Comments</label>
         </div>
         <div class="col-sm-8">
-            <textarea size="50" th:text="${report.comments}"></textarea>
+            <p th:text="${report.comments}"></p>
         </div>
     </div>
 

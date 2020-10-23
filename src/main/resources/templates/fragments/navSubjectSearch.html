@@ -83,7 +83,7 @@
                    aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-user"></i> <span sec:authentication="name"></span></a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dbDropdown">
-                    <a class="dropdown-header" href="/authenticated" sec:authorize="hasAuthority('guardian.update')"><i class="fas fa-user-cog"></i> Account settings</a>
+                    <a class="dropdown-header" href="/accountSettings" sec:authorize="hasAuthority('guardian.update')"><i class="fas fa-user-cog"></i> Account settings</a>
                     <form class="dropdown-item" th:action="@{/login}" method="get" sec:authorize="!isAuthenticated()">
                         <button type="submit" class="btn btn-group-sm btn-outline-info"><i class="fas fa-sign-in-alt"></i> LOGIN</button>
                     </form>

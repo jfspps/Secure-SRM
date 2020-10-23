@@ -59,7 +59,8 @@
                 <label class="control-label" size="30"><b>Subject taught</b></label>
             </div>
             <div class="col-sm-8">
-                <label size="50" th:text="${subject.subjectName}">Subject name to appear here</label>
+                <label><a th:text="${subject.subjectName}"
+                        th:href="@{/subjects/{ID}(ID=${subject.id})}"></a></label>
             </div>
         </div>
         <br/>

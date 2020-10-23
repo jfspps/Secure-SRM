@@ -67,8 +67,8 @@
             <label class="control-label">Threshold list owner</label>
         </div>
         <div class="col-sm-8">
-            <label class="control-label"
-                   th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"></label>
+            <label><a th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"
+                th:href="@{/teachers/{id}(id=${thresholdList.uploader.id})}"></a></label>
         </div>
     </div>
     <br/>
@@ -84,7 +84,7 @@
             <!--/*@thymesVar id="task" type="com.secure_srm.model.academic.StudentTask"*/-->
             <span th:unless="${thresholdList.studentTaskSet?.isEmpty()}" th:each="task : ${thresholdList.studentTaskSet}">
                 <div>
-                    <label size="50" th:text="${task.title}"></label>
+                    <label><a th:text="${task.title}" th:href="@{/studentTask/{id}(id=${task.id})}"></a></label>
                 </div>
             </span>
         </div>
