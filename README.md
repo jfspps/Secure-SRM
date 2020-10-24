@@ -8,9 +8,11 @@ Student record management is a Spring based academic database which stores and p
 
 The model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
-## Current and future work of Secure-SRM ##
+## Current (Oct 2020) and future work of Secure-SRM ##
 
-At present, the original SRM project can handle personal data (student, teacher and guardian contact details etc.). Following the integration of SRM with Web-login, work will proceed to extend the functionality of SRM with the development of 'Secure'SRM'. New features will include the storage and retrieval of academic related records, notably school assignment models (homework, performances, quizzes and mock exams), student results, grade mappings and results summaries.
+At present, Secure-SRM can store and retrieve personnel data (teachers, admin and guardians, each with Web-login credentials, and student records), academic data (student tasks, results, report, threshold lists and thresholds, to name a few) and finally class lists (form group lists and subject class lists). Various account settings can be changed by the user (email address, phone number and web-login password). Not all aspects of secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
+
+The next stage is the development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. Currently, I am investigating established frontends and interfaces to frontends, including jhipster and angular.
 
 ## Web-login specific overview ##
 
