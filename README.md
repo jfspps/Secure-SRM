@@ -12,7 +12,7 @@ The model entities are saved to an in-memory H2 database or a persistent MySQL d
 
 At present, Secure-SRM can store and retrieve personnel data (teachers, admin and guardians, each with Web-login credentials, and student records), academic data (student tasks, results, report, threshold lists and thresholds, to name a few) and finally class lists (form group lists and subject class lists). Various account settings can be changed by the user (email address, phone number and web-login password). Not all aspects of secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
 
-The next stage is the development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. Currently, I am investigating established frontends and interfaces to frontends, including jhipster and angular.
+The next stage is the implementation of DELTE operations for many entities (handling cascading properties) and the development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. Currently, I am investigating established frontends and interfaces to frontends, including jhipster and angular.
 
 ## Web-login specific overview ##
 
@@ -68,14 +68,6 @@ These interfaces are instantiated and then sent to a constructor of a bean, when
 [/com/secure_srm/services/springDataJPA/security](/src/main/java/com/secure_srm/services/springDataJPA/security)
 
 Classes which provide `securityServices` with access to the JPA methods. If other databases are required, then one would need to build other classes which implement a `securityServices` class and return other database queries.
-
-[/com/secure_srm/services/springDataJPA/TestRecordAuthenticationManager](/src/main/java/com/secure_srm/services/springDataJPA/TestRecordAuthenticationManager.java)
-
-Provides userIdIsMatched() which is used in custom annotations to grant access to entities based on the User's ID. For example, a guardian is granted access to a student's data if they have the valid ID (same family etc.).
-
-[/com/secure_srm/services/springDataJPA/TestRecordSDjpaService](/src/main/java/com/secure_srm/services/springDataJPA/TestRecordSDjpaService.java)
-
-Defines (overrides) Spring Data JPA methods pertaining to the [TestRecord service](/src/main/java/com/secure_srm/services/TestRecordService.java) (currently, CRUD ops).
 
 [/com/secure_srm/web](/src/main/java/com/secure_srm/web)
 
