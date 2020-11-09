@@ -55,8 +55,6 @@ Both classes store all login attempts
 
 Spring Security specific entity package (users, authorities, roles, loginSuccess and login failure). All models in Secure-SRM derive from `BaseEntity` and are date-stamped (creation and modification).
 
-For testing/debugging purposes, a testRecord entity (composed of one property: recordName) is provided.
-
 [/com/secure_srm/repositories/security](/src/main/java/com/secure_srm/repositories/security)
 
 Spring Security specific Spring Data JPA interfaces which define what JPA methods are available. Each interface extends `JpaRepository`. Other database daemons can be incorporated but must adhere (minimally) and implement the service interfaces (in [/com/secure_srm/services/securityServices](/src/main/java/com/secure_srm/services/securityServices)) each of which lists the methods required.
