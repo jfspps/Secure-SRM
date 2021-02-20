@@ -2,7 +2,7 @@
 
 ## Overview ##
 
-Student record management is a Spring based academic database which stores and processes student academic data. Web-login provides the Spring Security frontend, with authentication and authorisation functionality. This project is a combination of two projects, a non-secure project, Student Record Management [SRM](https://github.com/jfspps/SRM-Spring) and the Spring Security frontend, [Web-login](https://github.com/jfspps/Spring_weblogin).
+Secure Student-record-management is a Spring based academic database which stores and processes student academic data. Authentication and authorisation is provided by [Web-login](https://github.com/jfspps/Spring_weblogin), a Spring Security frontend . This project is the secured version of Student Record Management [SRM](https://github.com/jfspps/SRM-Spring).
 
 All model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
