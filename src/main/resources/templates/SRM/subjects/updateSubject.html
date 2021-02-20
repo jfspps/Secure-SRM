@@ -41,17 +41,17 @@
                 <p>Errors with form data listed below</p>
             </div>
 
-            <div class="col-sm-2">
-                <label class="control-label">Subject title</label>
-            </div>
-            <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">
-                <input size="50" placeholder="Subject title" th:field="*{subjectName}" th:errorclass="has-error"/>
-                <span class="help-block" th:if="${#fields.hasErrors('subjectName')}">
-                    <ul>
-                        <li th:each="err : ${#fields.errors('subjectName')}" th:text="${err}">Error</li>
-                    </ul>
-                </span>
-            </div>
+<!--            <div class="col-sm-2">-->
+<!--                <label class="control-label">Subject title</label>-->
+<!--            </div>-->
+<!--            <div th:class="${#fields.hasErrors('*')} ? 'col-sm-8 has-error' : 'col-sm-8'">-->
+<!--                <input size="50" placeholder="Subject title" th:field="*{subjectName}" th:errorclass="has-error"/>-->
+<!--                <span class="help-block" th:if="${#fields.hasErrors('subjectName')}">-->
+<!--                    <ul>-->
+<!--                        <li th:each="err : ${#fields.errors('subjectName')}" th:text="${err}">Error</li>-->
+<!--                    </ul>-->
+<!--                </span>-->
+<!--            </div>-->
         </div>
         <br />
 

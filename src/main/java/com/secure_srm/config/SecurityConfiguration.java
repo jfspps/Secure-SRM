@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 
 //use @Secured annotation to enable authorisation
@@ -80,5 +83,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         //ensures all data streams are HTTPS based (will require certification on deployment)
 //        http.requiresChannel().anyRequest().requiresSecure();
+    }
+
+    // required for AWS
+    @Bean
+    public ClassLoaderTemplateResolver templateResolver() {
+        ClassLoaderTemplateResolver templateResolver =
+                new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding("UTF-8");
+
+        return templateResolver;
+    }
+
+    // required for AWS
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+
+        // add support for Spring Security dialect
+        // https://www.baeldung.com/spring-security-thymeleaf
+        templateEngine.addDialect(new SpringSecurityDialect());
+        return templateEngine;
     }
 }

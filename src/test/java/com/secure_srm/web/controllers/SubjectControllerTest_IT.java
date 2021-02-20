@@ -97,21 +97,36 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
-                .andExpect(model().attribute("teachers", hasSize(2)));
+                .andExpect(model().attribute("teachers", hasSize(1)));
     }
 
+    //subject 1 is Mathematics, subject 2 is English
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
     @ParameterizedTest
-    void searchTeachers_updateSubject(String username, String pwd) throws Exception {
+    void searchTeachers_updateSubject_None(String username, String pwd) throws Exception {
         mockMvc.perform(get("/subjects/1/teachers/search").with(httpBasic(username, pwd)).with(csrf())
                 .param("TeacherLastName", "manning"))
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subject"))
-                .andExpect(model().attribute("teachers", hasSize(1)));
+                .andExpect(model().attribute("teachers", hasSize(0)));
     }
 
+    //subject 1 is Mathematics, subject 2 is English
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolStaff")
+    @ParameterizedTest
+    void searchTeachers_updateSubject(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/subjects/2/teachers/search").with(httpBasic(username, pwd)).with(csrf())
+                .param("TeacherLastName", "manning"))
+                .andExpect(status().is(200))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/subjects/updateSubject"))
+                .andExpect(model().attributeExists("subject"))
+                .andExpect(model().attribute("teachers", hasSize(0)));
+    }
+
+    //subject 1 is Mathematics, subject 2 is English
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
     @ParameterizedTest
     void postUpdateSubject(String username, String pwd) throws Exception {
@@ -123,19 +138,19 @@ public class SubjectControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/subjects/updateSubject"))
                 .andExpect(model().attributeExists("subjectTeachersFeedback"))
                 .andExpect(model().attributeExists("subject"))
-                .andExpect(model().attribute("teachers", hasSize(2)));
+                .andExpect(model().attribute("teachers", hasSize(0)));
     }
 
-    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
-    @ParameterizedTest
-    void postUpdateSubject_BlankSubjectTitle(String username, String pwd) throws Exception {
-        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
-                .param("subjectName", "")
-                .param("TeacherLastName", ""))
-                .andExpect(status().is(200))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/SRM/subjects/updateSubject"))
-                .andExpect(model().attributeExists("subject"))
-                .andExpect(model().attribute("teachers", hasSize(2)));
-    }
+//    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+//    @ParameterizedTest
+//    void postUpdateSubject_BlankSubjectTitle(String username, String pwd) throws Exception {
+//        mockMvc.perform(post("/subjects/1/teachers").with(httpBasic(username, pwd)).with(csrf())
+//                .param("subjectName", "")
+//                .param("TeacherLastName", ""))
+//                .andExpect(status().is(200))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("/SRM/subjects/updateSubject"))
+//                .andExpect(model().attributeExists("subject"))
+//                .andExpect(model().attribute("teachers", hasSize(2)));
+//    }
 }

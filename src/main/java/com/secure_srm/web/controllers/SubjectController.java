@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -123,7 +124,14 @@ public class SubjectController {
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
-        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
+
+        // if the subject has no registered teachers then add all to the list
+        if (subjectOnFile.getTeachers().isEmpty()){
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
+        } else {
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(subjectOnFile.getTeachers()));
+        }
+
         model.addAttribute("subject", subjectOnFile);
         return "/SRM/subjects/updateSubject";
     }
@@ -136,14 +144,17 @@ public class SubjectController {
             log.debug("Subject not found");
             throw new NotFoundException("Subject not found");
         }
+        Subject found = subjectService.findById(Long.valueOf(subjectId));
+        Set<TeacherUser> teachersOfSubject = found.getTeachers();
 
         if (TeacherLastName == null || TeacherLastName.isEmpty()){
-            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teachersOfSubject));
         } else {
-            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAllByLastNameContainingIgnoreCase(TeacherLastName)));
+            Set<TeacherUser> teachersFound = teachersOfSubject.stream().filter(teacherUser -> teacherUser.getLastName().equals(TeacherLastName)).collect(Collectors.toSet());
+            model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teachersFound));
         }
 
-        model.addAttribute("subject", subjectService.findById(Long.valueOf(subjectId)));
+        model.addAttribute("subject", found);
         return "/SRM/subjects/updateSubject";
     }
 
@@ -164,7 +175,8 @@ public class SubjectController {
         }
 
         Subject subjectOnFile = subjectService.findById(Long.valueOf(subjectId));
-        subjectOnFile.setSubjectName(subjectSubmitted.getSubjectName());
+        String originalSubjectName = subjectOnFile.getSubjectName();
+        subjectOnFile.setSubjectName(originalSubjectName);
 
         Set<TeacherUser> teachersRemoved = new HashSet<>(subjectOnFile.getTeachers());
 
@@ -187,9 +199,15 @@ public class SubjectController {
         Subject saved = subjectService.save(subjectOnFile);
 
         log.debug("Subject updated");
-        model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
+        // if all teachers removed from subject
+        if (saved.getTeachers() == null || saved.getTeachers().isEmpty()){
+            model.addAttribute("subjectTeachersFeedback", originalSubjectName + " not assigned any teachers");
+        } else {
+            model.addAttribute("subjectTeachersFeedback", "\"" + saved.getSubjectName() + "\"" + " updated");
+        }
+
         model.addAttribute("subject", saved);
-        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(teacherUserService.findAll()));
+        model.addAttribute("teachers", auxiliaryController.sortTeacherSetByLastName(saved.getTeachers()));
         return "/SRM/subjects/updateSubject";
     }
 }
