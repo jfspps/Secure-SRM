@@ -2,13 +2,11 @@
 
 ## Overview ##
 
-This project is a combination of two projects, Student Record Management [SRM](https://github.com/jfspps/SRM-Spring) and [Web-login](https://github.com/jfspps/Spring_weblogin).
+Student record management is a Spring based academic database which stores and processes student academic data. Web-login provides the Spring Security frontend, with authentication and authorisation functionality. This project is a combination of two projects, a non-secure project, Student Record Management [SRM](https://github.com/jfspps/SRM-Spring) and the Spring Security frontend, [Web-login](https://github.com/jfspps/Spring_weblogin).
 
-Student record management is a Spring based academic database which stores and processes student academic data. Web-login provides the Spring Security frontend, with authentication and authorisation functionality.
+All model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
 
-The model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
-
-## Current (Oct 2020) and future work of Secure-SRM ##
+## Current status and future work of Secure-SRM ##
 
 At present, Secure-SRM can store and retrieve personnel data (teachers, admin and guardians, each with Web-login credentials, and student records), academic data (student tasks, results, report, threshold lists and thresholds, to name a few) and finally class lists (form group lists and subject class lists). Various account settings can be changed by the user (email address, phone number and web-login password). Not all aspects of secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
 
