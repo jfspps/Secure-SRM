@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/jfspps/Secure-SRM.svg?style=svg)](https://circleci.com/gh/jfspps/Secure-SRM)
+
 # Secure Student Record Management (Secure-SRM) #
 
 ## Overview ##
