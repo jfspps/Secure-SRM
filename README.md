@@ -4,13 +4,32 @@
 
 Secure Student-record-management is a Spring based academic database which stores and processes student academic data. Authentication and authorisation is provided by [Web-login](https://github.com/jfspps/Spring_weblogin), a Spring Security frontend . This project is the secured version of Student Record Management [SRM](https://github.com/jfspps/SRM-Spring).
 
-All model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info.
+All model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info. The localhost port number has been set to 5000 to match that of the EC2 instance on AWS.
 
-## Current status and future work of Secure-SRM ##
+## General status of Secure-SRM ##
 
-At present, Secure-SRM can store and retrieve personnel data (teachers, admin and guardians, each with Web-login credentials, and student records), academic data (student tasks, results, report, threshold lists and thresholds, to name a few) and finally class lists (form group lists and subject class lists). Various account settings can be changed by the user (email address, phone number and web-login password). Not all aspects of secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
+At present, Secure-SRM can store and retrieve 
 
-The next stage is the implementation of DELETE operations for many entities (handling cascading properties) and the development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. A more efficient interface which allows for the input of multiple entries (e.g. uploading of a whole class worth of results) with established frontends, such as Angular, are also part of the future plan.
++ personnel data (teachers, admin and guardians, each with Web-login credentials, and student records) 
++ academic data (student tasks, results, report, threshold lists and thresholds, to name a few) 
++ class lists (form group lists and subject class lists)
+  
+Various account settings can be changed by the user (email address, phone number and web-login password). 
+
+Not all aspects of Secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
+
+## Future work for Secure-SRM ##
+
+Not all entities can be removed and such an approach is applied to allow schools and colleges to review numerical data coupled to task data. Personal information of past students, their guardians and teachers can be removed.
+
++ Implementation of DELETE operations for select entities, while handling cascaded operations. Allow for the
+  + Removal of personal details of students, guardians and former teachers. Replace them with generic or blank fields
+  + Removal of grade thresholds and threshold lists, without affecting student raw results
+  + Removal of student reports
+
++ Development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. A more efficient interface which allows for the input of multiple entries (e.g. uploading of a whole class worth of results) with established frontends, such as Angular, are also part of the future plan.
+
++ Export of academic results as a PDF
 
 ## Web-login specific overview ##
 
