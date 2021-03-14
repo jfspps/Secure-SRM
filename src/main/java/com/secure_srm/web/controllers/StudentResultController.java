@@ -2,9 +2,7 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.ForbiddenException;
 import com.secure_srm.exceptions.NotFoundException;
-import com.secure_srm.model.academic.StudentResult;
-import com.secure_srm.model.academic.StudentTask;
-import com.secure_srm.model.academic.Subject;
+import com.secure_srm.model.academic.*;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.StudentResultService;
@@ -17,7 +15,6 @@ import com.secure_srm.web.permissionAnnot.TeacherRead;
 import com.secure_srm.web.permissionAnnot.TeacherUpdate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -188,7 +185,50 @@ public class StudentResultController {
 
         StudentResult found = studentResultService.findById(Long.valueOf(resultID));
         model.addAttribute("result", found);
+
+        // pass the grade based on thresholds set (this may need optimising in future)
+        model.addAttribute("thresholdListsAndGrades", getResultAndThresholdLists(found));
+
         return "/SRM/studentResults/viewResult";
+    }
+
+    /**
+     * @param found StudentResult
+     * @return Returns a set of Result-threshold pairings; returns an empty HashSet if no
+     * threshold lists are associated with the student task
+     */
+    protected Set<ResultAndThresholdList> getResultAndThresholdLists(StudentResult found) {
+        Set<ThresholdList> thresholdLists = found.getStudentTask().getThresholdListSet();
+        Set<ResultAndThresholdList> resultAndThresholdLists = new HashSet<>();
+
+        if (!thresholdLists.isEmpty()) {
+            for (ThresholdList list : thresholdLists) {
+                if (list.getThresholds().isEmpty()) {
+                    continue;
+                }
+                String grade = "No grade available";
+                int max = 0;
+                int score;
+
+                // allow for blank entries (student absence etc.)
+                if (found.getScore().isBlank()){
+                    score = 0;
+                } else {
+                    score = Integer.parseInt(found.getScore());
+                }
+
+                // go through each Threshold in list;
+                // threshold represent the lowest score needed to secure a given grade
+                for (Threshold threshold : list.getThresholds()) {
+                    if (score >= threshold.getNumerical() && threshold.getNumerical() >= max) {
+                        max = threshold.getNumerical();
+                        grade = threshold.getAlphabetical();
+                    }
+                }
+                resultAndThresholdLists.add(new ResultAndThresholdList(grade, list));
+            }
+        }
+        return resultAndThresholdLists;
     }
 
     @TeacherUpdate

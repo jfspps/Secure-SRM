@@ -53,6 +53,19 @@
         </div>
     </div>
 
+    <!--/*@thymesVar id="thresholdListAndGrade" type="com.secure_srm.model.academic.ResultAndThresholdList"*/-->
+    <div class="row align-items-start" th:object="${thresholdListsAndGrades}" th:if="${!thresholdListsAndGrades.isEmpty()}">
+        <div class="col-sm-2">
+            <label>Threshold grade</label>
+        </div>
+        <div class="col-sm-8">
+            <div th:each="thresholdListAndGrade : ${thresholdListsAndGrades}" >
+                <label size="50" th:text="${thresholdListAndGrade.gradeAwarded + ' '}"></label>
+                <a th:href="@{/thresholdLists/{id}(id=${thresholdListAndGrade.thresholdList.getId()})}" th:text="${'(' + thresholdListAndGrade.thresholdList.uniqueID + ')'}"></a>
+            </div>
+        </div>
+    </div>
+
     <div class="row align-items-start">
         <div class="col-sm-2">
             <label>Maximum score/grade</label>

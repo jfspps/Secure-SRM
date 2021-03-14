@@ -84,8 +84,8 @@
                 </span>
                 <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
                 <span th:unless="${task.thresholdListSet?.isEmpty()}" th:each="thresholdList : ${task.thresholdListSet}">
-                    <label><a th:text="${thresholdList.uniqueID}"
-                        th:href="@{/thresholdLists/{id}(id=${thresholdList.id})}"></a></label>
+                    <div><label><a th:text="${thresholdList.uniqueID}"
+                        th:href="@{/thresholdLists/{id}(id=${thresholdList.id})}"></a></label></div>
                 </span>
             </div>
         </div>
