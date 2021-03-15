@@ -172,6 +172,10 @@ public class StudentResultController {
         }
 
         model.addAttribute("result", savedResult);
+
+        // pass the grade based on thresholds set (this may need optimising in future)
+        model.addAttribute("thresholdListsAndGrades", getResultAndThresholdLists(savedResult));
+
         return "/SRM/studentResults/viewResult";
     }
 
@@ -361,6 +365,10 @@ public class StudentResultController {
         }
 
         model.addAttribute("result", savedResult);
+
+        // pass the grade based on thresholds set (this may need optimising in future)
+        model.addAttribute("thresholdListsAndGrades", getResultAndThresholdLists(savedResult));
+
         return "/SRM/studentResults/viewResult";
     }
 }

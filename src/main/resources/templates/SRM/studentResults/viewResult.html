@@ -54,7 +54,7 @@
     </div>
 
     <!--/*@thymesVar id="thresholdListAndGrade" type="com.secure_srm.model.academic.ResultAndThresholdList"*/-->
-    <div class="row align-items-start" th:object="${thresholdListsAndGrades}" th:if="${!thresholdListsAndGrades.isEmpty()}">
+    <div class="row align-items-start" th:object="${thresholdListsAndGrades}" th:if="${thresholdListsAndGrades != null && !thresholdListsAndGrades.isEmpty()}">
         <div class="col-sm-2">
             <label>Threshold grade</label>
         </div>
@@ -62,6 +62,18 @@
             <div th:each="thresholdListAndGrade : ${thresholdListsAndGrades}" >
                 <label size="50" th:text="${thresholdListAndGrade.gradeAwarded + ' '}"></label>
                 <a th:href="@{/thresholdLists/{id}(id=${thresholdListAndGrade.thresholdList.getId()})}" th:text="${'(' + thresholdListAndGrade.thresholdList.uniqueID + ')'}"></a>
+            </div>
+        </div>
+    </div>
+
+    <!--/*@thymesVar id="thresholdListAndGrade" type="com.secure_srm.model.academic.ResultAndThresholdList"*/-->
+    <div class="row align-items-start" th:object="${thresholdListsAndGrades}" th:if="${thresholdListsAndGrades == null || thresholdListsAndGrades.isEmpty()}">
+        <div class="col-sm-2">
+            <label>Threshold grade</label>
+        </div>
+        <div class="col-sm-8">
+            <div>
+                <label size="50" th:text="${'No threshold list assigned'}"></label>
             </div>
         </div>
     </div>
