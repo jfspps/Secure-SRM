@@ -20,7 +20,8 @@
         </div>
     </div>
     <!--/*@thymesVar id="guardian" type="com.secure_srm.model.security.GuardianUser"*/-->
-    <form th:object="${guardian}" method="post" th:action="@{/guardians/{id}/delete(id=${guardian.getId()})}">
+    <form th:object="${guardian}" method="post" th:action="@{/guardians/{id}/delete(id=${guardian.getId()})}"
+          class="form-horizontal" id="delete-guardian-form">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Guardian name</b></label>
@@ -123,7 +124,7 @@
         <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/guardians/index" role="button">Guardian index</a>
-                <a class="btn btn-danger" type="submit">Confirm Delete</a>
+                <button class="btn btn-danger" type="submit">Save changes</button>
             </div>
         </div>
     </form>

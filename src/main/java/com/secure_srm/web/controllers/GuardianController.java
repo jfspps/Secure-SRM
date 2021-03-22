@@ -300,4 +300,15 @@ public class GuardianController {
         model.addAttribute("guardian", found);
         return "/SRM/guardians/confirmDelete";
     }
+
+    @AdminDelete
+    @PostMapping("/{guardianID}/delete")
+    public String postDeleteGuardian(@ModelAttribute("guardian") GuardianUser guardianUser, Model model, @PathVariable Long guardianID) {
+
+        // get personal details
+        GuardianUser found = guardianUserService.findById(guardianID);
+
+        model.addAttribute("reply", "Guardian, " + found.getFirstName() + " " + found.getLastName() + " removed.");
+        return "/SRM/deleteConfirmed";
+    }
 }

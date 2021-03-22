@@ -120,12 +120,12 @@ public class GuardianUserControllerTest_IT extends SecurityCredentialsTest{
                 .andExpect(model().attributeExists("guardian"));
     }
 
-//    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
-//    @ParameterizedTest
-//    void postDeleteGuardian(String username, String pwd) throws Exception {
-//        mockMvc.perform(post("/guardians/1/delete").with(httpBasic(username, pwd)).with(csrf()))
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("/SRM/guardians/deleteConfirmed"))
-//                .andExpect(model().attributeExists("reply"));
-//    }
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postDeleteGuardian(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/guardians/1/delete").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/deleteConfirmed"))
+                .andExpect(model().attributeExists("reply"));
+    }
 }

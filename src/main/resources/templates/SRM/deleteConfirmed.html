@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/header :: baseHead(~{::title})">
+    <title>Record deleted</title>
+</head>
+<body style="background-color: mintcream">
+<nav th:replace="fragments/navStudentSearch :: nav"></nav>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+<!--/*@thymesVar id="reply" type="java.lang.String"*/-->
+<div class="container" th:object="${reply}" sec:authorize="hasAuthority('admin.read')">
+    <div class="row justify-content-center">
+        <div class="col-12" id="navigationHeader">
+            <h3>Confirmation</h3>
+
+            <div sec:authorize="isAuthenticated()">
+                <p th:text="${reply}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--/*@thymesVar id="hasSubject" type="java.lang.Boolean"*/-->
+<div class="container" sec:authorize="hasAuthority('admin.read')">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-sm-9">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    Personnel data
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/index}">View student records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/students/new}">New student record</a></p>
+                    <h5 class="card-title">Teachers</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/index}">View teacher records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/teachers/new}">New teacher record</a></p>
+                    <h5 class="card-title">Guardians</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/index}">View guardian records</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/guardians/new}">New guardian record</a></p>
+                    <h5 class="card-title">Form groups</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/index}">View form groups</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/formGroupList/new}">New form group</a></p>
+                    <h5 class="card-title">Subject classes</h5>
+                    <p><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/index}">View subject classes</a></p>
+                    <p sec:authorize="hasAuthority('admin.create')"><a role="button" class="btn btn-sm btn-block btn-outline-info" th:href="@{/subjectClassList/new}">New subject class</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+</body>
+</html>
