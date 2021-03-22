@@ -45,10 +45,14 @@ public class RootUser extends BaseEntity implements Comparable<RootUser>{
             return true;
         }
 
-        RootUser rootUser = (RootUser) obj;
-        String rootUserDetails = rootUser.firstName + rootUser.lastName + rootUser.contactDetail.toString();
-        String thisRootUserDetails = this.firstName + this.lastName + this.contactDetail.toString();
+        if (obj instanceof RootUser){
+            RootUser rootUser = (RootUser) obj;
+            String rootUserDetails = rootUser.firstName + rootUser.lastName + rootUser.contactDetail.toString();
+            String thisRootUserDetails = this.firstName + this.lastName + this.contactDetail.toString();
 
-        return thisRootUserDetails.equals(rootUserDetails);
+            return thisRootUserDetails.equals(rootUserDetails);
+        }
+
+        return false;
     }
 }

@@ -64,10 +64,13 @@ public class TeacherUser extends BaseEntity implements Comparable<TeacherUser>{
             return true;
         }
 
-        TeacherUser teacherUser = (TeacherUser) obj;
-        String teacherDetails = teacherUser.firstName + teacherUser.lastName + teacherUser.contactDetail.toString();
-        String thisTeacherDetails = this.firstName + this.lastName + this.contactDetail.toString();
+        if (obj instanceof TeacherUser){
+            TeacherUser teacherUser = (TeacherUser) obj;
+            String teacherDetails = teacherUser.firstName + teacherUser.lastName + teacherUser.contactDetail.toString();
+            String thisTeacherDetails = this.firstName + this.lastName + this.contactDetail.toString();
 
-        return thisTeacherDetails.equals(teacherDetails);
+            return thisTeacherDetails.equals(teacherDetails);
+        }
+        return false;
     }
 }

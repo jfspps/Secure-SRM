@@ -260,6 +260,17 @@ public class StudentController {
         return "/SRM/students/studentDetails";
     }
 
+    @AdminUpdate
+    @GetMapping("/{studentId}/anon")
+    public String getAnonStudent(@PathVariable String studentId, Model model){
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+
+        updateStudentModel(model, studentOnFile);
+
+        model.addAttribute("student", studentOnFile);
+        return "/SRM/students/confirmAnon";
+    }
+
     @TeacherRead
     private void checkStudentID(String studentID) {
         try{

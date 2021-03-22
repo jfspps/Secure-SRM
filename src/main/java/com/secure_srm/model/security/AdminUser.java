@@ -49,10 +49,13 @@ public class AdminUser extends BaseEntity implements Comparable<AdminUser>{
             return true;
         }
 
-        AdminUser adminUser = (AdminUser) obj;
-        String adminDetails = adminUser.firstName + adminUser.lastName + adminUser.contactDetail.toString();
-        String thisAdminDetails = this.firstName + this.lastName + this.contactDetail.toString();
+        if (obj instanceof AdminUser){
+            AdminUser adminUser = (AdminUser) obj;
+            String adminDetails = adminUser.firstName + adminUser.lastName + adminUser.contactDetail.toString();
+            String thisAdminDetails = this.firstName + this.lastName + this.contactDetail.toString();
 
-        return thisAdminDetails.equals(adminDetails);
+            return thisAdminDetails.equals(adminDetails);
+        }
+        return false;
     }
 }

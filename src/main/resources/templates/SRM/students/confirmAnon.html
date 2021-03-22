@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/header :: baseHead(~{::title})">
-    <title>Student details</title>
+    <title>Anonymize student</title>
 </head>
 <body>
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
@@ -16,7 +16,7 @@
         </div>
     </div>
     <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
-    <form th:object="${student}" method="get">
+    <form th:object="${student}" method="post" th:action="@{/students/{studentId}/anon(studentId=(${student.getId()}))}">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Student name</b></label>
@@ -99,7 +99,7 @@
                 </span>
                 <span th:unless="${teacher == null}">
                     <label size="50"><a th:text="${teacher.firstName + ' ' + teacher.lastName}"
-                                         th:href="@{/teachers/{teacherId}(teacherId=${teacher.id})}"></a></label>
+                                        th:href="@{/teachers/{teacherId}(teacherId=${teacher.id})}"></a></label>
                 </span>
             </div>
         </div>
@@ -132,7 +132,7 @@
                 <span th:unless="${student.getSubjectClassLists().size() == 0}" th:each="subjectList: ${subjectClassLists}">
                     <div>
                         <label><a th:text="${subjectList.groupName + ' (' + subjectList.subject.subjectName + ')'}"
-                                   th:href="@{/subjectClassList/{ID}(ID=${subjectList.id})}"></a></label>
+                                  th:href="@{/subjectClassList/{ID}(ID=${subjectList.id})}"></a></label>
                     </div>
                 </span>
             </div>
@@ -150,11 +150,15 @@
         <br/>
         <div class="row align-items-start">
             <div class="col-sm-10">
+                <p>Please confirm. This will overwrite all personally identifying records for this student and associated guardians.
+                    If the guardians on file are not assigned to any student on file, then their records will be removed from the database</p>
+            </div>
+        </div>
+        <br/>
+        <div class="row align-items-start">
+            <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/students/index" role="button">Student index</a>
-                <a class="btn btn-outline-warning" th:href="@{/students/{studentId}/edit(studentId=${student.id})}"
-                   role="button" sec:authorize="hasAuthority('admin.update')">Edit record</a>
-                <a class="btn btn-outline-danger" th:href="@{/students/{studentId}/anon(studentId=${student.id})}"
-                   role="button" sec:authorize="hasAuthority('admin.update')">Anonymise student</a>
+                <button class="btn btn-danger" type="submit">Anonymise student</button>
             </div>
         </div>
     </form>

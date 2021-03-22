@@ -71,10 +71,13 @@ public class Student extends BaseEntity implements Comparable<Student>{
             return true;
         }
 
-        Student passed = (Student) obj;
-        String passedProps = passed.firstName + passed.middleNames + passed.lastName;
+        if (obj instanceof Student){
+            Student passed = (Student) obj;
+            String passedProps = passed.firstName + passed.middleNames + passed.lastName;
 
-        String thisStudent = this.firstName + this.middleNames + this.lastName;
-        return (thisStudent.equals(passedProps));
+            String thisStudent = this.firstName + this.middleNames + this.lastName;
+            return (thisStudent.equals(passedProps));
+        }
+        return false;
     }
 }
