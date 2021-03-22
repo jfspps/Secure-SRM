@@ -78,8 +78,7 @@ public class DataLoader_SDjpa implements CommandLineRunner {
 
     private void loadSecurityData(){
         // Privileges Root > Admin > Teacher > Guardian
-        // all permissions below are in relation to TestRecord CRUD ops
-        // a separate set of permissions for each object type (in schools, assignment, report, exam score etc.) could be
+        // A separate set of permissions for each object type (in schools, assignment, report, exam score etc.) could be
         // implemented in future (e.g. admin to view exam results would be 'admin.examScore.read' for example
 
         //root authorities

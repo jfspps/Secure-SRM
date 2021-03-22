@@ -63,10 +63,10 @@
                     <label class="control-label" size="30"><b>Email address</b></label>
                 </div>
                 <div class="col-sm-8">
-                <span th:if="${contactDetail.email.isEmpty()}">
+                <span th:if="${contactDetail == null || contactDetail.email.isEmpty()}">
                     <label size="50">(No email address on record)</label>
                 </span>
-                    <span th:unless="${contactDetail.email.isEmpty()}">
+                    <span th:unless="${contactDetail == null || contactDetail.email.isEmpty()}">
                     <label size="50" th:text="*{email}">Email address to appear here</label>
                 </span>
                 </div>
@@ -77,10 +77,10 @@
                     <label class="control-label" size="30"><b>Phone number</b></label>
                 </div>
                 <div class="col-sm-8">
-                <span th:if="${contactDetail.phoneNumber.isEmpty()}">
+                <span th:if="${contactDetail == null || contactDetail.phoneNumber.isEmpty()}">
                     <label size="50">(No phone number on record)</label>
                 </span>
-                    <span th:unless="${contactDetail.phoneNumber.isEmpty()}">
+                    <span th:unless="${contactDetail == null || contactDetail.phoneNumber.isEmpty()}">
                     <label size="50" th:text="*{phoneNumber}">Phone number to appear here</label>
                 </span>
                 </div>

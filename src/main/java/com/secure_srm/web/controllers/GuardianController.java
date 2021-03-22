@@ -1,12 +1,10 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
-import com.secure_srm.model.BaseEntity;
 import com.secure_srm.model.people.Address;
 import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.Student;
 import com.secure_srm.model.security.GuardianUser;
-import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.model.security.User;
 import com.secure_srm.services.peopleServices.AddressService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
@@ -20,11 +18,9 @@ import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.embedded.undertow.UndertowServletWebServer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Controller
 @RequiredArgsConstructor
@@ -303,12 +300,41 @@ public class GuardianController {
 
     @AdminDelete
     @PostMapping("/{guardianID}/delete")
-    public String postDeleteGuardian(@ModelAttribute("guardian") GuardianUser guardianUser, Model model, @PathVariable Long guardianID) {
+    public String postDeleteGuardian(Model model, @PathVariable Long guardianID) {
 
         // get personal details
-        GuardianUser found = guardianUserService.findById(guardianID);
+        GuardianUser guardianUserFound = guardianUserService.findById(guardianID);
 
-        model.addAttribute("reply", "Guardian, " + found.getFirstName() + " " + found.getLastName() + " removed.");
+        // remove security credentials
+        // Each User has different credentials and a GuardianUser may be granted different privileges
+        Set<User> userSet = guardianUserFound.getUsers();
+        userSet.forEach(userService::delete
+        );
+
+        // delete Address (Address would be dangling)
+        Address foundAddress = guardianUserFound.getAddress();
+        guardianUserFound.setAddress(null);
+        addressService.delete(foundAddress);
+
+        // retrieve ContactDetails and free Guardian's reference
+        ContactDetail foundContacts = guardianUserFound.getContactDetail();
+        guardianUserFound.setContactDetail(null);
+
+        // update Student records
+        Set<Student> studentSet = guardianUserFound.getStudents();
+        guardianUserFound.setStudents(null);
+        studentSet.forEach(student -> {
+            if (student.getContactDetail().equals(foundContacts)){
+                student.setContactDetail(null);
+            }
+            student.getGuardians().remove(guardianUserFound);
+            studentService.save(student);
+        });
+
+        contactDetailService.delete(foundContacts);
+        guardianUserService.delete(guardianUserFound);
+
+        model.addAttribute("reply", "Guardian, " + guardianUserFound.getFirstName() + " " + guardianUserFound.getLastName() + ", removed.");
         return "/SRM/deleteConfirmed";
     }
 }
