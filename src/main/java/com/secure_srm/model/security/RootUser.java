@@ -38,4 +38,17 @@ public class RootUser extends BaseEntity implements Comparable<RootUser>{
         String inputBothNames = input.lastName + ' ' + input.firstName;
         return bothNames.compareTo(inputBothNames);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj){
+            return true;
+        }
+
+        RootUser rootUser = (RootUser) obj;
+        String rootUserDetails = rootUser.firstName + rootUser.lastName + rootUser.contactDetail.toString();
+        String thisRootUserDetails = this.firstName + this.lastName + this.contactDetail.toString();
+
+        return thisRootUserDetails.equals(rootUserDetails);
+    }
 }

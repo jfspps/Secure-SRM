@@ -64,4 +64,17 @@ public class Student extends BaseEntity implements Comparable<Student>{
         String inputBothNames = input.lastName + ' ' + input.firstName;
         return bothNames.compareTo(inputBothNames);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj){
+            return true;
+        }
+
+        Student passed = (Student) obj;
+        String passedProps = passed.firstName + passed.middleNames + passed.lastName;
+
+        String thisStudent = this.firstName + this.middleNames + this.lastName;
+        return (thisStudent.equals(passedProps));
+    }
 }

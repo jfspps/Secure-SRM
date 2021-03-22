@@ -22,4 +22,12 @@ public class ContactDetail extends BaseEntity {
 
     @Builder.Default
     private String phoneNumber = "";
+
+    @Override
+    public String toString() {
+        return "ContactDetail{" +
+                "email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }

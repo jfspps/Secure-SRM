@@ -59,4 +59,17 @@ public class GuardianUser extends BaseEntity implements Comparable<GuardianUser>
         String inputBothNames = input.lastName + ' ' + input.firstName;
         return bothNames.compareTo(inputBothNames);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj){
+            return true;
+        }
+
+        GuardianUser guardianUser = (GuardianUser) obj;
+        String guardianDetails = guardianUser.firstName + guardianUser.lastName + guardianUser.contactDetail.toString();
+        String thisGuardianDetails = this.firstName + this.lastName + this.contactDetail.toString();
+
+        return thisGuardianDetails.equals(guardianDetails);
+    }
 }
