@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -216,5 +218,17 @@ public class TeacherController {
         model.addAttribute("userFeedback", "Teacher details updated");
         model.addAttribute("teacher", savedTeacher);
         return "/SRM/teachers/teacherDetails";
+    }
+
+    /**
+     * Assigns the user name fields of a teacher with generic, non-identifying strings
+     */
+    @AdminUpdate
+    public void anonymizeTeacher(TeacherUser teacher){
+        Date date = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yy-mm-dd-hhmm:ss");
+        teacher.setFirstName("Anon_" + dateFormat.format(date));
+        teacher.setLastName("Anon_" + dateFormat.format(date));
+        teacherUserService.save(teacher);
     }
 }

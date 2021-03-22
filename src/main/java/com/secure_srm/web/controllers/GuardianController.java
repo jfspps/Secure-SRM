@@ -305,36 +305,41 @@ public class GuardianController {
         // get personal details
         GuardianUser guardianUserFound = guardianUserService.findById(guardianID);
 
+        deleteGuardianRecord(guardianUserFound);
+
+        model.addAttribute("reply", "Guardian, " + guardianUserFound.getFirstName() + " " + guardianUserFound.getLastName() + ", removed.");
+        return "/SRM/deleteConfirmed";
+    }
+
+    @AdminDelete
+    public void deleteGuardianRecord(GuardianUser guardianUser) {
         // remove security credentials
         // Each User has different credentials and a GuardianUser may be granted different privileges
-        Set<User> userSet = guardianUserFound.getUsers();
+        Set<User> userSet = guardianUser.getUsers();
         userSet.forEach(userService::delete
         );
 
         // delete Address (Address would be dangling)
-        Address foundAddress = guardianUserFound.getAddress();
-        guardianUserFound.setAddress(null);
+        Address foundAddress = guardianUser.getAddress();
+        guardianUser.setAddress(null);
         addressService.delete(foundAddress);
 
         // retrieve ContactDetails and free Guardian's reference
-        ContactDetail foundContacts = guardianUserFound.getContactDetail();
-        guardianUserFound.setContactDetail(null);
+        ContactDetail foundContacts = guardianUser.getContactDetail();
+        guardianUser.setContactDetail(null);
 
         // update Student records
-        Set<Student> studentSet = guardianUserFound.getStudents();
-        guardianUserFound.setStudents(null);
+        Set<Student> studentSet = guardianUser.getStudents();
+        guardianUser.setStudents(null);
         studentSet.forEach(student -> {
             if (student.getContactDetail().equals(foundContacts)){
                 student.setContactDetail(null);
             }
-            student.getGuardians().remove(guardianUserFound);
+            student.getGuardians().remove(guardianUser);
             studentService.save(student);
         });
 
         contactDetailService.delete(foundContacts);
-        guardianUserService.delete(guardianUserFound);
-
-        model.addAttribute("reply", "Guardian, " + guardianUserFound.getFirstName() + " " + guardianUserFound.getLastName() + ", removed.");
-        return "/SRM/deleteConfirmed";
+        guardianUserService.delete(guardianUser);
     }
 }

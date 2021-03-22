@@ -22,6 +22,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -279,5 +281,18 @@ public class StudentController {
         model.addAttribute("teacher", found.getTeacher());
         model.addAttribute("formGroupList", found.getFormGroupList());
         model.addAttribute("subjectClassLists", found.getSubjectClassLists());
+    }
+
+    /**
+     * Assigns the user name fields of a student with generic, non-identifying strings
+     */
+    @AdminUpdate
+    public void anonymizeStudent(Student student){
+        Date date = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yy-mm-dd-hhmm:ss");
+        student.setFirstName("Anon_" + dateFormat.format(date));
+        student.setMiddleNames(" ");
+        student.setLastName("Anon_" + dateFormat.format(date));
+        studentService.save(student);
     }
 }

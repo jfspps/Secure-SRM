@@ -24,8 +24,8 @@ Not all aspects of Secure-SRM are available to all users. For example, teachers 
 
 Not all entities can be removed and such an approach is applied to allow schools and colleges to review numerical data coupled to task data. Personal information of past students, their guardians and teachers can be removed.
 
-+ Implementation of DELETE operations for select entities, while handling cascaded operations. Allow for the
-  + Removal of personal details of students, guardians and former teachers. Replace them with generic or blank fields
++ Implementation of DELETE operations for select entities. Allow for the
+  + Removal of personal details of students and former teachers. Replace them with generic or blank fields
   + Removal of grade thresholds and threshold lists, without affecting student raw results
   + Removal of student reports
 
