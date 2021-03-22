@@ -81,4 +81,13 @@ public class TeacherUserController_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("teacher"))
                 .andExpect(model().attributeExists("userFeedback"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void getAnonTeacher(String username, String pwd) throws Exception {
+        mockMvc.perform(get("/teachers/1/anon").with(httpBasic(username, pwd)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/teachers/confirmAnon"))
+                .andExpect(model().attributeExists("teacher"));
+    }
 }

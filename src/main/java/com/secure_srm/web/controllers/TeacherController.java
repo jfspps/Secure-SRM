@@ -220,6 +220,23 @@ public class TeacherController {
         return "/SRM/teachers/teacherDetails";
     }
 
+    //note that User username and account properties are only accessible via updateTeacher
+    @AdminUpdate
+    @GetMapping("/{teacherId}/anon")
+    public ModelAndView getAnonTeacher(@PathVariable String teacherId) {
+        ModelAndView mav = new ModelAndView("/SRM/teachers/confirmAnon");
+        if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
+            log.debug("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
+
+        TeacherUser teacher = teacherUserService.findById(Long.valueOf(teacherId));
+        Set<Subject> subjectsTaught = new HashSet<>(teacher.getSubjects());
+        mav.addObject("subjectsTaught", subjectsTaught);
+        mav.addObject("teacher", teacher);
+        return mav;
+    }
+
     /**
      * Assigns the user name fields of a teacher with generic, non-identifying strings
      */
