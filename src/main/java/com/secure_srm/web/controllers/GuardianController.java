@@ -15,6 +15,7 @@ import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.services.securityServices.RoleService;
 import com.secure_srm.services.securityServices.UserService;
 import com.secure_srm.web.permissionAnnot.AdminCreate;
+import com.secure_srm.web.permissionAnnot.AdminDelete;
 import com.secure_srm.web.permissionAnnot.AdminUpdate;
 import com.secure_srm.web.permissionAnnot.TeacherRead;
 import lombok.RequiredArgsConstructor;
@@ -287,5 +288,16 @@ public class GuardianController {
         model.addAttribute("students", auxiliaryController.sortStudentSetByLastName(saved.getStudents()));
         model.addAttribute("userFeedback", "Registered students updated");
         return "/SRM/guardians/guardianDetails";
+    }
+
+    @AdminDelete
+    @GetMapping("/{guardianID}/delete")
+    public String getDeleteGuardian(Model model, @PathVariable Long guardianID) {
+
+        // get personal details
+        GuardianUser found = guardianUserService.findById(guardianID);
+
+        model.addAttribute("guardian", found);
+        return "/SRM/guardians/confirmDelete";
     }
 }
