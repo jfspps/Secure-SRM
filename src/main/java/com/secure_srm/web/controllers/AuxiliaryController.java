@@ -31,6 +31,10 @@ import java.util.*;
 public class AuxiliaryController {
 
     private final UserService userService;
+    private final AddressService addressService;
+    private final ContactDetailService contactDetailService;
+    private final StudentService studentService;
+    private final GuardianUserService guardianUserService;
 
     /**
      * Get the username of the User
@@ -231,5 +235,37 @@ public class AuxiliaryController {
         //see StudentTask's model string comparison method, compareTo()
         Collections.sort(listByTitle);
         return listByTitle;
+    }
+
+    @AdminDelete
+    public void deleteGuardianRecord(GuardianUser guardianUser) {
+        // remove security credentials
+        // Each User has different credentials and a GuardianUser may be granted different privileges
+        Set<User> userSet = guardianUser.getUsers();
+        userSet.forEach(userService::delete
+        );
+
+        // delete Address (Address would be dangling)
+        Address foundAddress = guardianUser.getAddress();
+        guardianUser.setAddress(null);
+        addressService.delete(foundAddress);
+
+        // retrieve ContactDetails and free Guardian's reference
+        ContactDetail foundContacts = guardianUser.getContactDetail();
+        guardianUser.setContactDetail(null);
+
+        // update Student records
+        Set<Student> studentSet = guardianUser.getStudents();
+        guardianUser.setStudents(null);
+        studentSet.forEach(student -> {
+            if (student.getContactDetail().equals(foundContacts)){
+                student.setContactDetail(null);
+            }
+            student.getGuardians().remove(guardianUser);
+            studentService.save(student);
+        });
+
+        contactDetailService.delete(foundContacts);
+        guardianUserService.delete(guardianUser);
     }
 }

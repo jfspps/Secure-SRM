@@ -285,4 +285,13 @@ class StudentControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("formGroupList"))
                 .andExpect(model().attributeExists("subjectClassLists"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postAnonStudent(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/students/1/anon").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/deleteConfirmed"))
+                .andExpect(model().attributeExists("reply"));
+    }
 }

@@ -226,7 +226,7 @@ public class TeacherController {
     @AdminUpdate
     public void anonymizeTeacher(TeacherUser teacher){
         Date date = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yy-mm-dd-hhmm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyMMdd-hhmm:ss");
         teacher.setFirstName("Anon_" + dateFormat.format(date));
         teacher.setLastName("Anon_" + dateFormat.format(date));
         teacherUserService.save(teacher);

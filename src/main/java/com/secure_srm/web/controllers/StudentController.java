@@ -1,13 +1,18 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
+import com.secure_srm.model.people.ContactDetail;
+import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
+import com.secure_srm.model.people.SubjectClassList;
 import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.model.security.User;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
+import com.secure_srm.services.peopleServices.FormGroupListService;
 import com.secure_srm.services.peopleServices.StudentService;
+import com.secure_srm.services.peopleServices.SubjectClassListService;
 import com.secure_srm.services.securityServices.GuardianUserService;
 import com.secure_srm.services.securityServices.TeacherUserService;
 import com.secure_srm.services.securityServices.UserService;
@@ -35,6 +40,9 @@ public class StudentController {
     private final StudentService studentService;
     private final GuardianUserService guardianUserService;
     private final TeacherUserService teacherUserService;
+    private final SubjectClassListService subjectClassListService;
+    private final FormGroupListService formGroupListService;
+
     private final ContactDetailService contactDetailService;
     private final AuxiliaryController auxiliaryController;
 
@@ -271,6 +279,18 @@ public class StudentController {
         return "/SRM/students/confirmAnon";
     }
 
+    @AdminDelete
+    @PostMapping("/{studentId}/anon")
+    public String postAnonStudent(@PathVariable String studentId, Model model){
+        Student studentOnFile = studentService.findById(Long.valueOf(studentId));
+        String reply = "Student, " + studentOnFile.getFirstName() + " " + studentOnFile.getLastName() + ", anonymised.";
+
+        anonymizeStudent(studentOnFile);
+
+        model.addAttribute("reply", reply);
+        return "/SRM/deleteConfirmed";
+    }
+
     @TeacherRead
     private void checkStudentID(String studentID) {
         try{
@@ -297,13 +317,46 @@ public class StudentController {
     /**
      * Assigns the user name fields of a student with generic, non-identifying strings
      */
-    @AdminUpdate
-    public void anonymizeStudent(Student student){
+    @AdminDelete
+    public Student anonymizeStudent(Student student){
         Date date = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yy-mm-dd-hhmm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyMMdd-hhmm:ss");
         student.setFirstName("Anon_" + dateFormat.format(date));
         student.setMiddleNames(" ");
         student.setLastName("Anon_" + dateFormat.format(date));
-        studentService.save(student);
+
+        Set<GuardianUser> guardianUserSet = student.getGuardians();
+        student.setContactDetail(null);
+        student.setGuardians(null);
+
+        // remove guardian references and all traces of contact details
+        guardianUserSet.forEach(guardianUser -> {
+            guardianUser.getStudents().remove(student);
+
+            // remove guardian if dangling
+            if (guardianUser.getStudents().isEmpty()){
+                // this also deletes matching contact details
+                auxiliaryController.deleteGuardianRecord(guardianUser);
+            } else {
+                guardianUserService.save(guardianUser);
+            }
+        });
+
+        //update tutor, subject and class lists (refresh all class lists separately)
+        student.setTeacher(null);
+
+        Set<SubjectClassList> subjectClassLists = student.getSubjectClassLists();
+        student.setSubjectClassLists(null);
+        subjectClassLists.forEach(subjectClassList -> {
+            subjectClassList.getStudentList().remove(student);
+            subjectClassListService.save(subjectClassList);
+        });
+
+        FormGroupList formGroupList = student.getFormGroupList();
+        student.setFormGroupList(null);
+        formGroupList.getStudentList().remove(student);
+        formGroupListService.save(formGroupList);
+
+        return studentService.save(student);
     }
 }

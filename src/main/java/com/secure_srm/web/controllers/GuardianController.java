@@ -305,41 +305,9 @@ public class GuardianController {
         // get personal details
         GuardianUser guardianUserFound = guardianUserService.findById(guardianID);
 
-        deleteGuardianRecord(guardianUserFound);
+        auxiliaryController.deleteGuardianRecord(guardianUserFound);
 
         model.addAttribute("reply", "Guardian, " + guardianUserFound.getFirstName() + " " + guardianUserFound.getLastName() + ", removed.");
         return "/SRM/deleteConfirmed";
-    }
-
-    @AdminDelete
-    public void deleteGuardianRecord(GuardianUser guardianUser) {
-        // remove security credentials
-        // Each User has different credentials and a GuardianUser may be granted different privileges
-        Set<User> userSet = guardianUser.getUsers();
-        userSet.forEach(userService::delete
-        );
-
-        // delete Address (Address would be dangling)
-        Address foundAddress = guardianUser.getAddress();
-        guardianUser.setAddress(null);
-        addressService.delete(foundAddress);
-
-        // retrieve ContactDetails and free Guardian's reference
-        ContactDetail foundContacts = guardianUser.getContactDetail();
-        guardianUser.setContactDetail(null);
-
-        // update Student records
-        Set<Student> studentSet = guardianUser.getStudents();
-        guardianUser.setStudents(null);
-        studentSet.forEach(student -> {
-            if (student.getContactDetail().equals(foundContacts)){
-                student.setContactDetail(null);
-            }
-            student.getGuardians().remove(guardianUser);
-            studentService.save(student);
-        });
-
-        contactDetailService.delete(foundContacts);
-        guardianUserService.delete(guardianUser);
     }
 }
