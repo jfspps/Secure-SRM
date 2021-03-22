@@ -237,6 +237,22 @@ public class TeacherController {
         return mav;
     }
 
+    @AdminUpdate
+    @PostMapping("/{teacherId}/anon")
+    public String postAnonTeacher(@PathVariable String teacherId, Model model) {
+        if (teacherUserService.findById(Long.valueOf(teacherId)) == null) {
+            log.debug("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
+        TeacherUser teacherOnFile = teacherUserService.findById(Long.valueOf(teacherId));
+        String reply = "Teacher, " + teacherOnFile.getFirstName() + " " + teacherOnFile.getLastName() + ", anonymised.";
+
+        anonymizeTeacher(teacherOnFile);
+
+        model.addAttribute("reply", reply);
+        return "/SRM/deleteConfirmed";
+    }
+
     /**
      * Assigns the user name fields of a teacher with generic, non-identifying strings
      */
@@ -246,6 +262,16 @@ public class TeacherController {
         DateFormat dateFormat = new SimpleDateFormat("yyMMdd-hhmm:ss");
         teacher.setFirstName("Anon_" + dateFormat.format(date));
         teacher.setLastName("Anon_" + dateFormat.format(date));
+
+        // relinquish security credentials
+        Set<User> userSet = teacher.getUsers();
+        userSet.forEach(userService::delete);
+
+        // update Contact Details
+        ContactDetail teacherContacts = teacher.getContactDetail();
+        teacher.setContactDetail(null);
+        contactDetailService.delete(teacherContacts);
+
         teacherUserService.save(teacher);
     }
 }

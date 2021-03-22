@@ -11,6 +11,16 @@
 
 <div class="container" sec:authorize="hasAuthority('teacher.read')">
     <!--/*@thymesVar id="teacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <br/>
+    <div class="row">
+        <div class="col">
+            <h2>Teacher details</h2>
+            <!--/*@thymesVar id="userFeedback" type="java.lang.String"*/-->
+            <span class="help-block" th:if="${userFeedback != null}">
+                <p class="alert alert-info" th:text="${userFeedback}"></p>
+            </span>
+        </div>
+    </div>
     <form th:object="${teacher}" method="post" th:action="@{/teachers/{teacherId}/anon(teacherId=${teacher.getId()})}">
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -96,7 +106,7 @@
         <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/teachers/index" role="button">Teacher index</a>
-                <button class="btn btn-outline-danger" type="submit">Anonymise record</button>
+                <button class="btn btn-danger" type="submit">Anonymise record</button>
             </div>
         </div>
     </form>

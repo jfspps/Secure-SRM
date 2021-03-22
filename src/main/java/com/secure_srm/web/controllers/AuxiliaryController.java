@@ -242,8 +242,7 @@ public class AuxiliaryController {
         // remove security credentials
         // Each User has different credentials and a GuardianUser may be granted different privileges
         Set<User> userSet = guardianUser.getUsers();
-        userSet.forEach(userService::delete
-        );
+        userSet.forEach(userService::delete);
 
         // delete Address (Address would be dangling)
         Address foundAddress = guardianUser.getAddress();

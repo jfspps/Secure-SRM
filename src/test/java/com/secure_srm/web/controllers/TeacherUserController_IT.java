@@ -90,4 +90,13 @@ public class TeacherUserController_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/teachers/confirmAnon"))
                 .andExpect(model().attributeExists("teacher"));
     }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolAdminUsers")
+    @ParameterizedTest
+    void postAnonTeacher(String username, String pwd) throws Exception {
+        mockMvc.perform(post("/teachers/1/anon").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/SRM/deleteConfirmed"))
+                .andExpect(model().attributeExists("reply"));
+    }
 }
