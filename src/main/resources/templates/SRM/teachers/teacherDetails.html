@@ -108,7 +108,7 @@
                 <a class="btn btn-outline-info" href="/teachers/index" role="button">Teacher index</a>
                 <a class="btn btn-outline-warning" th:href="@{/teachers/{teacherId}/edit(teacherId=${teacher.id})}"
                    role="button" sec:authorize="hasAuthority('admin.update')">Edit record</a>
-                <a class="btn btn-outline-danger" th:href="@{/teachers/{teacherId}/anon(teacherId=${teacher.id})}"
+                <a class="btn btn-outline-danger" th:if="${!teacher.isAnonymised()}" th:href="@{/teachers/{teacherId}/anon(teacherId=${teacher.id})}"
                    role="button" sec:authorize="hasAuthority('admin.update')">Anonymise record</a>
             </div>
         </div>

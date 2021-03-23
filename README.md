@@ -20,12 +20,16 @@ Various account settings can be changed by the user (email address, phone number
 
 Not all aspects of Secure-SRM are available to all users. For example, teachers cannot build new assignment types or web-login user, while school administrators cannot upload student results or reports. Teachers have ownership of certain entities (thresholds, student tasks, reports) for which other teachers have read-only access.
 
-## Future work for Secure-SRM ##
-
 Not all entities can be removed and such an approach is applied to allow schools and colleges to review numerical data coupled to task data. Personal information of past students, their guardians and teachers can be removed.
 
-+ Implementation of DELETE operations for select entities. Allow for the
-  + Removal of personal details of students and former teachers. Replace them with generic or blank fields
++ Deletion or anonymity of select entities currently available:
+  + Removal of personal details (anonymise) of former teachers. Replaced them with generic fields.
+  + Removal of personal details of students and subsequent update of guardian personal details.
+  + Complete removal of guardian records and updating of student records
+  
+## Future work for Secure-SRM ##
+
++ Implementation of DELETE operations for select entities. Under development:
   + Removal of grade thresholds and threshold lists, without affecting student raw results
   + Removal of student reports
 

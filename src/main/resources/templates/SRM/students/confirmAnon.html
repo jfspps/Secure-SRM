@@ -9,14 +9,15 @@
 <nav th:replace="fragments/navStudentSearch :: nav"></nav>
 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-<div class="container" sec:authorize="hasAuthority('teacher.read')">
+<div class="container" sec:authorize="hasAuthority('admin.update')">
     <div class="row">
         <div class="col">
             <h2>Student details</h2>
         </div>
     </div>
     <!--/*@thymesVar id="student" type="com.secure_srm.model.people.Student"*/-->
-    <form th:object="${student}" method="post" th:action="@{/students/{studentId}/anon(studentId=(${student.getId()}))}">
+    <form th:if="${!student.isAnonymised()}" th:object="${student}" method="post"
+          th:action="@{/students/{studentId}/anon(studentId=(${student.getId()}))}">
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label" size="30"><b>Student name</b></label>
@@ -151,7 +152,7 @@
         <div class="row align-items-start">
             <div class="col-sm-10">
                 <p>Please confirm. This will overwrite all personally identifying records for this student and associated guardians.
-                    If the guardians on file are not assigned to any student on file, then their records will be removed from the database</p>
+                    If the guardians on file are not assigned to any student on file, then their records will be removed from the database.</p>
             </div>
         </div>
         <br/>

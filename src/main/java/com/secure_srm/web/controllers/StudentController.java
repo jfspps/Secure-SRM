@@ -357,6 +357,8 @@ public class StudentController {
         formGroupList.getStudentList().remove(student);
         formGroupListService.save(formGroupList);
 
+        student.setAnonymised(true);
+
         return studentService.save(student);
     }
 }

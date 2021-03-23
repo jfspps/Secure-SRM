@@ -50,6 +50,8 @@ public class TeacherUser extends BaseEntity implements Comparable<TeacherUser>{
     @OneToOne
     private ContactDetail contactDetail;
 
+    private boolean anonymised = false;
+
     //custom comparator (list teachers by lastName and then firstName)
     @Override
     public int compareTo(TeacherUser input) {

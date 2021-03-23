@@ -150,7 +150,7 @@ public class TeacherController {
 
         TeacherUser teacherFound = teacherUserService.findById(Long.valueOf(teacherId));
         model.addAttribute("teacher", teacherFound);
-        model.addAttribute("user", teacherFound.getUsers().stream().findFirst().get());
+        model.addAttribute("user", teacherFound.getUsers().stream().findFirst().orElse(null));
         model.addAttribute("subjectsOnFile", auxiliaryController.sortSetBySubjectName(subjectService.findAll()));
         return "/SRM/teachers/updateTeacher";
     }
@@ -265,13 +265,20 @@ public class TeacherController {
 
         // relinquish security credentials
         Set<User> userSet = teacher.getUsers();
-        userSet.forEach(userService::delete);
+        userSet.forEach(user -> {
+            user.eraseCredentials();
+            user.setUsername("Anon_" + dateFormat.format(date));
+            user.setEnabled(false);
+            user.setAccountNonLocked(false);
+            userService.save(user);
+        });
 
         // update Contact Details
         ContactDetail teacherContacts = teacher.getContactDetail();
         teacher.setContactDetail(null);
         contactDetailService.delete(teacherContacts);
 
+        teacher.setAnonymised(true);
         teacherUserService.save(teacher);
     }
 }
