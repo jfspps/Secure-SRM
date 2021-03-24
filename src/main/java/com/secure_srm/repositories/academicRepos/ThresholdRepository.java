@@ -23,4 +23,6 @@ public interface ThresholdRepository extends JpaRepository<Threshold, Long> {
     Set<Threshold> findAllByUploader_LastName(String lastName);
 
     Set<Threshold> findAllByUniqueIdContainingIgnoreCase(String uniqueID);
+
+    Set<Threshold> findAllByUploader_FirstNameAndUploader_LastName(String firstName, String lastName);
 }

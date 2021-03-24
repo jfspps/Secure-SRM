@@ -17,4 +17,6 @@ public interface ThresholdService extends BaseService<Threshold, Long> {
     Threshold findByUniqueID(String uniqueID);
 
     Set<Threshold> findAllByUniqueID(String uniqueID);
+
+    Set<Threshold> findAllByTeacher(String firstName, String lastName);
 }

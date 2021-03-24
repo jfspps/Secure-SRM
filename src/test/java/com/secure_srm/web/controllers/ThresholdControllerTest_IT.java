@@ -149,4 +149,20 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("thresholdFeedback"))
                 .andExpect(model().attributeExists("teacher"));
     }
+
+    @WithUserDetails("marymanning")
+    @Test
+    void getDeleteThreshold() throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(get("/thresholds/" + saved.getId() + "/delete").with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/thresholds/index"));
+    }
 }

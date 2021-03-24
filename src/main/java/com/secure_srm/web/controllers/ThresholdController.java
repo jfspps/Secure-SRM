@@ -3,6 +3,7 @@ package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Threshold;
+import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.services.academicServices.ThresholdListService;
 import com.secure_srm.services.academicServices.ThresholdService;
@@ -136,6 +137,7 @@ public class ThresholdController {
         }
 
         model.addAttribute("threshold", onFile);
+        model.addAttribute("currentTeacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/updateThreshold";
     }
 
@@ -170,6 +172,27 @@ public class ThresholdController {
         model.addAttribute("threshold", saved);
         model.addAttribute("teacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/threshold/thresholdDetails";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{id}/delete")
+    public String getDeleteThreshold(@PathVariable String id, Model model){
+        if (thresholdService.findById(Long.valueOf(id)) == null){
+            log.debug("Threshold not found");
+            throw new NotFoundException("Threshold not found");
+        }
+
+        Threshold threshold = thresholdService.findById(Long.valueOf(id));
+        Set<ThresholdList> thresholdList = threshold.getThresholdLists();
+        thresholdList.forEach(list -> {
+            list.getThresholds().remove(threshold);
+            thresholdListService.save(list);
+        });
+
+        thresholdService.delete(thresholdService.findById(Long.valueOf(id)));
+        log.info("Threshold deleted with ID: " + id);
+
+        return "redirect:/thresholds/index";
     }
 }
 

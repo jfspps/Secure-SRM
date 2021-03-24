@@ -29,7 +29,7 @@
                 <input size="50" placeholder="Integer threshold" th:field="*{numerical}"/>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -37,11 +37,12 @@
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Letter grade or designation" th:field="*{alphabetical}"/>
-                <p>Letter grade above is awarded to raw scores which are greater than or equal to above numerical threshold (subject to higher thresholds).
+                <p>Letter grade above is awarded to raw scores which are greater than or equal to above numerical
+                    threshold (subject to higher thresholds).
                     Other designations e.g. MERIT, PASS, etc. may be used in addition to A+, C--, D*, f, b1, etc.</p>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -49,32 +50,59 @@
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Unique identifier" th:field="*{uniqueId}"/>
-                <p>The unique identifier is compared to all thresholds for the current teacher only (not against all teachers). Different teachers can save thresholds with the same identifier.</p>
+                <p>The unique identifier is compared to all thresholds for the current teacher only (not against all
+                    teachers). Different teachers can save thresholds with the same identifier.</p>
                 <!--/*@thymesVar id="thresholdFeedback" type="java.lang.String"*/-->
                 <span class="help-block" th:if="${thresholdFeedback != null}">
                     <p class="alert alert-info" th:text="${thresholdFeedback}"></p>
                 </span>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label">Threshold owner</label>
             </div>
             <div class="col-sm-8">
-                <label class="control-label" th:text="${threshold.uploader.firstName + ' ' + threshold.uploader.lastName}"></label>
+                <label class="control-label"
+                       th:text="${threshold.uploader.firstName + ' ' + threshold.uploader.lastName}"></label>
             </div>
         </div>
 
-        <br />
-        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.update')" >
+        <br/>
+        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.update')">
             <div class="col-sm-2">
                 <button class="btn btn-info" type="submit">Submit changes</button>
             </div>
         </div>
     </form>
-    <br />
+    <br/>
+
+    <div class="row align-items-start">
+        <div class="col-sm-2">
+            <p>Number of lists with this threshold:</p>
+        </div>
+        <div class="col-sm-8">
+            <p th:text="${threshold.getThresholdLists().size()}"></p>
+        </div>
+    </div>
+    <br/>
+
+    <!--/*@thymesVar id="currentTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <div class="row align-items-start" th:object="${currentTeacher}"
+         th:if="${currentTeacher.equals(threshold.getUploader())}">
+        <div class="col-sm-2">
+            <a th:href="@{/thresholds/{id}/delete(id=${threshold.getId()})}" class="btn btn-danger">Delete threshold</a>
+        </div>
+        <div class="col-sm-8">
+            <p>
+                This will remove this threshold from all lists which use this threshold.
+                Note that there is no confirmation to delete this threshold. You will be automatically returned to the
+                threshold index with your own thresholds listed.
+            </p>
+        </div>
+    </div>
 
     <div class="row align-items-start">
         <div class="col-sm-5">

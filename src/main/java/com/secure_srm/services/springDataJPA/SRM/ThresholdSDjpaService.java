@@ -52,6 +52,11 @@ public class ThresholdSDjpaService implements ThresholdService {
     }
 
     @Override
+    public Set<Threshold> findAllByTeacher(String firstName, String lastName) {
+        return thresholdRepository.findAllByUploader_FirstNameAndUploader_LastName(firstName, lastName);
+    }
+
+    @Override
     public Threshold save(Threshold object) {
         return thresholdRepository.save(object);
     }
