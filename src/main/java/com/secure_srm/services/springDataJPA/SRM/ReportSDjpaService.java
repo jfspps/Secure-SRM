@@ -52,6 +52,11 @@ public class ReportSDjpaService implements ReportService {
     }
 
     @Override
+    public Set<Report> findAllByStudentFirstMiddleAndLastNames(String firstName, String middleNames, String lastName) {
+        return reportRepository.findAllByStudent_FirstNameAndStudent_MiddleNamesAndStudent_LastName(firstName, middleNames, lastName);
+    }
+
+    @Override
     public Report save(Report object) {
         return reportRepository.save(object);
     }

@@ -12,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,5 +92,20 @@ class ReportSDjpaServiceTest {
         Report found = reportSDjpaService.findBySubject("Cricket");
         verify(reportRepository, times(1)).findBySubject_SubjectName(any());
         assertEquals(subjectName, found.getSubject().getSubjectName());
+    }
+
+    @Test
+    void findAllByStudentNames() {
+        when(reportRepository.findAllByStudent_FirstNameAndStudent_MiddleNamesAndStudent_LastName(
+                anyString(), anyString(), anyString())).thenReturn(new HashSet<>(Set.of(report)));
+
+        Set<Report> reportsFound = reportSDjpaService.findAllByStudentFirstMiddleAndLastNames(
+                studentFirstName, "", studentLastName);
+
+        verify(reportRepository, times(1))
+                .findAllByStudent_FirstNameAndStudent_MiddleNamesAndStudent_LastName(
+                        anyString(), anyString(), anyString());
+
+        assertEquals(subjectName, reportsFound.stream().findAny().get().getSubject().getSubjectName());
     }
 }

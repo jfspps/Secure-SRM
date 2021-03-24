@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.swing.text.html.Option;
 import java.util.Optional;
+import java.util.Set;
 
 //the implementation of the following methods is supplied automatically by JPA
 
@@ -23,4 +24,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findBySubject_SubjectName(String subjectName);
 
     Optional<Report> findByUniqueIdentifier(String uniqueIdentifier);
+
+    Set<Report> findAllByStudent_FirstNameAndStudent_MiddleNamesAndStudent_LastName(String firstName, String middleNames, String lastName);
 }

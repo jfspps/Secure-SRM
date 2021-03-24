@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.model.people.Student;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -293,5 +294,10 @@ class StudentControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/deleteConfirmed"))
                 .andExpect(model().attributeExists("reply"));
+
+        Student found = studentService.findById(1L);
+
+        assertEquals(0, reportService.findAllByStudentFirstMiddleAndLastNames(
+                found.getFirstName(), found.getMiddleNames(), found.getLastName()).size());
     }
 }

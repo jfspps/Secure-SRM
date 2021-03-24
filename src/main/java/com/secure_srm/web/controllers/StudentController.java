@@ -1,6 +1,7 @@
 package com.secure_srm.web.controllers;
 
 import com.secure_srm.exceptions.NotFoundException;
+import com.secure_srm.model.academic.Report;
 import com.secure_srm.model.people.ContactDetail;
 import com.secure_srm.model.people.FormGroupList;
 import com.secure_srm.model.people.Student;
@@ -8,6 +9,7 @@ import com.secure_srm.model.people.SubjectClassList;
 import com.secure_srm.model.security.GuardianUser;
 import com.secure_srm.model.security.TeacherUser;
 import com.secure_srm.model.security.User;
+import com.secure_srm.services.academicServices.ReportService;
 import com.secure_srm.services.academicServices.SubjectService;
 import com.secure_srm.services.peopleServices.ContactDetailService;
 import com.secure_srm.services.peopleServices.FormGroupListService;
@@ -42,6 +44,7 @@ public class StudentController {
     private final TeacherUserService teacherUserService;
     private final SubjectClassListService subjectClassListService;
     private final FormGroupListService formGroupListService;
+    private final ReportService reportService;
 
     private final ContactDetailService contactDetailService;
     private final AuxiliaryController auxiliaryController;
@@ -285,6 +288,7 @@ public class StudentController {
         Student studentOnFile = studentService.findById(Long.valueOf(studentId));
         String reply = "Student, " + studentOnFile.getFirstName() + " " + studentOnFile.getLastName() + ", anonymised.";
 
+        removeReports(studentOnFile);
         anonymizeStudent(studentOnFile);
 
         model.addAttribute("reply", reply);
@@ -360,5 +364,18 @@ public class StudentController {
         student.setAnonymised(true);
 
         return studentService.save(student);
+    }
+
+    /**
+     * This removes all records related to the student (as part of anonymity). Returns the number of reports removed.
+     */
+    @AdminDelete
+    public int removeReports(Student student){
+        // note that student middle name defaults to an empty string ""
+        Set<Report> reports = reportService.findAllByStudentFirstMiddleAndLastNames(
+                student.getFirstName(), student.getMiddleNames(), student.getLastName());
+        reports.forEach(reportService::delete);
+
+        return reports.size();
     }
 }
