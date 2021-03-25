@@ -42,8 +42,8 @@
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/studentTask/index}">View student tasks</a></p>
                     <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-secondary" th:href="@{/studentTask/new}">New student task</a></p>
                     <h5 class="card-title">Academic thresholds and threshold-lists</h5>
-                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholds/index}">View academic thresholds</a></p>
-                    <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholds/new}">New academic threshold</a></p>
+                    <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholds/index}">View thresholds</a></p>
+                    <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholds/new}">New threshold</a></p>
                     <p sec:authorize="hasAuthority('teacher.read')"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholdLists/index}">View threshold-lists</a></p>
                     <p sec:authorize="hasAuthority('teacher.create')" th:if="${hasSubject}"><a role="button" class="btn btn-sm btn-block btn-outline-primary" th:href="@{/thresholdLists/new}">New threshold-list</a></p>
                     <h5 class="card-title">Student reports</h5>

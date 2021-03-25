@@ -64,6 +64,16 @@
         <br/>
 
         <div class="row align-items-start">
+            <div class="col-sm-2">
+                <p>Number of lists with this threshold:</p>
+            </div>
+            <div class="col-sm-8">
+                <p th:text="${threshold.getThresholdLists().size()}"></p>
+            </div>
+        </div>
+        <br/>
+
+        <div class="row align-items-start">
             <div class="col-sm-10">
                 <a class="btn btn-outline-info" href="/thresholds/index" role="button">Academic threshold index</a>
                 <a class="btn btn-outline-warning" th:object="${teacher}" th:if="${threshold.uploader == teacher}"

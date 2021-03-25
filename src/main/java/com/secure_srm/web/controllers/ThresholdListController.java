@@ -1,5 +1,6 @@
 package com.secure_srm.web.controllers;
 
+import com.secure_srm.exceptions.ForbiddenException;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.StudentTask;
 import com.secure_srm.model.academic.Threshold;
@@ -188,6 +189,7 @@ public class ThresholdListController {
         model.addAttribute("thresholdList", found);
         model.addAttribute("thresholds", found.getThresholds());
         model.addAttribute("studentTasks", found.getStudentTaskSet());
+        model.addAttribute("currentTeacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/thresholdList/updateThresholdList";
     }
 
@@ -229,6 +231,7 @@ public class ThresholdListController {
         model.addAttribute("studentTasks", studentTasks);
         model.addAttribute("thresholdList", found);
         model.addAttribute("thresholds", auxiliaryController.sortThresholdByUniqueID(thresholdSet));
+        model.addAttribute("currentTeacher", auxiliaryController.getCurrentTeacherUser());
         return "/SRM/thresholdList/updateThresholdList";
     }
 
@@ -305,5 +308,45 @@ public class ThresholdListController {
 
         model.addAttribute("teacher", currentTeacher);
         return "/SRM/thresholdList/viewThresholdList";
+    }
+
+    @TeacherUpdate
+    @GetMapping("/{id}/delete")
+    public String getDeleteThresholdList(@PathVariable("id") String thresholdListID){
+        if (thresholdListService.findById(Long.valueOf(thresholdListID)) == null){
+            log.debug("Threshold list not found");
+            throw new NotFoundException("Threshold list not found");
+        }
+
+        TeacherUser currentTeacher = auxiliaryController.getCurrentTeacherUser();
+        ThresholdList found = thresholdListService.findById(Long.valueOf(thresholdListID));
+        if (!found.getUploader().equals(currentTeacher)){
+            throw new ForbiddenException("Permission denied");
+        }
+
+        // update the student tasks
+        Set<StudentTask> studentTasks = found.getStudentTaskSet();
+        // each task can be assigned to multiple (different) threshold lists
+        studentTasks.forEach(studentTask -> {
+            studentTask.getThresholdListSet().stream()
+                    .filter(thresholdList ->
+                        thresholdList.equals(found)
+                    ).forEach(list -> {
+                        studentTask.getThresholdListSet().remove(list);
+                        studentTaskService.save(studentTask);
+            });
+        });
+
+        Set<Threshold> thresholds = found.getThresholds();
+        // each threshold references this list only once
+        thresholds.forEach(threshold -> {
+                    threshold.getThresholdLists().remove(found);
+                    thresholdService.save(threshold);
+                });
+
+        thresholdListService.delete(found);
+        log.info("Deleted threshold list with ID: " + thresholdListID);
+
+        return "redirect:/thresholdLists/index";
     }
 }

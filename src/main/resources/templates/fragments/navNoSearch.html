@@ -51,8 +51,8 @@
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentResult/new}">Student result</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentTask/new}">Student task</a>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/assignmentTypes/new}">Assignment type</a>
-                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholds/new}">Academic threshold</a>
-                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholdLists/new}">Academic threshold-list</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholds/new}">Threshold</a>
+                        <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/thresholdLists/new}">Threshold-list</a>
                         <a th:if="${hasSubject}" sec:authorize="hasAuthority('teacher.create')" class="dropdown-item" th:href="@{/studentReports/new}">Student report</a>
                         <a sec:authorize="hasAuthority('admin.create')" class="dropdown-item" th:href="@{/subjects/new}">Subject</a>
                     </span>
@@ -60,8 +60,8 @@
                     <a class="dropdown-item" th:href="@{/studentResult/index}">Student result summary</a>
                     <a class="dropdown-item" th:href="@{/studentTask/index}">Student task summary</a>
                     <a class="dropdown-item" th:href="@{/assignmentTypes/index}">Assignment type summary</a>
-                    <a class="dropdown-item" th:href="@{/thresholds/index}">Academic threshold summary</a>
-                    <a class="dropdown-item" th:href="@{/thresholdLists/index}">Academic threshold-list summary</a>
+                    <a class="dropdown-item" th:href="@{/thresholds/index}">Threshold summary</a>
+                    <a class="dropdown-item" th:href="@{/thresholdLists/index}">Threshold-list summary</a>
                     <a class="dropdown-item" th:href="@{/studentReports/index}">Student report summary</a>
                     <a class="dropdown-item" th:href="@{/subjects/index}">Subject summary</a>
                 </div>

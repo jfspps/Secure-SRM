@@ -3,9 +3,11 @@ package com.secure_srm.web.controllers;
 import com.secure_srm.model.academic.ThresholdList;
 import com.secure_srm.model.security.TeacherUser;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 import javax.transaction.Transactional;
 
@@ -101,7 +103,8 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/thresholdList/updateThresholdList"))
                 .andExpect(model().attributeExists("thresholdList"))
                 .andExpect(model().attributeExists("thresholds"))
-                .andExpect(model().attributeExists("studentTasks"));
+                .andExpect(model().attributeExists("studentTasks"))
+                .andExpect(model().attributeExists("currentTeacher"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -133,7 +136,8 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(view().name("/SRM/thresholdList/updateThresholdList"))
                 .andExpect(model().attributeExists("thresholdList"))
                 .andExpect(model().attributeExists("thresholds"))
-                .andExpect(model().attributeExists("studentTasks"));
+                .andExpect(model().attributeExists("studentTasks"))
+                .andExpect(model().attributeExists("currentTeacher"));
     }
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
@@ -151,5 +155,28 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("thresholdList"))
                 .andExpect(model().attributeExists("thresholds"))
                 .andExpect(model().attributeExists("teacher"));
+    }
+
+    @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
+    @ParameterizedTest
+    void getDeleteThresholdList(String username, String pwd) throws Exception {
+        TeacherUser currentTeacher = userService.findByUsername(username).getTeacherUser();
+        Set<ThresholdList> thresholdListSet = thresholdListService.findAll();
+        ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();
+
+        mockMvc.perform(get("/thresholdLists/" + found.getId() + "/delete").with(httpBasic(username, pwd)).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/thresholdLists/index"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getDeleteThresholdList_denied() throws Exception {
+        TeacherUser currentTeacher = userService.findByUsername("marymanning").getTeacherUser();
+        Set<ThresholdList> thresholdListSet = thresholdListService.findAll();
+        ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();
+
+        mockMvc.perform(get("/thresholdLists/" + found.getId() + "/delete").with(csrf()))
+                .andExpect(status().isForbidden());
     }
 }

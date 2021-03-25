@@ -108,7 +108,8 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/SRM/threshold/updateThreshold"))
-                .andExpect(model().attributeExists("threshold"));
+                .andExpect(model().attributeExists("threshold"))
+                .andExpect(model().attributeExists("currentTeacher"));
     }
 
     @WithUserDetails("keithjones")
@@ -148,6 +149,21 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .andExpect(model().attributeExists("threshold"))
                 .andExpect(model().attributeExists("thresholdFeedback"))
                 .andExpect(model().attributeExists("teacher"));
+    }
+
+    @WithUserDetails("keithjones")
+    @Test
+    void getDeleteThreshold_denied() throws Exception {
+        Threshold tempThreshold = Threshold.builder()
+                .uploader(userService.findByUsername("marymanning").getTeacherUser())
+                .thresholdLists(new HashSet<>())
+                .numerical(33)
+                .alphabetical("D")
+                .uniqueId("something different").build();
+        Threshold saved = thresholdService.save(tempThreshold);
+
+        mockMvc.perform(get("/thresholds/" + saved.getId() + "/delete").with(csrf()))
+                .andExpect(status().isForbidden());
     }
 
     @WithUserDetails("marymanning")

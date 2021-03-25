@@ -1,6 +1,7 @@
 package com.secure_srm.web.controllers;
 
 
+import com.secure_srm.exceptions.ForbiddenException;
 import com.secure_srm.exceptions.NotFoundException;
 import com.secure_srm.model.academic.Threshold;
 import com.secure_srm.model.academic.ThresholdList;
@@ -176,13 +177,18 @@ public class ThresholdController {
 
     @TeacherUpdate
     @GetMapping("/{id}/delete")
-    public String getDeleteThreshold(@PathVariable String id, Model model){
+    public String getDeleteThreshold(@PathVariable String id){
         if (thresholdService.findById(Long.valueOf(id)) == null){
             log.debug("Threshold not found");
             throw new NotFoundException("Threshold not found");
         }
 
         Threshold threshold = thresholdService.findById(Long.valueOf(id));
+        // prevent all other users, inc. other account users, deleting the threshold
+        if (!threshold.getUploader().equals(auxiliaryController.getCurrentTeacherUser())){
+            throw new ForbiddenException("Permission denied");
+        }
+
         Set<ThresholdList> thresholdList = threshold.getThresholdLists();
         thresholdList.forEach(list -> {
             list.getThresholds().remove(threshold);

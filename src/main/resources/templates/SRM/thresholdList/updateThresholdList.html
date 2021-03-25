@@ -158,6 +158,21 @@
     </form>
     <br />
 
+    <!--/*@thymesVar id="currentTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+    <div class="row align-items-start" th:object="${currentTeacher}"
+         th:if="${currentTeacher.equals(thresholdList.getUploader())}">
+        <div class="col-sm-2">
+            <a th:href="@{/thresholdLists/{id}/delete(id=${thresholdList.getId()})}" class="btn btn-danger">Delete threshold list</a>
+        </div>
+        <div class="col-sm-8">
+            <p>
+                This will remove the threshold list from the database. Note that there is no confirmation to delete this threshold list.
+                You will be automatically returned to the threshold list index. The existing thresholds will remain on file.
+            </p>
+        </div>
+    </div>
+    <br/>
+
     <div class="row align-items-start">
         <div class="col-sm-5">
             <a class="btn btn-outline-primary" th:href="@{/thresholdLists/index}"
