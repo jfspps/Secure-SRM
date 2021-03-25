@@ -26,12 +26,11 @@ Not all entities can be removed and such an approach is applied to allow schools
   + Removal of personal details (anonymise) of former teachers. Replaced them with generic fields.
   + Removal of personal details of students and subsequent update of guardian personal details.
   + Complete removal of guardian records and updating of student records
+  + Removal of grade thresholds, without affecting student raw results
+  + Removal of grade threshold lists (student tasks and thresholds updated)  
+  + Removal of student reports (provided as part of anonymise student functions)
   
 ## Future work for Secure-SRM ##
-
-+ Implementation of DELETE operations for select entities. Under development:
-  + Removal of grade thresholds and threshold lists, without affecting student raw results
-  + Removal of student reports
 
 + Development of school administrators', teachers' and parents' portals which provide streamlined data entry, which includes uploading multiple records at the same time (e.g. student task, thresholds and student results) in way which resembles the often used spreadsheet form. A more efficient interface which allows for the input of multiple entries (e.g. uploading of a whole class worth of results) with established frontends, such as Angular, are also part of the future plan.
 
