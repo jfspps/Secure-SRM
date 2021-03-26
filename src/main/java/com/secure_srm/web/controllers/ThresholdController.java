@@ -176,8 +176,8 @@ public class ThresholdController {
     }
 
     @TeacherUpdate
-    @GetMapping("/{id}/delete")
-    public String getDeleteThreshold(@PathVariable String id){
+    @PostMapping("/{id}/delete")
+    public String postDeleteThreshold(@PathVariable String id){
         if (thresholdService.findById(Long.valueOf(id)) == null){
             log.debug("Threshold not found");
             throw new NotFoundException("Threshold not found");

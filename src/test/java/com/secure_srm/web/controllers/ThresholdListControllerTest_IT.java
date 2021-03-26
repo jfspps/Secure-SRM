@@ -15,8 +15,7 @@ import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -159,24 +158,24 @@ public class ThresholdListControllerTest_IT extends SecurityCredentialsTest {
 
     @MethodSource("com.secure_srm.web.controllers.SecurityCredentialsTest#streamSchoolTeachers")
     @ParameterizedTest
-    void getDeleteThresholdList(String username, String pwd) throws Exception {
+    void postDeleteThresholdList(String username, String pwd) throws Exception {
         TeacherUser currentTeacher = userService.findByUsername(username).getTeacherUser();
         Set<ThresholdList> thresholdListSet = thresholdListService.findAll();
         ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();
 
-        mockMvc.perform(get("/thresholdLists/" + found.getId() + "/delete").with(httpBasic(username, pwd)).with(csrf()))
+        mockMvc.perform(post("/thresholdLists/" + found.getId() + "/delete").with(httpBasic(username, pwd)).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/thresholdLists/index"));
     }
 
     @WithUserDetails("keithjones")
     @Test
-    void getDeleteThresholdList_denied() throws Exception {
+    void postDeleteThresholdList_denied() throws Exception {
         TeacherUser currentTeacher = userService.findByUsername("marymanning").getTeacherUser();
         Set<ThresholdList> thresholdListSet = thresholdListService.findAll();
         ThresholdList found = thresholdListSet.stream().filter(thresholdList -> thresholdList.getUploader().equals(currentTeacher)).findFirst().get();
 
-        mockMvc.perform(get("/thresholdLists/" + found.getId() + "/delete").with(csrf()))
+        mockMvc.perform(post("/thresholdLists/" + found.getId() + "/delete").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 }

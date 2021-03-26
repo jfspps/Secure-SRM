@@ -90,19 +90,22 @@
     <br/>
 
     <!--/*@thymesVar id="currentTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-    <div class="row align-items-start" th:object="${currentTeacher}"
-         th:if="${currentTeacher.equals(threshold.getUploader())}">
-        <div class="col-sm-2">
-            <a th:href="@{/thresholds/{id}/delete(id=${threshold.getId()})}" class="btn btn-danger">Delete threshold</a>
+    <form th:if="${currentTeacher.equals(threshold.getUploader())}" th:object="${currentTeacher}" method="post"
+          th:action="@{/thresholds/{id}/delete(id=${threshold.getId()})}"
+          class="form-horizontal" id="delete-threshold-form">
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <button class="btn btn-danger" type="submit">Delete threshold</button>
+            </div>
+            <div class="col-sm-8">
+                <p>
+                    This will remove this threshold from all lists which use this threshold.
+                    Note that there is no confirmation to delete this threshold. You will be automatically returned to the
+                    threshold index.
+                </p>
+            </div>
         </div>
-        <div class="col-sm-8">
-            <p>
-                This will remove this threshold from all lists which use this threshold.
-                Note that there is no confirmation to delete this threshold. You will be automatically returned to the
-                threshold index.
-            </p>
-        </div>
-    </div>
+    </form>
 
     <div class="row align-items-start">
         <div class="col-sm-5">

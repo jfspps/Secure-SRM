@@ -311,8 +311,8 @@ public class ThresholdListController {
     }
 
     @TeacherUpdate
-    @GetMapping("/{id}/delete")
-    public String getDeleteThresholdList(@PathVariable("id") String thresholdListID){
+    @PostMapping("/{id}/delete")
+    public String deleteThresholdList(@PathVariable("id") String thresholdListID){
         if (thresholdListService.findById(Long.valueOf(thresholdListID)) == null){
             log.debug("Threshold list not found");
             throw new NotFoundException("Threshold list not found");

@@ -13,7 +13,8 @@
     <div class="row">
         <div class="col">
             <h2>Update academic threshold list</h2>
-            <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting changes.
+            <p>Conducting a search will reset any changes entered. Perform any searches needed before submitting
+                changes.
                 All current thresholds and tasks saved to this record are also viewed when searching.</p>
         </div>
     </div>
@@ -25,7 +26,8 @@
                 <label>Threshold search</label>
             </div>
             <div class="col-sm-8">
-                <input class="form-control mr-sm-2" type="text" name="thresholdUniqueId" placeholder="Threshold unique ID"
+                <input class="form-control mr-sm-2" type="text" name="thresholdUniqueId"
+                       placeholder="Threshold unique ID"
                        aria-label="Search" maxlength="50">
             </div>
         </div>
@@ -41,7 +43,7 @@
             </div>
         </div>
     </form>
-    <br />
+    <br/>
 
     <!--/*@thymesVar id="thresholdList" type="com.secure_srm.model.academic.ThresholdList"*/-->
     <form th:object="${thresholdList}" method="post" th:action="@{/thresholdLists/{id}/edit(id=${thresholdList.id})}"
@@ -61,14 +63,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <span th:if="${thresholds.isEmpty()}">
+                    <span th:if="${thresholds.isEmpty()}">
                             <tr>
                                 <td></td>
                                 <td>No thresholds on record</td>
                                 <td></td>
                             </tr>
                         </span>
-                        <span th:unless="${thresholds.isEmpty()}">
+                    <span th:unless="${thresholds.isEmpty()}">
                             <!--/*@thymesVar id="thresholdFound" type="com.secure_srm.model.academic.Threshold"*/-->
                             <tr th:each="thresholdFound: ${thresholds}">
                                 <td>
@@ -84,7 +86,7 @@
                 </table>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -123,7 +125,7 @@
                 </table>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
@@ -131,46 +133,54 @@
             </div>
             <div class="col-sm-8">
                 <input size="50" placeholder="Unique identifier" th:field="*{uniqueID}"/>
-                <p>The unique identifier is compared to all thresholds for the current teacher only (not against all teachers). Different teachers can save thresholds with the same identifier.</p>
+                <p>The unique identifier is compared to all thresholds for the current teacher only (not against all
+                    teachers). Different teachers can save thresholds with the same identifier.</p>
                 <!--/*@thymesVar id="thresholdListFeedback" type="java.lang.String"*/-->
                 <span class="help-block" th:if="${thresholdListFeedback != null}">
                     <p class="alert alert-info" th:text="${thresholdListFeedback}"></p>
                 </span>
             </div>
         </div>
-        <br />
+        <br/>
 
         <div class="row align-items-start">
             <div class="col-sm-2">
                 <label class="control-label">Threshold list owner</label>
             </div>
             <div class="col-sm-8">
-                <label class="control-label" th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"></label>
+                <label class="control-label"
+                       th:text="${thresholdList.uploader.firstName + ' ' + thresholdList.uploader.lastName}"></label>
             </div>
         </div>
 
-        <br />
-        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.create')" >
+        <br/>
+        <div class="row align-items-start" sec:authorize="hasAuthority('teacher.create')">
             <div class="col-sm-2">
                 <button class="btn btn-info" type="submit">Submit changes</button>
             </div>
         </div>
     </form>
-    <br />
+    <br/>
 
     <!--/*@thymesVar id="currentTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
-    <div class="row align-items-start" th:object="${currentTeacher}"
-         th:if="${currentTeacher.equals(thresholdList.getUploader())}">
-        <div class="col-sm-2">
-            <a th:href="@{/thresholdLists/{id}/delete(id=${thresholdList.getId()})}" class="btn btn-danger">Delete threshold list</a>
+    <form th:if="${currentTeacher.equals(thresholdList.getUploader())}" th:object="${currentTeacher}" method="post"
+          th:action="@{/thresholdLists/{id}/delete(id=${thresholdList.getId()})}"
+          class="form-horizontal" id="delete-threshold-form">
+        <!--/*@thymesVar id="currentTeacher" type="com.secure_srm.model.security.TeacherUser"*/-->
+        <div class="row align-items-start">
+            <div class="col-sm-2">
+                <button class="btn btn-danger" type="submit">Delete threshold list</button>
+            </div>
+            <div class="col-sm-8">
+                <p>
+                    This will remove the threshold list from the database. Note that there is no confirmation to delete
+                    this threshold list.
+                    You will be automatically returned to the threshold list index. The existing thresholds will remain
+                    on file.
+                </p>
+            </div>
         </div>
-        <div class="col-sm-8">
-            <p>
-                This will remove the threshold list from the database. Note that there is no confirmation to delete this threshold list.
-                You will be automatically returned to the threshold list index. The existing thresholds will remain on file.
-            </p>
-        </div>
-    </div>
+    </form>
     <br/>
 
     <div class="row align-items-start">

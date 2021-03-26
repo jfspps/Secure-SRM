@@ -14,8 +14,7 @@ import java.util.HashSet;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -153,7 +152,7 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
 
     @WithUserDetails("keithjones")
     @Test
-    void getDeleteThreshold_denied() throws Exception {
+    void postDeleteThreshold_denied() throws Exception {
         Threshold tempThreshold = Threshold.builder()
                 .uploader(userService.findByUsername("marymanning").getTeacherUser())
                 .thresholdLists(new HashSet<>())
@@ -162,13 +161,13 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .uniqueId("something different").build();
         Threshold saved = thresholdService.save(tempThreshold);
 
-        mockMvc.perform(get("/thresholds/" + saved.getId() + "/delete").with(csrf()))
+        mockMvc.perform(post("/thresholds/" + saved.getId() + "/delete").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @WithUserDetails("marymanning")
     @Test
-    void getDeleteThreshold() throws Exception {
+    void postDeleteThreshold() throws Exception {
         Threshold tempThreshold = Threshold.builder()
                 .uploader(userService.findByUsername("marymanning").getTeacherUser())
                 .thresholdLists(new HashSet<>())
@@ -177,7 +176,7 @@ public class ThresholdControllerTest_IT extends SecurityCredentialsTest {
                 .uniqueId("something different").build();
         Threshold saved = thresholdService.save(tempThreshold);
 
-        mockMvc.perform(get("/thresholds/" + saved.getId() + "/delete").with(csrf()))
+        mockMvc.perform(post("/thresholds/" + saved.getId() + "/delete").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/thresholds/index"));
     }

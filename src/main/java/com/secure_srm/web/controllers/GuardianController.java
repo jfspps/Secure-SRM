@@ -300,7 +300,7 @@ public class GuardianController {
 
     @AdminDelete
     @PostMapping("/{guardianID}/delete")
-    public String postDeleteGuardian(Model model, @PathVariable Long guardianID) {
+    public String deleteGuardian(Model model, @PathVariable Long guardianID) {
 
         // get personal details
         GuardianUser guardianUserFound = guardianUserService.findById(guardianID);
