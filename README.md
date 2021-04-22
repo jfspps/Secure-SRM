@@ -8,7 +8,7 @@ Secure Student-record-management is a Spring based academic database which store
 
 All model entities are saved to an in-memory H2 database or a persistent MySQL database. See [application.properties](/src/main/resources/application.properties) for more info. The localhost port number has been set to 5000 to match that of the EC2 instance on AWS.
 
-## Docker ##
+## Docker demo ##
 
 The DockerFile with instructions is provided [here](/docker). The image can also be pulled from [Docker Hub](https://hub.docker.com/r/jfspps/secure-srm). The login details are here:
 
